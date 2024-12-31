@@ -3,7 +3,7 @@ const { OAuth2Client } = require('google-auth-library');
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 
-exports.verifyOAuthToken = async (provider, token) => {
+exports.verifyOAuthToken = async (provider="google", token) => {
   if (provider === 'google') {
     try {
       const ticket = await googleClient.verifyIdToken({

@@ -34,7 +34,7 @@ exports.signup = async (req, res) => {
         password: hashedPassword,
         fullname,
       });
-
+      
       res.status(201).json({ message: 'User created successfully', user: newUser });
     }
   } catch (error) {
