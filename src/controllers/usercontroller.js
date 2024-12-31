@@ -94,7 +94,7 @@ exports.checkAndSignup = async (req, res) => {
 
     const existingUser = await userService.findUserByEmail(email);
     if (existingUser) {
-      return res.status(200).json({ message: 'User already exists', user: existingUser });
+      return res.status(409).json({ message: 'User already exists', user: existingUser });
     }
     res.status(200).json({ message: 'User can be created'});
   } catch (error) {
