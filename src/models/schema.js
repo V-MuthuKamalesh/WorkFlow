@@ -9,6 +9,21 @@ const userSchema = new Schema({
   createdAt: { type: Date, default: Date.now }
 });
 
+const workspaceSchema = new Schema({
+  name: { type: String, required: true },
+  description: { type: String },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  members: [
+    {
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      role: { type: String, enum: ['admin', 'member'], default: 'member' },
+    },
+  ],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+});
+
+
 const boardSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String },
@@ -218,6 +233,7 @@ const incidentSchema = new Schema({
 
 module.exports = {
   User : mongoose.model('User', userSchema),
+  Workspace : mongoose.model('Workspace', workspaceSchema),
   Board : mongoose.model('Board', boardSchema),
   Group : mongoose.model('Group', groupSchema),
   Item : mongoose.model('Item', itemSchema),
