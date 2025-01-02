@@ -6,6 +6,15 @@ exports.findUserByEmail = async (email) => {
     throw new Error('Error finding user');
   }  
 };
+
+exports.findUserByUserName = async (username) => {
+  try {
+    return await User.findOne({ username });
+  } catch (error) {
+    throw new Error('Error finding user');
+  }  
+};
+
 exports.createUser = async (userData) => {
   try {
     const newUser = new User(userData);

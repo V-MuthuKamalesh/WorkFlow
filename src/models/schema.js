@@ -5,8 +5,22 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   fullname: { type: String, required: true },
+  username: { type: String, required: true, unique: true },
   imgUrl: { type: String },
   createdAt: { type: Date, default: Date.now }
+});
+
+const moduleSchema = new Schema({
+  name: {
+    type: String,
+    enum: ['Workmanagement', 'CRM', 'Dev', 'Service'],
+    required: true,
+  },
+  description: { type: String, default: '' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  workspaces: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workspace' }],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
 });
 
 const workspaceSchema = new Schema({
@@ -238,6 +252,7 @@ const incidentSchema = new Schema({
 
 module.exports = {
   User : mongoose.model('User', userSchema),
+  Module : mongoose.model('Module', moduleSchema),
   Workspace : mongoose.model('Workspace', workspaceSchema),
   Board : mongoose.model('Board', boardSchema),
   Group : mongoose.model('Group', groupSchema),
