@@ -19,6 +19,7 @@ exports.signup = async (req, res) => {
       email,
       password: hashedPassword,
       fullname,
+      username
     });
     
     res.status(201).json({ message: 'User created successfully', user: newUser });
