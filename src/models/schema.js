@@ -17,7 +17,6 @@ const moduleSchema = new Schema({
     required: true,
   },
   description: { type: String, default: '' },
-  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   workspaces: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workspace' }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
