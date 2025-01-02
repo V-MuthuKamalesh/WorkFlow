@@ -54,7 +54,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({ message: 'Login successful', token });
+    res.status(200).json({ message: 'Login successful', token,userName:user.fullname });
   
   } catch (error) {
     console.error(error);
@@ -86,7 +86,7 @@ exports.OAuth = async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.status(200).json({ message: 'Login successful', token });
+    res.status(200).json({ message: 'Login successful', token,userName:user.fullname });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Something went wrong!' });
