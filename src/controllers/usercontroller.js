@@ -73,11 +73,14 @@ exports.logout = (req, res) => {
 exports.OAuth = async (req, res) => {
   try {
     const { email,name} = req.body;
-    const user = await userService.findUserByEmail(email);
+    const password = name;
+    console.log(email,name,password);
+    let user = await userService.findUserByEmail(email);
     if (!user) {
+      const hashedPassword = await bcrypt.hash(password, 10);
       user = await userService.createUser({
         email,
-        password: null,
+        password: hashedPassword,
         fullname:name,
       });
     }
