@@ -4,7 +4,7 @@ exports.findUserByEmail = async (email) => {
     return await User.findOne({ email });
   } catch (error) {
     throw new Error('Error finding user');
-  }
+  }  
 };
 exports.createUser = async (userData) => {
   try {

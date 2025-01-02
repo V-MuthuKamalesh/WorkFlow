@@ -19,26 +19,37 @@ const workspaceSchema = new Schema({
       role: { type: String, enum: ['admin', 'member'], default: 'member' },
     },
   ],
+  boards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Board' }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
-
 
 const boardSchema = new Schema({
   title: { type: String, required: true },
   description: { type: String },
   createdById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
 });
 
 const groupSchema = new Schema({
   title: { type: String, required: true },
   boardId: { type: mongoose.Schema.Types.ObjectId, ref: 'Board', required: true },
   items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }],
+  contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }],
+  deals: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Deal' }],
+  leads: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Lead' }],
+  projects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
+  sprints: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Sprint' }],
+  bugs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Bug' }],
+  epics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Epic' }],
+  tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }],
+  incidents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Incident' }],
   createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now }
+  updatedAt: { type: Date, default: Date.now },
 });
+
 
 const itemSchema = new Schema({
   title: { type: String, required: true },
@@ -82,12 +93,6 @@ const dealSchema = new Schema({
     {
       contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
       contactName: { type: String },
-    },
-  ],
-  accounts: [
-    {
-      accountId: { type: mongoose.Schema.Types.ObjectId, ref: 'Account' },
-      accountName: { type: String },
     },
   ],
   priority: { type: String },
