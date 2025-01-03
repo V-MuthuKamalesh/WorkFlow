@@ -4,23 +4,47 @@ const mongoose = require('mongoose');
 async function query(filterBy) {
     try {
         if (filterBy.moduleId) {
-            const module = await Module.findById(filterBy.moduleId).populate('workspaces');
+            const module = await Module.findById(filterBy.moduleId).populate({
+                path: 'workspaces',
+                populate: [
+                    {
+                        path: 'createdBy',
+                        select: 'name email', // Include relevant fields for the workspace creator
+                    },
+                    {
+                        path: 'members.userId',
+                        select: 'name email', // Include relevant fields for workspace members
+                    },
+                    {
+                        path: 'boards',
+                        populate: [
+                            {
+                                path: 'groups',
+                                select: '_id title createdAt updatedAt',
+                                populate: {
+                                    path: 'items',
+                                    
+                                },
+                            },
+                        ],
+                    },
+                ],
+            });
+
             if (!module) {
                 throw new Error('Module not found');
             }
-            const workspaceIds = module.workspaces.map(workspace => workspace._id);
-            const workspaces = await Workspace.find({ _id: { $in: workspaceIds } })
-                .populate('createdBy members.userId boards');
-            
-            return workspaces;
+
+            return module.workspaces;
         } else {
             throw new Error('Module ID is required to fetch workspaces');
         }
     } catch (err) {
-        console.error("Error fetching workspaces:", err);
+        console.error('Error fetching workspaces:', err);
         throw err;
     }
 }
+
 
 async function getById(workspaceId, moduleId) {
     try {
@@ -222,87 +246,251 @@ async function updateBoard(workspaceId, boardId, boardData, moduleId) {
 }
 
 // Group Functions
+// Add Group to Board
 async function addGroup(boardId, groupData, moduleId) {
     try {
+        // Find module and check if the board exists in its workspaces
+        const module = await Module.findById(moduleId).populate('workspaces');
+        if (!module) {
+            throw new Error('Module not found');
+        }
+
+        const workspaceExists = module.workspaces.some(
+            workspace => workspace.boards.some(board => board.toString() === boardId)
+        );
+        if (!workspaceExists) {
+            throw new Error('Board does not belong to the specified module');
+        }
+
+        // Find the board to which the group will be added
+        const board = await Board.findById(boardId);
+        if (!board) {
+            throw new Error('Board not found');
+        }
+
+        // Create and save the group
         const group = new Group(groupData);
         await group.save();
 
-        const board = await Board.findById(boardId);
+        // Push the new group to the board's groups array
         board.groups.push(group._id);
         await board.save();
 
         return board;
     } catch (err) {
+        console.error('Error adding group to board:', err);
         throw err;
     }
 }
 
+// Remove Group from Board
 async function removeGroup(boardId, groupId, moduleId) {
     try {
+        // Find module and check if the board exists in its workspaces
+        const module = await Module.findById(moduleId).populate('workspaces');
+        if (!module) {
+            throw new Error('Module not found');
+        }
+
+        const workspaceExists = module.workspaces.some(
+            workspace => workspace.boards.some(board => board.toString() === boardId)
+        );
+        if (!workspaceExists) {
+            throw new Error('Board does not belong to the specified module');
+        }
+
+        // Find the board and remove the group from the groups array
+        const board = await Board.findById(boardId);
+        if (!board) {
+            throw new Error('Board not found');
+        }
+
         await Group.findByIdAndDelete(groupId);
 
-        const board = await Board.findById(boardId);
+        // Remove the group's ID from the board's groups array
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
 
         return board;
     } catch (err) {
+        console.error('Error removing group from board:', err);
         throw err;
     }
 }
 
-async function updateGroup(groupData, moduleId) {
+// Update Group
+async function updateGroup(workspaceId, boardId, groupId, groupData, moduleId) {
     try {
+        // Step 1: Find the module and validate existence
+        const module = await Module.findById(moduleId).populate({
+            path: 'workspaces',
+            populate: {
+                path: 'boards',
+                populate: 'groups',
+            },
+        });
+        if (!module) {
+            throw new Error('Module not found');
+        }
+
+        // Step 2: Validate the workspace belongs to the module
+        const workspace = module.workspaces.find(
+            (ws) => ws._id.toString() === workspaceId
+        );
+        if (!workspace) {
+            throw new Error('Workspace not found in the specified module');
+        }
+
+        // Step 3: Validate the board belongs to the workspace
+        const board = workspace.boards.find(
+            (bd) => bd._id.toString() === boardId
+        );
+        if (!board) {
+            throw new Error('Board not found in the specified workspace');
+        }
+
+        // Step 4: Validate the group belongs to the board
+        const group = board.groups.find(
+            (grp) => grp._id.toString() === groupId
+        );
+        if (!group) {
+            throw new Error('Group not found in the specified board');
+        }
+
+        // Step 5: Update the group data
         const updatedGroup = await Group.findByIdAndUpdate(
-            groupData._id,
+            groupId,
             { $set: groupData },
             { new: true }
         );
+
         return updatedGroup;
     } catch (err) {
+        console.error('Error updating group:', err);
         throw err;
     }
 }
 
 // Item Functions
-async function addItemToGroup(groupId, itemData, moduleId) {
+// Add Item to Group
+async function addItemToGroup(workspaceId, boardId, groupId, itemData, moduleId) {
     try {
+        // Step 1: Find the module and validate existence
+        const module = await Module.findById(moduleId).populate({
+            path: 'workspaces',
+            populate: {
+                path: 'boards',
+                populate: 'groups',
+            },
+        });
+        if (!module) {
+            throw new Error('Module not found');
+        }
+
+        // Step 2: Validate the workspace belongs to the module
+        const workspace = module.workspaces.find(
+            (ws) => ws._id.toString() === workspaceId
+        );
+        if (!workspace) {
+            throw new Error('Workspace not found in the specified module');
+        }
+
+        // Step 3: Validate the board belongs to the workspace
+        const board = workspace.boards.find(
+            (bd) => bd._id.toString() === boardId
+        );
+        if (!board) {
+            throw new Error('Board not found in the specified workspace');
+        }
+
+        // Step 4: Validate the group belongs to the board
+        const group = board.groups.find(
+            (grp) => grp._id.toString() === groupId
+        );
+        if (!group) {
+            throw new Error('Group not found in the specified board');
+        }
+
+        // Step 5: Find the group and create the item
+        const groupToUpdate = await Group.findById(groupId);
+        if (!groupToUpdate) {
+            throw new Error('Group not found');
+        }
+
         const item = new Item(itemData);
         await item.save();
 
-        const group = await Group.findById(groupId);
-        group.items.push(item._id);
-        await group.save();
+        // Step 6: Add the item to the group's items array
+        groupToUpdate.items.push(item._id);
+        await groupToUpdate.save();
 
-        return group;
+        return groupToUpdate;
     } catch (err) {
+        console.error('Error adding item to group:', err);
         throw err;
     }
 }
 
+
+// Remove Item from Group
 async function removeItemFromGroup(groupId, itemId, moduleId) {
     try {
+        // Find module and check if the group exists in a board within the module
+        const module = await Module.findById(moduleId).populate('workspaces');
+        if (!module) {
+            throw new Error('Module not found');
+        }
+
+        const workspaceExists = module.workspaces.some(
+            workspace => workspace.boards.some(board => board.groups.some(group => group.toString() === groupId))
+        );
+        if (!workspaceExists) {
+            throw new Error('Group does not belong to the specified module');
+        }
+
+        // Find the group and remove the item from the items array
+        const group = await Group.findById(groupId);
+        if (!group) {
+            throw new Error('Group not found');
+        }
+
         await Item.findByIdAndDelete(itemId);
 
-        const group = await Group.findById(groupId);
+        // Remove the item's ID from the group's items array
         group.items = group.items.filter(item => item.toString() !== itemId);
         await group.save();
 
         return group;
     } catch (err) {
+        console.error('Error removing item from group:', err);
         throw err;
     }
 }
 
+// Update Item in Group
 async function updateItemInGroup(itemData, moduleId) {
     try {
+        // Find module and check if the item exists within a group in the module
+        const module = await Module.findById(moduleId).populate('workspaces');
+        if (!module) {
+            throw new Error('Module not found');
+        }
+
+        const item = await Item.findById(itemData._id);
+        if (!item) {
+            throw new Error('Item not found');
+        }
+
+        // Update item data
         const updatedItem = await Item.findByIdAndUpdate(
             itemData._id,
             { $set: itemData },
             { new: true }
         );
+
         return updatedItem;
     } catch (err) {
+        console.error('Error updating item:', err);
         throw err;
     }
 }

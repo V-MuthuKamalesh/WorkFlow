@@ -1,9 +1,10 @@
 const workspaceService = require('../services/workspace');
 const { Module } = require('../models/schema'); 
+const  moduleId  = "67766a5150a4edf07d7fc25b";
 async function getWorkspaces(req, res) {
     try {
         const filterBy = {};
-        filterBy.moduleId = "67766a5150a4edf07d7fc25b";  
+        filterBy.moduleId = moduleId;  
         const workspaces = await workspaceService.query(filterBy);
         res.status(200).send(workspaces);
     } catch (err) {
@@ -14,7 +15,6 @@ async function getWorkspaces(req, res) {
 async function getWorkspaceById(req, res) {
     try {
         const { id } = req.params;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
         const workspace = await workspaceService.getById(id, moduleId);
         if (!workspace) return res.status(404).send({ error: 'Workspace not found' });
         res.status(200).send(workspace);
@@ -26,7 +26,6 @@ async function getWorkspaceById(req, res) {
 async function createWorkspace(req, res) {
     try {
         const workspaceData = req.body;
-        const moduleId = "67766a5150a4edf07d7fc25b"; 
         
         workspaceData.moduleId = moduleId;
         
@@ -51,7 +50,7 @@ async function updateWorkspace(req, res) {
         const workspaceData = req.body;
         const workspaceId = req.params.id;
         workspaceData._id = workspaceId;
-        workspaceData.moduleId = "67766a5150a4edf07d7fc25b";  
+        workspaceData.moduleId = moduleId;  
         const updatedWorkspace = await workspaceService.update(workspaceData);
         res.status(200).send(updatedWorkspace);
     } catch (err) {
@@ -62,7 +61,6 @@ async function updateWorkspace(req, res) {
 async function deleteWorkspace(req, res) {
     try {
         const { id } = req.params;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
         await workspaceService.remove(id, moduleId);
         res.status(200).send({ message: 'Workspace deleted successfully' });
     } catch (err) {
@@ -74,7 +72,6 @@ async function addMemberToWorkspace(req, res) {
     try {
         const { id } = req.params;
         const { userId, role } = req.body;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
         const updatedWorkspace = await workspaceService.addMember(id, userId, role, moduleId);
         res.status(200).send(updatedWorkspace);
     } catch (err) {
@@ -86,7 +83,6 @@ async function addBoardToWorkspace(req, res) {
     try {
         const { id } = req.params;
         const boardData = req.body;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
         const updatedWorkspace = await workspaceService.addBoard(id, boardData, moduleId);
         res.status(200).send(updatedWorkspace);
     } catch (err) {
@@ -97,7 +93,6 @@ async function addBoardToWorkspace(req, res) {
 async function removeBoardFromWorkspace(req, res) {
     try {
         const { workspaceId, boardId } = req.params;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
         const updatedWorkspace = await workspaceService.removeBoard(workspaceId, boardId, moduleId);
         res.status(200).send(updatedWorkspace);
     } catch (err) {
@@ -107,7 +102,6 @@ async function removeBoardFromWorkspace(req, res) {
 
 async function updateBoardInWorkspace(req, res) {
     try {
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
         const { workspaceId, boardId } = req.params;
         const boardData = req.body; 
         
@@ -126,7 +120,7 @@ async function addGroupToBoard(req, res) {
     try {
         const { boardId } = req.params;
         const groupData = req.body;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
+
         const updatedBoard = await workspaceService.addGroup(boardId, groupData, moduleId);
         res.status(200).send(updatedBoard);
     } catch (err) {
@@ -137,7 +131,6 @@ async function addGroupToBoard(req, res) {
 async function removeGroupFromBoard(req, res) {
     try {
         const { boardId, groupId } = req.params;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
         const updatedBoard = await workspaceService.removeGroup(boardId, groupId, moduleId);
         res.status(200).send(updatedBoard);
     } catch (err) {
@@ -147,9 +140,9 @@ async function removeGroupFromBoard(req, res) {
 
 async function updateGroupInBoard(req, res) {
     try {
+        const {workspaceId,boardId,groupId}=req.params;
         const groupData = req.body;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
-        const updatedGroup = await workspaceService.updateGroup(groupData, moduleId);
+        const updatedGroup = await workspaceService.updateGroup(workspaceId,boardId,groupId,groupData, moduleId);
         res.status(200).send(updatedGroup);
     } catch (err) {
         res.status(500).send({ error: 'Failed to update group in board', details: err.message });
@@ -158,10 +151,9 @@ async function updateGroupInBoard(req, res) {
 
 async function addItemToGroup(req, res) {
     try {
-        const { groupId } = req.params;
+        const { workspaceId, boardId, groupId } = req.params;
         const itemData = req.body;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
-        const updatedGroup = await workspaceService.addItemToGroup(groupId, itemData, moduleId);
+        const updatedGroup = await workspaceService.addItemToGroup(workspaceId, boardId, groupId, itemData, moduleId);
         res.status(200).send(updatedGroup);
     } catch (err) {
         res.status(500).send({ error: 'Failed to add item to group', details: err.message });
@@ -171,7 +163,6 @@ async function addItemToGroup(req, res) {
 async function removeItemFromGroup(req, res) {
     try {
         const { groupId, itemId } = req.params;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
         const updatedGroup = await workspaceService.removeItemFromGroup(groupId, itemId, moduleId);
         res.status(200).send(updatedGroup);
     } catch (err) {
@@ -182,7 +173,6 @@ async function removeItemFromGroup(req, res) {
 async function updateItemInGroup(req, res) {
     try {
         const itemData = req.body;
-        const  moduleId  = "67766a5150a4edf07d7fc25b";
         const updatedItem = await workspaceService.updateItemInGroup(itemData, moduleId);
         res.status(200).send(updatedItem);
     } catch (err) {

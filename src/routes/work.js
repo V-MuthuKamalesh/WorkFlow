@@ -3,12 +3,12 @@ const router = express.Router();
 const workController = require('../controllers/workcontroller');
 const {checkAuth} = require('../middlewares/auth');
 
-router.get('/', workController.getWorkspaces);
-router.get('/:id', workController.getWorkspaceById);
-router.post('/', workController.createWorkspace);
-router.put('/:id', workController.updateWorkspace);
-router.delete('/:id', workController.deleteWorkspace);
-router.post('/:id/members', workController.addMemberToWorkspace);
+router.get('/getWorkspace', workController.getWorkspaces);
+router.get('/getWorkspacebyId/:id', workController.getWorkspaceById);
+router.post('/createWorkspace', workController.createWorkspace);
+router.put('/updateWorkspacebyId/:id', workController.updateWorkspace);
+router.delete('/deleteWorkspacebyId/:id', workController.deleteWorkspace);
+router.post('/addMember/:id/members', workController.addMemberToWorkspace);
 
 router.post('/:id/boards', workController.addBoardToWorkspace);
 router.delete('/:workspaceId/:boardId', workController.removeBoardFromWorkspace);
