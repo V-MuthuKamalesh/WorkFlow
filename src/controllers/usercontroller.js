@@ -4,7 +4,7 @@ const bcrypt = require('bcrypt');
 
 exports.signup = async (req, res) => {
   try {
-    const { email, password, fullname, username} = req.body;
+    const { email, password, fullname} = req.body;
     const user = await userService.findUserByEmail(email);
     const Nuser = await userService.findUserByUserName(username);
     if (user) {
@@ -18,8 +18,7 @@ exports.signup = async (req, res) => {
     const newUser = await userService.createUser({
       email,
       password: hashedPassword,
-      fullname,
-      username
+      fullname
     });
     
     res.status(201).json({ message: 'User created successfully', user: newUser });

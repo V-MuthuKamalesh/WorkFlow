@@ -10,16 +10,18 @@ router.put('/updateWorkspacebyId/:id', workController.updateWorkspace);
 router.delete('/deleteWorkspacebyId/:id', workController.deleteWorkspace);
 router.post('/addMember/:id/members', workController.addMemberToWorkspace);
 
-router.post('/:id/boards', workController.addBoardToWorkspace);
-router.delete('/:workspaceId/:boardId', workController.removeBoardFromWorkspace);
-router.put('/:workspaceId/:boardId', workController.updateBoardInWorkspace);
+router.post('/addBoard/:id/boards', workController.addBoardToWorkspace);
+router.delete('/deleteBoard/:workspaceId/:boardId', workController.removeBoardFromWorkspace);
+router.put('/updateBoard/:workspaceId/:boardId', workController.updateBoardInWorkspace);
 
-router.post('/:workspaceId/:boardId/', workController.addGroupToBoard);
-router.delete('/:workspaceId/:boardId/:groupId', workController.removeGroupFromBoard);
-router.put('/:workspaceId/:boardId/:groupId', workController.updateGroupInBoard);
+router.post('/addGroup/:workspaceId/:boardId/', workController.addGroupToBoard);
+router.delete('/deleteGroup/:workspaceId/:boardId/:groupId', workController.removeGroupFromBoard);
+router.put('/updateGroup/:workspaceId/:boardId/:groupId', workController.updateGroupInBoard);
 
-router.post('/:workspaceId/:boardId/:groupId/', workController.addItemToGroup);
-router.delete('/:workspaceId/:boardId/:groupId/:itemId', workController.removeItemFromGroup);
-router.put('/:workspaceId/:boardId/:groupId/:itemId', workController.updateItemInGroup);
+router.post('/addItem/:workspaceId/:boardId/:groupId/', workController.addItemToGroup);
+router.delete('/deleteItem/:workspaceId/:boardId/:groupId/:itemId', workController.removeItemFromGroup);
+router.put('/updateItem/:workspaceId/:boardId/:groupId/:itemId', workController.updateItemInGroup);
+router.post('/addMembers/:workspaceId/:boardId/:groupId/:itemId',workController.addMembersToItem);
+
 
 module.exports = router;

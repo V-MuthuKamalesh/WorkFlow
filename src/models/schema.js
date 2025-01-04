@@ -5,13 +5,12 @@ const userSchema = new Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   fullname: { type: String, required: true },
-  username: { type: String, required: true, unique: true },
   imgUrl: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 
 const moduleSchema = new Schema({
-  name: {
+  moduleName: {
     type: String,
     enum: ['Workmanagement', 'CRM', 'Dev', 'Service'],
     required: true,
@@ -23,7 +22,7 @@ const moduleSchema = new Schema({
 });
 
 const workspaceSchema = new Schema({
-  name: { type: String, required: true },
+  workspaceName: { type: String, required: true },
   description: { type: String },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   members: [
@@ -38,7 +37,7 @@ const workspaceSchema = new Schema({
 });
 
 const boardSchema = new Schema({
-  title: { type: String, required: true },
+  boardName: { type: String, required: true },
   description: { type: String },
   createdById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
@@ -47,7 +46,7 @@ const boardSchema = new Schema({
 });
 
 const groupSchema = new Schema({
-  title: { type: String, required: true },
+  groupName: { type: String, required: true },
   boardId: { type: mongoose.Schema.Types.ObjectId, ref: 'Board', required: true },
   items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }],
   contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }],
@@ -65,7 +64,7 @@ const groupSchema = new Schema({
 
 
 const itemSchema = new Schema({
-  title: { type: String, required: true },
+  itemName: { type: String, required: true },
   description: { type: String },
   status: { type: String },
   priority: { type: String },

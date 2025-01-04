@@ -162,8 +162,8 @@ async function addItemToGroup(req, res) {
 
 async function removeItemFromGroup(req, res) {
     try {
-        const { groupId, itemId } = req.params;
-        const updatedGroup = await workspaceService.removeItemFromGroup(groupId, itemId, moduleId);
+        const { workspaceId, boardId, groupId, itemId } = req.params;
+        const updatedGroup = await workspaceService.removeItemFromGroup(workspaceId, boardId, groupId, itemId, moduleId);
         res.status(200).send(updatedGroup);
     } catch (err) {
         res.status(500).send({ error: 'Failed to remove item from group', details: err.message });
@@ -172,11 +172,24 @@ async function removeItemFromGroup(req, res) {
 
 async function updateItemInGroup(req, res) {
     try {
+        const { workspaceId, boardId, groupId, itemId } = req.params;
         const itemData = req.body;
-        const updatedItem = await workspaceService.updateItemInGroup(itemData, moduleId);
+        itemData._id=itemId;
+        const updatedItem = await workspaceService.updateItemInGroup(workspaceId, boardId, groupId, itemData, moduleId);
         res.status(200).send(updatedItem);
     } catch (err) {
         res.status(500).send({ error: 'Failed to update item in group', details: err.message });
+    }
+}
+
+async function addMembersToItem(req, res) {
+    try {
+        const { workspaceId, boardId, groupId, itemId } = req.params;
+        const { userId } = req.body;
+        const updatedItem = await workspaceService.addMembersToItem(workspaceId, boardId, groupId, itemId, userId, moduleId);
+        res.status(200).send(updatedItem);
+    } catch (err) {
+        res.status(500).send({error: 'Failed to add members to item',details: err.message});
     }
 }
 
@@ -196,4 +209,5 @@ module.exports = {
     addItemToGroup,
     removeItemFromGroup,
     updateItemInGroup,
+    addMembersToItem
 };
