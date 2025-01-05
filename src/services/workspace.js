@@ -305,8 +305,8 @@ async function getBoard(workspaceId, boardId, moduleId) {
                 items: group.items.map((item) => ({
                     itemName: item.itemName,
                     assignedToId: item.assignedToId,
-                    status: item.status,
-                    dueDate: item.dueDate,
+                    status: item.status||"",
+                    dueDate: item.dueDate||"",
                 })),
             })),
         };
