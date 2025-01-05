@@ -5,42 +5,17 @@ async function query(filterBy) {
         if (filterBy.moduleId) {
             const module = await Module.findById(filterBy.moduleId).populate({
                 path: 'workspaces',
-                populate: [
-                    {
-                        path: 'createdBy',
-                        select: 'name email', 
-                    },
-                    {
-                        path: 'members.userId',
-                        select: 'name email',
-                    },
-                    {
-                        path: 'boards',
-                        populate: [
-                            {
-                                path: 'groups',
-                                select: '_id groupName createdAt updatedAt',
-                                populate: {
-                                    path: 'items',
-                                    populate:{
-                                        path:'assignedToId',
-                                        select:'fullname email',
-                                    }
-                                    
-                                },
-                            },
-                        ],
-                    },
-                ],
+                select: 'workspaceName', // Only include workspaceName in the populated workspaces
             });
 
             if (!module) {
                 throw new Error('Module not found');
             }
 
+            // Transform the workspaces to include only workspaceId and workspaceName
             const transformedWorkspaces = module.workspaces.map((workspace) => {
-                const { _id, ...rest } = workspace.toObject(); 
-                return { workspaceId: _id, ...rest };
+                const { _id, workspaceName } = workspace.toObject(); 
+                return { workspaceId: _id, workspaceName };
             });
 
             return transformedWorkspaces;
@@ -54,12 +29,17 @@ async function query(filterBy) {
 }
 
 
+
 async function getById(workspaceId, moduleId) {
     try {
+        // Fetch the module and populate the workspaces
         const module = await Module.findById(moduleId).populate('workspaces');
+        
         if (!module) {
             throw new Error('Module not found');
         }
+
+        // Find the workspace in the module's workspaces
         const workspace = module.workspaces.find(
             (workspace) => workspace._id.toString() === workspaceId
         );
@@ -67,15 +47,28 @@ async function getById(workspaceId, moduleId) {
         if (!workspace) {
             throw new Error('Workspace not found in the specified module');
         }
-        const detailedWorkspace = await Workspace.findById(workspaceId)
-            .populate('createdBy members.userId boards');
 
-        return detailedWorkspace;
+        // Fetch the workspace with only the boardId and boardName for the boards
+        const detailedWorkspace = await Workspace.findById(workspaceId)
+            .populate({
+                path: 'boards',
+                select: 'boardName',  // Only fetch the boardName field
+            });
+
+        // Transform boards to return only boardId and boardName
+        const transformedBoards = detailedWorkspace.boards.map(board => {
+            const { _id, boardName } = board.toObject();
+            return { boardId: _id, boardName };
+        });
+
+        return transformedBoards;  // Return the array of boards with boardId and boardName
     } catch (err) {
         console.error('Error fetching workspace by ID:', err);
         throw err;
     }
 }
+
+
 
 
 async function add(workspaceData) {
