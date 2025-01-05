@@ -61,7 +61,7 @@ async function getById(workspaceId, moduleId) {
             return { boardId: _id, boardName };
         });
 
-        return transformedBoards;  // Return the array of boards with boardId and boardName
+        return {workspaceName:workspace.workspaceName,boards:transformedBoards};  // Return the array of boards with boardId and boardName
     } catch (err) {
         console.error('Error fetching workspace by ID:', err);
         throw err;
