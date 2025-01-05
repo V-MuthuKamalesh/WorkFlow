@@ -160,7 +160,7 @@ async function addBoard(workspaceId, boardData, moduleId) {
         if (!workspace) {
             throw new Error('Workspace not found');
         }
-        boardData.workspaceName = workspace.name;
+        boardData.workspaceName = workspace.workspaceName;
         const board = new Board(boardData);
         await board.save();
 
@@ -246,37 +246,8 @@ async function updateBoard(workspaceId, boardId, boardData, moduleId) {
     }
 }
 
-async function getBoard(workspaceId, boardId, moduleId) {
+async function getBoard(boardId) {
     try {
-        // Check if the module exists
-        const module = await Module.findById(moduleId).populate('workspaces');
-        if (!module) {
-            throw new Error('Module not found');
-        }
-
-        // Check if the workspace belongs to the module
-        const workspaceExists = module.workspaces.some(
-            (workspace) => workspace._id.toString() === workspaceId
-        );
-        if (!workspaceExists) {
-            throw new Error('Workspace does not belong to the specified module');
-        }
-
-        // Find the workspace and ensure it exists
-        const workspace = await Workspace.findById(workspaceId).populate('boards');
-        if (!workspace) {
-            throw new Error('Workspace not found');
-        }
-
-        // Check if the board exists in the workspace
-        const boardExists = workspace.boards.some(
-            (board) => board._id.toString() === boardId
-        );
-        if (!boardExists) {
-            throw new Error('Board not found in the specified workspace');
-        }
-
-        // Fetch the board and populate its details
         const board = await Board.findById(boardId)
             .populate({
                 path: 'groups',
@@ -287,26 +258,22 @@ async function getBoard(workspaceId, boardId, moduleId) {
                         select: '_id email fullname',
                     },
                 },
-            })
-            .populate('workspaceName', 'workspaceName'); // Assuming workspaceName refers to Workspace schema
-
+            });
         if (!board) {
             throw new Error('Board not found');
         }
-
-        // Format the response
         return {
             boardId: board._id,
-            workspaceName: workspace.workspaceName,
             boardName: board.boardName,
+            workspaceName: board.workspaceName,
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.items.map((item) => ({
                     itemName: item.itemName,
                     assignedToId: item.assignedToId,
-                    status: item.status||"",
-                    dueDate: item.dueDate||"",
+                    status: item.status || "",
+                    dueDate: item.dueDate || "",
                 })),
             })),
         };
@@ -315,6 +282,7 @@ async function getBoard(workspaceId, boardId, moduleId) {
         throw { error: 'Failed to fetch board', details: err.message };
     }
 }
+
 
 
 // Group Functions

@@ -115,12 +115,8 @@ async function updateBoardInWorkspace(req, res) {
 
 async function getBoardById(req, res) {
     try {
-        const { workspaceId, boardId } = req.params;
-
-        // Call the service function
-        const boardData = await workspaceService.getBoard(workspaceId, boardId, moduleId);
-
-        // Send the formatted response
+        const { boardId } = req.params;
+        const boardData = await workspaceService.getBoard(boardId);
         res.status(200).send(boardData);
     } catch (err) {
         console.error('Error in getBoardById:', err);
