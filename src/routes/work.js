@@ -4,7 +4,7 @@ const workController = require('../controllers/workcontroller');
 const {checkAuth} = require('../middlewares/auth');
 
 router.get('/getWorkspace', workController.getWorkspaces);
-router.get('/getWorkspacebyId/:id', workController.getWorkspaceById);
+router.get('/getBoardsbyWorkspacebyId/:id', workController.getWorkspaceById);
 router.post('/createWorkspace', workController.createWorkspace);
 router.put('/updateWorkspacebyId/:id', workController.updateWorkspace);
 router.delete('/deleteWorkspacebyId/:id', workController.deleteWorkspace);
