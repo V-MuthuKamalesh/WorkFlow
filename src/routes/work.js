@@ -13,6 +13,7 @@ router.post('/addMember/:id/members', workController.addMemberToWorkspace);
 router.post('/addBoard/:id/boards', workController.addBoardToWorkspace);
 router.delete('/deleteBoard/:workspaceId/:boardId', workController.removeBoardFromWorkspace);
 router.put('/updateBoard/:workspaceId/:boardId', workController.updateBoardInWorkspace);
+router.get('/getBoard/:workspaceId/:boardId',workController.getBoardById)
 
 router.post('/addGroup/:workspaceId/:boardId/', workController.addGroupToBoard);
 router.delete('/deleteGroup/:workspaceId/:boardId/:groupId', workController.removeGroupFromBoard);

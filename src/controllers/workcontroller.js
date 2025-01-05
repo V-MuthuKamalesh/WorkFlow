@@ -113,6 +113,21 @@ async function updateBoardInWorkspace(req, res) {
     }
 }
 
+async function getBoardById(req, res) {
+    try {
+        const { workspaceId, boardId } = req.params;
+
+        // Call the service function
+        const boardData = await workspaceService.getBoard(workspaceId, boardId, moduleId);
+
+        // Send the formatted response
+        res.status(200).send(boardData);
+    } catch (err) {
+        console.error('Error in getBoardById:', err);
+        res.status(500).send(err);
+    }
+}
+
 
 // Group Functions
 
@@ -203,6 +218,7 @@ module.exports = {
     addBoardToWorkspace,
     removeBoardFromWorkspace,
     updateBoardInWorkspace,
+    getBoardById,
     addGroupToBoard,
     removeGroupFromBoard,
     updateGroupInBoard,
