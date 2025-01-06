@@ -1,200 +1,165 @@
 const workspaceService = require('../services/workspace');
-const { Module } = require('../models/schema'); 
-const  moduleId  = "67766a5150a4edf07d7fc25b";
-async function getWorkspaces(req, res) {
+const { Module } = require('../models/schema');
+const moduleId = "67766a5150a4edf07d7fc25b";
+
+async function getWorkspaces() {
     try {
-        const filterBy = {};
-        filterBy.moduleId = moduleId;  
+        const filterBy = { moduleId };
         const workspaces = await workspaceService.query(filterBy);
-        res.status(200).send(workspaces);
+        return workspaces;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to get workspaces', details: err.message });
+        throw new Error('Failed to get workspaces: ' + err.message);
     }
 }
 
-async function getWorkspaceById(req, res) {
+async function getWorkspaceById(id) {
     try {
-        const { id } = req.params;
         const workspace = await workspaceService.getById(id);
-        if (!workspace) return res.status(404).send({ error: 'Workspace not found' });
-        res.status(200).send(workspace);
+        if (!workspace) throw new Error('Workspace not found');
+        return workspace;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to get workspace', details: err.message });
+        throw new Error('Failed to get workspace: ' + err.message);
     }
 }
 
-async function createWorkspace(req, res) {
+async function createWorkspace(data) {
     try {
-        const workspaceData = req.body;
-        workspaceData.moduleId = moduleId;
-        const newWorkspace = await workspaceService.add(workspaceData);
-        await Module.findByIdAndUpdate(
-            moduleId,
-            { $push: { workspaces: newWorkspace._id } }, 
-            { new: true } 
-        );
-        res.status(201).send(newWorkspace);
+        data.moduleId = moduleId;
+        const newWorkspace = await workspaceService.add(data);
+        await Module.findByIdAndUpdate(moduleId, { $push: { workspaces: newWorkspace._id } });
+        return newWorkspace;
     } catch (err) {
-        console.error("Error creating workspace:", err);
-        res.status(500).send({ error: 'Failed to create workspace', details: err.message });
+        throw new Error('Failed to create workspace: ' + err.message);
     }
 }
 
-async function updateWorkspace(req, res) {
+async function updateWorkspace(id, updateData) {
     try {
-        const workspaceData = req.body;
-        const workspaceId = req.params.id;
-        workspaceData._id = workspaceId;
-        workspaceData.moduleId = moduleId;  
-        const updatedWorkspace = await workspaceService.update(workspaceData);
-        res.status(200).send(updatedWorkspace);
+        const updatedWorkspace = await workspaceService.update(id, updateData);
+        return updatedWorkspace;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to update workspace', details: err.message });
+        throw new Error('Failed to update workspace: ' + err.message);
     }
 }
 
-async function deleteWorkspace(req, res) {
+async function deleteWorkspace(id) {
     try {
-        const { id } = req.params;
         await workspaceService.remove(id, moduleId);
-        res.status(200).send({ message: 'Workspace deleted successfully' });
+        return { message: 'Workspace deleted successfully' };
     } catch (err) {
-        res.status(500).send({ error: 'Failed to delete workspace', details: err.message });
+        throw new Error('Failed to delete workspace: ' + err.message);
     }
 }
 
-async function addMemberToWorkspace(req, res) {
+async function addMemberToWorkspace(id, members) {
     try {
-        const { id } = req.params;
-        const { userId, role } = req.body;
-        const updatedWorkspace = await workspaceService.addMember(id, userId, role);
-        res.status(200).send(updatedWorkspace);
+        const updatedWorkspace = await workspaceService.addMember(id, members);
+        return updatedWorkspace;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to add member to workspace', details: err.message });
+        throw new Error('Failed to add member to workspace: ' + err.message);
     }
 }
-
-async function addBoardToWorkspace(req, res) {
+async function addBoardToWorkspace(id, boardData) {
     try {
-        const { id } = req.params;
-        const boardData = req.body;
         const updatedWorkspace = await workspaceService.addBoard(id, boardData);
-        res.status(200).send(updatedWorkspace);
+        return updatedWorkspace;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to add board to workspace', details: err.message });
+        throw new Error('Failed to add board to workspace'+ err.message );
     }
 }
 
-async function removeBoardFromWorkspace(req, res) {
+async function removeBoardFromWorkspace(boardId) {
     try {
-        const { boardId } = req.params;
         const updatedWorkspace = await workspaceService.removeBoard(boardId);
-        res.status(200).send(updatedWorkspace);
+        return updatedWorkspace;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to remove board from workspace', details: err.message });
+        throw new Error('Failed to remove board from workspace'+err.message );
     }
 }
 
-async function updateBoardInWorkspace(req, res) {
+async function updateBoardInWorkspace(boardId, boardData) {
     try {
-        const {boardId } = req.params;
-        const boardData = req.body; 
-        
         const updatedWorkspace = await workspaceService.updateBoard(boardId, boardData);
-
-        res.status(200).send(updatedWorkspace);
+        return updatedWorkspace;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to update board in workspace', details: err.message });
+        throw new Error('Failed to update board in workspace'+ err.message );
     }
 }
 
-async function getBoardById(req, res) {
+async function getBoardById(boardId) {
     try {
-        const { boardId } = req.params;
         const boardData = await workspaceService.getBoard(boardId);
-        res.status(200).send(boardData);
+        return boardData;
     } catch (err) {
         console.error('Error in getBoardById:', err);
-        res.status(500).send(err);
+        throw new Error(err);
     }
 }
 
 
 // Group Functions
 
-async function addGroupToBoard(req, res) {
+async function addGroupToBoard(boardId, groupData) {
     try {
-        const { boardId } = req.params;
-        const groupData = req.body;
         const updatedBoard = await workspaceService.addGroup(boardId, groupData);
-        res.status(200).send(updatedBoard);
+        return updatedBoard;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to add group to board', details: err.message });
+        throw new Error('Failed to add group to board'+ err.message );
     }
 }
 
-async function removeGroupFromBoard(req, res) {
+async function removeGroupFromBoard(groupId) {
     try {
-        const { groupId } = req.params;
         const updatedBoard = await workspaceService.removeGroup(groupId);
-        res.status(200).send(updatedBoard);
+        return updatedBoard;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to remove group from board', details: err.message });
+        throw new Error('Failed to remove group from board'+ err.message );
     }
 }
 
-async function updateGroupInBoard(req, res) {
+async function updateGroupInBoard(groupId, groupData) {
     try {
-        const {groupId}=req.params;
-        const groupData = req.body;
         const updatedGroup = await workspaceService.updateGroup(groupId,groupData);
-        res.status(200).send(updatedGroup);
+        return updatedGroup;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to update group in board', details: err.message });
+        throw new Error('Failed to update group in board'+err.message );
     }
 }
 
-async function addItemToGroup(req, res) {
+async function addItemToGroup(groupId, itemData) {
     try {
-        const { groupId } = req.params;
-        const itemData = req.body;
         const updatedGroup = await workspaceService.addItemToGroup(groupId, itemData);
-        res.status(200).send(updatedGroup);
+        return updatedGroup;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to add item to group', details: err.message });
+        throw new Error('Failed to add item to group'+ err.message );
     }
 }
 
-async function removeItemFromGroup(req, res) {
+async function removeItemFromGroup(itemId) {
     try {
-        const {itemId } = req.params;
         const updatedGroup = await workspaceService.removeItemFromGroup(itemId);
-        res.status(200).send(updatedGroup);
+        return updatedGroup;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to remove item from group', details: err.message });
+        throw new Error('Failed to remove item from group' + err.message );
     }
 }
 
-async function updateItemInGroup(req, res) {
+async function updateItemInGroup(itemId, itemData) {
     try {
-        const { itemId } = req.params;
-        const itemData = req.body;
         itemData._id=itemId;
         const updatedItem = await workspaceService.updateItemInGroup(itemData);
-        res.status(200).send(updatedItem);
+        return updatedItem;
     } catch (err) {
-        res.status(500).send({ error: 'Failed to update item in group', details: err.message });
+        throw new Error('Failed to update item in group'+err.message );
     }
 }
 
-async function addMembersToItem(req, res) {
+async function addMembersToItem(itemId, userId) {
     try {
-        const { itemId } = req.params;
-        const { userId } = req.body;
         const updatedItem = await workspaceService.addMembersToItem(itemId, userId);
-        res.status(200).send(updatedItem);
+        return updatedItem;
     } catch (err) {
-        res.status(500).send({error: 'Failed to add members to item',details: err.message});
+        throw new Error('Failed to add members to item'+err.message);
     }
 }
 

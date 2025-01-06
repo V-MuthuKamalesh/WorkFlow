@@ -1,28 +1,126 @@
 const express = require('express');
-const router = express.Router();
+const { Server } = require('socket.io');
+const http = require('http');
 const workController = require('../controllers/workcontroller');
-const {checkAuth} = require('../middlewares/auth');
 
-router.get('/getWorkspace', workController.getWorkspaces);
-router.get('/getBoardsbyWorkspacebyId/:id', workController.getWorkspaceById);
-router.post('/createWorkspace', workController.createWorkspace);
-router.put('/updateWorkspacebyId/:id', workController.updateWorkspace);
-router.delete('/deleteWorkspacebyId/:id', workController.deleteWorkspace);
-router.post('/addMember/:id/members', workController.addMemberToWorkspace);
+const router = express.Router();
 
-router.post('/addBoard/:id/boards', workController.addBoardToWorkspace);
-router.delete('/deleteBoard/:boardId', workController.removeBoardFromWorkspace);
-router.put('/updateBoard/:boardId', workController.updateBoardInWorkspace);
-router.get('/getBoard/:boardId',workController.getBoardById)
+// Initialize HTTP server and Socket.IO
+const server = http.createServer(router);
+const io = new Server(server);
 
-router.post('/addGroup/:boardId/', workController.addGroupToBoard);
-router.delete('/deleteGroup/:groupId', workController.removeGroupFromBoard);
-router.put('/updateGroup/:groupId', workController.updateGroupInBoard);
+// Handle WebSocket connections
+io.on('connection', (socket) => {
+    console.log('A user connected');
 
-router.post('/addItem/:groupId/', workController.addItemToGroup);
-router.delete('/deleteItem/:itemId', workController.removeItemFromGroup);
-router.put('/updateItem/:itemId', workController.updateItemInGroup);
-router.post('/addMembers/:itemId',workController.addMembersToItem);
+    // Work-related events
+    socket.on('getWorkspaces', async (_, callback) => {
+        const workspaces = await workController.getWorkspaces();
+        callback(workspaces);
+    });
 
+    socket.on('getBoardsByWorkspaceById', async (data, callback) => {
+        const { id } = data;
+        const workspace = await workController.getWorkspaceById(id);
+        callback(workspace);
+    });
+
+    socket.on('createWorkspace', async (data, callback) => {
+        const workspace = await workController.createWorkspace(data);
+        callback(workspace);
+    });
+
+    socket.on('updateWorkspaceById', async (data, callback) => {
+        const { id, updateData } = data;
+        const updatedWorkspace = await workController.updateWorkspace(id, updateData);
+        callback(updatedWorkspace);
+    });
+
+    socket.on('deleteWorkspaceById', async (data, callback) => {
+        const { id } = data;
+        const result = await workController.deleteWorkspace(id);
+        callback(result);
+    });
+
+    socket.on('addMemberToWorkspace', async (data, callback) => {
+        const { id, members } = data;
+        const updatedWorkspace = await workController.addMemberToWorkspace(id, members);
+        callback(updatedWorkspace);
+    });
+
+    // Board events
+    socket.on('addBoardToWorkspace', async (data, callback) => {
+        const { id, board } = data;
+        const updatedWorkspace = await workController.addBoardToWorkspace(id, board);
+        callback(updatedWorkspace);
+    });
+
+    socket.on('removeBoardFromWorkspace', async (data, callback) => {
+        const { boardId } = data;
+        const updatedWorkspace = await workController.removeBoardFromWorkspace(boardId);
+        callback(updatedWorkspace);
+    });
+
+    socket.on('updateBoardInWorkspace', async (data, callback) => {
+        const { boardId, updateData } = data;
+        const updatedBoard = await workController.updateBoardInWorkspace(boardId, updateData);
+        callback(updatedBoard);
+    });
+
+    socket.on('getBoardById', async (data, callback) => {
+        const { boardId } = data;
+        const board = await workController.getBoardById(boardId);
+        callback(board);
+    });
+
+    // Group events
+    socket.on('addGroupToBoard', async (data, callback) => {
+        const { boardId, group } = data;
+        const updatedBoard = await workController.addGroupToBoard(boardId, group);
+        callback(updatedBoard);
+    });
+
+    socket.on('removeGroupFromBoard', async (data, callback) => {
+        const { groupId } = data;
+        const updatedBoard = await workController.removeGroupFromBoard(groupId);
+        callback(updatedBoard);
+    });
+
+    socket.on('updateGroupInBoard', async (data, callback) => {
+        const { groupId, updateData } = data;
+        const updatedGroup = await workController.updateGroupInBoard(groupId, updateData);
+        callback(updatedGroup);
+    });
+
+    // Item events
+    socket.on('addItemToGroup', async (data, callback) => {
+        const { groupId, item } = data;
+        const updatedGroup = await workController.addItemToGroup(groupId, item);
+        callback(updatedGroup);
+    });
+
+    socket.on('removeItemFromGroup', async (data, callback) => {
+        const { itemId } = data;
+        const updatedGroup = await workController.removeItemFromGroup(itemId);
+        callback(updatedGroup);
+    });
+
+    socket.on('updateItemInGroup', async (data, callback) => {
+        const { itemId, updateData } = data;
+        const updatedItem = await workController.updateItemInGroup(itemId, updateData);
+        callback(updatedItem);
+    });
+
+    socket.on('addMembersToItem', async (data, callback) => {
+        const { itemId, userId } = data;
+        const updatedItem = await workController.addMembersToItem(itemId, userId);
+        callback(updatedItem);
+    });
+
+    socket.on('disconnect', () => {
+        console.log('A user disconnected');
+    });
+});
 
 module.exports = router;
+module.exports.server = server; 
