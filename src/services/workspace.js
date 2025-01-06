@@ -184,6 +184,7 @@ async function getBoard(boardId) {
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.items.map((item) => ({
+                    itemId: item._id,
                     itemName: item.itemName,
                     assignedToId: item.assignedToId,
                     status: item.status || "",
