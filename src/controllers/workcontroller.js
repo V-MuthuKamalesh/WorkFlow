@@ -8,7 +8,7 @@ async function getWorkspaces() {
         const workspaces = await workspaceService.query(filterBy);
         return workspaces;
     } catch (err) {
-        throw new Error('Failed to get workspaces: ' + err.message);
+        console.log('Failed to get workspaces: ' + err.message);
     }
 }
 
@@ -18,7 +18,7 @@ async function getWorkspaceById(id) {
         if (!workspace) throw new Error('Workspace not found');
         return workspace;
     } catch (err) {
-        throw new Error('Failed to get workspace: ' + err.message);
+        console.log('Failed to get workspace: ' + err.message);
     }
 }
 
@@ -29,7 +29,7 @@ async function createWorkspace(data) {
         await Module.findByIdAndUpdate(moduleId, { $push: { workspaces: newWorkspace._id } });
         return newWorkspace;
     } catch (err) {
-        throw new Error('Failed to create workspace: ' + err.message);
+        console.log('Failed to create workspace: ' + err.message);
     }
 }
 
@@ -38,7 +38,7 @@ async function updateWorkspace(id, updateData) {
         const updatedWorkspace = await workspaceService.update(id, updateData);
         return updatedWorkspace;
     } catch (err) {
-        throw new Error('Failed to update workspace: ' + err.message);
+        console.log('Failed to update workspace: ' + err.message);
     }
 }
 
@@ -47,7 +47,7 @@ async function deleteWorkspace(id) {
         await workspaceService.remove(id, moduleId);
         return { message: 'Workspace deleted successfully' };
     } catch (err) {
-        throw new Error('Failed to delete workspace: ' + err.message);
+        console.log('Failed to delete workspace: ' + err.message);
     }
 }
 
@@ -56,7 +56,7 @@ async function addMemberToWorkspace(id, members) {
         const updatedWorkspace = await workspaceService.addMember(id, members);
         return updatedWorkspace;
     } catch (err) {
-        throw new Error('Failed to add member to workspace: ' + err.message);
+        console.log('Failed to add member to workspace: ' + err.message);
     }
 }
 async function addBoardToWorkspace(id, boardData) {
@@ -64,7 +64,7 @@ async function addBoardToWorkspace(id, boardData) {
         const updatedWorkspace = await workspaceService.addBoard(id, boardData);
         return updatedWorkspace;
     } catch (err) {
-        throw new Error('Failed to add board to workspace'+ err.message );
+        console.log('Failed to add board to workspace'+ err.message );
     }
 }
 
@@ -73,7 +73,7 @@ async function removeBoardFromWorkspace(boardId) {
         const updatedWorkspace = await workspaceService.removeBoard(boardId);
         return updatedWorkspace;
     } catch (err) {
-        throw new Error('Failed to remove board from workspace'+err.message );
+        console.log('Failed to remove board from workspace'+err.message );
     }
 }
 
@@ -82,7 +82,7 @@ async function updateBoardInWorkspace(boardId, boardData) {
         const updatedWorkspace = await workspaceService.updateBoard(boardId, boardData);
         return updatedWorkspace;
     } catch (err) {
-        throw new Error('Failed to update board in workspace'+ err.message );
+        console.log('Failed to update board in workspace'+ err.message );
     }
 }
 
@@ -92,7 +92,6 @@ async function getBoardById(boardId) {
         return boardData;
     } catch (err) {
         console.error('Error in getBoardById:', err);
-        throw new Error(err);
     }
 }
 
@@ -104,7 +103,7 @@ async function addGroupToBoard(boardId, groupData) {
         const updatedBoard = await workspaceService.addGroup(boardId, groupData);
         return updatedBoard;
     } catch (err) {
-        throw new Error('Failed to add group to board'+ err.message );
+        console.log('Failed to add group to board'+ err.message );
     }
 }
 
@@ -113,7 +112,7 @@ async function removeGroupFromBoard(groupId) {
         const updatedBoard = await workspaceService.removeGroup(groupId);
         return updatedBoard;
     } catch (err) {
-        throw new Error('Failed to remove group from board'+ err.message );
+        console.log('Failed to remove group from board'+ err.message );
     }
 }
 
@@ -122,7 +121,7 @@ async function updateGroupInBoard(groupId, groupData) {
         const updatedGroup = await workspaceService.updateGroup(groupId,groupData);
         return updatedGroup;
     } catch (err) {
-        throw new Error('Failed to update group in board'+err.message );
+        console.log('Failed to update group in board'+err.message );
     }
 }
 
@@ -131,7 +130,7 @@ async function addItemToGroup(groupId, itemData) {
         const updatedGroup = await workspaceService.addItemToGroup(groupId, itemData);
         return updatedGroup;
     } catch (err) {
-        throw new Error('Failed to add item to group'+ err.message );
+        console.log('Failed to add item to group'+ err.message );
     }
 }
 
@@ -140,7 +139,7 @@ async function removeItemFromGroup(itemId) {
         const updatedGroup = await workspaceService.removeItemFromGroup(itemId);
         return updatedGroup;
     } catch (err) {
-        throw new Error('Failed to remove item from group' + err.message );
+        console.log('Failed to remove item from group' + err.message );
     }
 }
 
@@ -150,7 +149,7 @@ async function updateItemInGroup(itemId, itemData) {
         const updatedItem = await workspaceService.updateItemInGroup(itemData);
         return updatedItem;
     } catch (err) {
-        throw new Error('Failed to update item in group'+err.message );
+        console.log('Failed to update item in group'+err.message );
     }
 }
 
@@ -159,7 +158,7 @@ async function addMembersToItem(itemId, userId) {
         const updatedItem = await workspaceService.addMembersToItem(itemId, userId);
         return updatedItem;
     } catch (err) {
-        throw new Error('Failed to add members to item'+err.message);
+        console.log('Failed to add members to item'+err.message);
     }
 }
 

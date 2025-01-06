@@ -5,11 +5,9 @@ const workController = require('../controllers/workcontroller');
 
 const router = express.Router();
 
-// Initialize HTTP server and Socket.IO
 const server = http.createServer(router);
 const io = new Server(server);
 
-// Handle WebSocket connections
 io.on('connection', (socket) => {
     console.log('A user connected');
 
