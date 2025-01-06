@@ -44,8 +44,8 @@ async function updateWorkspace(id, updateData) {
 
 async function deleteWorkspace(id) {
     try {
-        await workspaceService.remove(id, moduleId);
-        return { message: 'Workspace deleted successfully' };
+        const workspaceId = await workspaceService.remove(id, moduleId);
+        return workspaceId;
     } catch (err) {
         console.log('Failed to delete workspace: ' + err.message);
     }
