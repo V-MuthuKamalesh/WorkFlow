@@ -116,3 +116,35 @@ exports.verifyToken = (req, res, next) => {
     return res.status(401).json({ message: 'Invalid token' });
   }
 };
+
+exports.sendPasswordResetEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    await userService.sendPasswordResetEmail(email);
+    res.status(200).json({ message: 'Password reset email sent' });
+  } catch (error) {
+    console.error(error);
+    res.status(error.status || 500).json({ message: error.message || 'Something went wrong' });
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    await userService.resetPassword(token, newPassword);
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(error.status || 500).json({ message: error.message || 'Invalid or expired token' });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await userService.getAllUsers(); 
+    res.status(200).json(users); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Something went wrong!' });
+  }
+};

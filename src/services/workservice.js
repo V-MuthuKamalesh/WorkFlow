@@ -1,5 +1,5 @@
-const { Group, Item } = require('../models/schema'); 
-
+const { Group, Item, User } = require('../models/schema'); 
+const { sendSlackNotification } = require('../utils/slack');
 
 // Item Functions
 async function addItemToGroup(groupId, itemData) {
@@ -50,6 +50,12 @@ async function updateItemInGroup(itemData) {
             { $set: itemData },
             { new: true }
         );
+        const users = await User.find({ _id: { $in: item.assignedToId } });
+        const notificationPromises = users.map((user) => {
+            const message = `Hello ${user.fullname},\n\nThe item "${item.itemName}" has been updated.\nPlease check the details and take necessary actions.\n\nThank you!`;
+            return sendSlackNotification(user.email, message);
+        });
+        await Promise.all(notificationPromises);
         return updatedItem;
     } catch (err) {
         console.error('Error updating item in group:', err);
@@ -71,6 +77,12 @@ async function addMembersToItem(itemId, userId) {
         }
         item.assignedToId.push(userId);
         const updatedItem = await item.save();
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const message = `Hello ${user.fullname},\n\nYou have been assigned to the item "${item.itemName}". Please check the details and take necessary actions.\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
         return updatedItem;
     } catch (err) {
         console.error('Error adding members to item:', err);

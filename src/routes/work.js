@@ -15,7 +15,7 @@ module.exports = (io) => {
         });
 
         socket.on('getBoardsByWorkspaceById', async (data, callback) => {
-            const { id } = data;
+            const {id}=data;
             const workspace = await workController.getWorkspaceById(id);
             callback(workspace);
         });
@@ -32,7 +32,7 @@ module.exports = (io) => {
         });
 
         socket.on('deleteWorkspaceById', async (data, callback) => {
-            const { id } = data;
+            const  {id}  = data;
             const result = await workController.deleteWorkspace(id);
             callback(result);
         });

@@ -7,4 +7,7 @@ router.post('/oauth', userController.OAuth);
 router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.post('/tokenexpired',userController.verifyToken);
+router.post('/sendemail',userController.sendPasswordResetEmail);
+router.post('/reset',userController.resetPassword);
+router.get('/allusers',userController.getAllUsers);
 module.exports = router;

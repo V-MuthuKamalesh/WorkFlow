@@ -16,7 +16,9 @@ async function getWorkspaces() {
 async function getWorkspaceById(id) {
     try {
         const workspace = await workspaceService.getById(id);
-        if (!workspace) throw new Error('Workspace not found');
+        console.log(workspace);
+        
+        if (!workspace) console.log('Workspace not found');
         return workspace;
     } catch (err) {
         console.log('Failed to get workspace: ' + err.message);
