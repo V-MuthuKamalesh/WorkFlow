@@ -1,4 +1,5 @@
 const workspaceService = require('../services/workspace');
+const workService = require('../services/workservice');
 const { Module } = require('../models/schema');
 const moduleId = "67766a5150a4edf07d7fc25b";
 
@@ -127,7 +128,7 @@ async function updateGroupInBoard(groupId, groupData) {
 
 async function addItemToGroup(groupId, itemData) {
     try {
-        const updatedGroup = await workspaceService.addItemToGroup(groupId, itemData);
+        const updatedGroup = await workService.addItemToGroup(groupId, itemData);
         return updatedGroup;
     } catch (err) {
         console.log('Failed to add item to group'+ err.message );
@@ -136,7 +137,7 @@ async function addItemToGroup(groupId, itemData) {
 
 async function removeItemFromGroup(itemId) {
     try {
-        const updatedGroup = await workspaceService.removeItemFromGroup(itemId);
+        const updatedGroup = await workService.removeItemFromGroup(itemId);
         return updatedGroup;
     } catch (err) {
         console.log('Failed to remove item from group' + err.message );
@@ -146,7 +147,7 @@ async function removeItemFromGroup(itemId) {
 async function updateItemInGroup(itemId, itemData) {
     try {
         itemData._id=itemId;
-        const updatedItem = await workspaceService.updateItemInGroup(itemData);
+        const updatedItem = await workService.updateItemInGroup(itemData);
         return updatedItem;
     } catch (err) {
         console.log('Failed to update item in group'+err.message );
@@ -155,7 +156,7 @@ async function updateItemInGroup(itemId, itemData) {
 
 async function addMembersToItem(itemId, userId) {
     try {
-        const updatedItem = await workspaceService.addMembersToItem(itemId, userId);
+        const updatedItem = await workService.addMembersToItem(itemId, userId);
         return updatedItem;
     } catch (err) {
         console.log('Failed to add members to item'+err.message);

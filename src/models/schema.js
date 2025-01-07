@@ -55,6 +55,7 @@ const groupSchema = new Schema({
   leads: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Lead' }],
   projects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
   sprints: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Sprint' }],
+  tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
   bugs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Bug' }],
   epics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Epic' }],
   tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }],
@@ -172,11 +173,19 @@ const projectSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
+const taskSchema = new Schema({
+  taskName: { type: String, required: true },
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
+  status: { type: String, enum: ['Pending', 'In Progress', 'Completed'], default: 'Pending' },
+  priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
+  dueDate: { type: Date },
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+});
+
 const sprintSchema = new Schema({
+  sprintName: { type: String, required: true },
   sprintGoals: { type: String, required: true },
-  totalEstimatedEffort: { type: Number },
-  sprintProgress: { type: Number },
-  activeSprint: { type: Boolean },
   sprintTimeline: {
     startDate: { type: Date },
     endDate: { type: Date },
@@ -187,42 +196,24 @@ const sprintSchema = new Schema({
       taskTitle: { type: String },
     },
   ],
-  completed: { type: Boolean },
-  sprintStartDate: { type: Date },
-  sprintEndDate: { type: Date },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
 const bugSchema = new Schema({
+  bugName: { type: String, required: true },
   reporter: {
     _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     username: { type: String },
     fullname: { type: String },
   },
-  priority: { type: String },
-  connectedTasks: [
-    {
-      taskId: { type: mongoose.Schema.Types.ObjectId },
-      taskTitle: { type: String },
-    },
-  ],
-  timeUntilResolution: { type: Number },
   reportDate: { type: Date },
   developer: {
     _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     username: { type: String },
     fullname: { type: String },
   },
-  source: { type: String },
-  pictureOrVideo: {
-    fileId: { type: mongoose.Schema.Types.ObjectId },
-    fileName: { type: String },
-    filePath: { type: String },
-  },
-  resolution: { type: String },
-  lastUpdated: { type: Date },
-  taskStatus: { type: String },
+  priority: { type: String },
   status: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
@@ -265,5 +256,6 @@ module.exports = {
   Epic: mongoose.model('Epic', epicSchema),
   Ticket: mongoose.model('Ticket', ticketSchema),
   Incident: mongoose.model('Incident', incidentSchema),
+  Task: mongoose.model('Task', taskSchema),
 };
 

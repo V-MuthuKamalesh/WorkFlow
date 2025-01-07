@@ -58,7 +58,7 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log(token);
+    // console.log(token);
     res.status(200).json({ message: 'Login successful', token,userName:user.fullname ,userId:user._id});
   
   } catch (error) {
@@ -79,7 +79,7 @@ exports.OAuth = async (req, res) => {
   try {
     const { email,name} = req.body;
     const password = name;
-    console.log(email,name,password);
+    // console.log(email,name,password);
     let user = await userService.findUserByEmail(email);
     if (!user) {
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -91,7 +91,7 @@ exports.OAuth = async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    console.log(token);
+    // console.log(token);
     res.status(200).json({ message: 'Login successful', token,userName:user.fullname,userId:user._id });
   } catch (error) {
     console.error(error);
