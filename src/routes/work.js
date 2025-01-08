@@ -20,6 +20,12 @@ module.exports = (io) => {
             const workspace = await workController.getWorkspaceById(id);
             callback(workspace);
         });
+        
+        socket.on('getWorkspaceDetailsById', async (data, callback) => {
+            const {id}=data;
+            const workspace = await workController.getWorkspaceDetailsById(id);
+            callback(workspace);
+        });
 
         socket.on('createWorkspace', async (data, callback) => {
             const workspace = await workController.createWorkspace(data);

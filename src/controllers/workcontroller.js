@@ -7,7 +7,7 @@ const moduleId = "67766a5150a4edf07d7fc25b";
 async function getWorkspaces(token) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded._id;
+        const userId = decoded.userId;
         const filterBy = { moduleId, userId };
         const workspaces = await workspaceService.query(filterBy);
         return workspaces;
@@ -20,6 +20,18 @@ async function getWorkspaceById(id) {
     try {
         const workspace = await workspaceService.getById(id);
         console.log(workspace);
+        
+        if (!workspace) console.log('Workspace not found');
+        return workspace;
+    } catch (err) {
+        console.log('Failed to get workspace: ' + err.message);
+    }
+}
+
+async function getWorkspaceDetailsById(id) {
+    try {
+        const workspace = await workspaceService.getWorkspaceDetailsById(id);
+        // console.log(workspace);
         
         if (!workspace) console.log('Workspace not found');
         return workspace;
@@ -173,6 +185,7 @@ async function addMembersToItem(itemId, userId) {
 module.exports = {
     getWorkspaces,
     getWorkspaceById,
+    getWorkspaceDetailsById,
     createWorkspace,
     updateWorkspace,
     addMemberToWorkspace,

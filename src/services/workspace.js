@@ -12,10 +12,9 @@ async function query(filterBy) {
             throw new Error('Module not found');
         }
         const transformedWorkspaces = module.workspaces
-            .filter(workspace => 
-                workspace.createdBy.toString() === userId || 
-                workspace.members.includes(userId)
-            )
+            .filter(workspace => {
+                workspace.createdBy.toString() === userId || workspace.members.some(member => member.userId.toString() === userId);
+            })
             .map(workspace => {
                 const { _id, workspaceName } = workspace.toObject();
                 return { workspaceId: _id, workspaceName };
@@ -48,6 +47,29 @@ async function getById(workspaceId) {
         throw err;
     }
 }
+
+async function getWorkspaceDetailsById(workspaceId) {
+    try {
+        const detailedWorkspace = await Workspace.findById(workspaceId)
+            .populate({
+                path: 'boards', 
+            });
+        if (!detailedWorkspace) {
+            throw new Error('Workspace not found');
+        }
+        return {
+            workspaceId: detailedWorkspace._id,
+            workspaceName: detailedWorkspace.workspaceName,
+            createdBy: detailedWorkspace.createdBy,
+            members: detailedWorkspace.members,  
+            boards: detailedWorkspace.boards.map(board => board.toObject())
+        };
+    } catch (err) {
+        console.error('Error fetching workspace by ID:', err);
+        throw err;
+    }
+}
+
 
 async function add(workspaceData) {
     try {
@@ -267,6 +289,7 @@ async function updateGroup(groupId, groupData) {
 module.exports = {
     query,
     getById,
+    getWorkspaceDetailsById,
     add,
     update,
     remove,
