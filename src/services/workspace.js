@@ -11,15 +11,17 @@ async function query(filterBy) {
         if (!module) {
             throw new Error('Module not found');
         }
+        console.log(module);
+        
         const transformedWorkspaces = module.workspaces
-            .filter(workspace => {
-                workspace.createdBy.toString() === userId || workspace.members.some(member => member.userId.toString() === userId);
-            })
-            .map(workspace => {
-                const { _id, workspaceName } = workspace.toObject();
-                return { workspaceId: _id, workspaceName };
-            });
-
+        .filter(workspace => {
+            return workspace.createdBy.toString() === userId || workspace.members.some(member => member.userId.toString() === userId);
+          })
+        .map(workspace => {
+            const { _id, workspaceName } = workspace.toObject();
+            return { workspaceId: _id, workspaceName };
+        });
+        console.log(transformedWorkspaces);
         return transformedWorkspaces;
     } catch (err) {
         console.error('Error fetching workspaces:', err);

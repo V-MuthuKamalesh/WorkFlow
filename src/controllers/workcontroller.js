@@ -8,6 +8,7 @@ async function getWorkspaces(token) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
+        console.log(userId);
         const filterBy = { moduleId, userId };
         const workspaces = await workspaceService.query(filterBy);
         return workspaces;
