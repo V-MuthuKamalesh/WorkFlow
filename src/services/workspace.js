@@ -1,23 +1,27 @@
 const { Module, Workspace, Board, Group } = require('../models/schema'); 
 
+
 async function query(filterBy) {
     try {
-        if (filterBy.moduleId) {
-            const module = await Module.findById(filterBy.moduleId).populate({
-                path: 'workspaces',
-                select: 'workspaceName', 
-            });
-            if (!module) {
-                throw new Error('Module not found');
-            }
-            const transformedWorkspaces = module.workspaces.map((workspace) => {
-                const { _id, workspaceName } = workspace.toObject(); 
+        const { moduleId, userId } = filterBy;
+        const module = await Module.findById(moduleId).populate({
+            path: 'workspaces',
+            select: 'workspaceName createdBy members',
+        });
+        if (!module) {
+            throw new Error('Module not found');
+        }
+        const transformedWorkspaces = module.workspaces
+            .filter(workspace => 
+                workspace.createdBy.toString() === userId || 
+                workspace.members.includes(userId)
+            )
+            .map(workspace => {
+                const { _id, workspaceName } = workspace.toObject();
                 return { workspaceId: _id, workspaceName };
             });
-            return transformedWorkspaces;
-        } else {
-            throw new Error('Module ID is required to fetch workspaces');
-        }
+
+        return transformedWorkspaces;
     } catch (err) {
         console.error('Error fetching workspaces:', err);
         throw err;
@@ -77,21 +81,24 @@ async function remove(workspaceId, moduleId) {
     }
 }
 
-async function addMember(workspaceId, userId, role = 'member') {
+async function addMember(workspaceId, userId, adminId, role = 'member') {
     try {
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) {
             throw new Error('Workspace not found');
         }
+        if (workspace.createdBy.toString() !== adminId) {
+            return 'You do not have permission to add a user to this workspace';
+        }
         const isAlreadyMember = workspace.members.some(
             member => member.userId.toString() === userId
         );
         if (isAlreadyMember) {
-            throw new Error('User is already a member of this workspace');
+            return 'User is already a member of this workspace';
         }
         workspace.members.push({ userId, role });
         const updatedWorkspace = await workspace.save();
-        return updatedWorkspace;
+        return 'User added to Workspace successfully';
     } catch (err) {
         console.error('Error adding member to workspace:', err);
         throw err;

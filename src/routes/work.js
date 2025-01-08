@@ -9,8 +9,9 @@ module.exports = (io) => {
         console.log('A user connected in Workmanagement');
 
         // Work-related events
-        socket.on('getWorkspaces', async (_, callback) => {
-            const workspaces = await workController.getWorkspaces();
+        socket.on('getWorkspaces', async (data, callback) => {
+            const {token} = data;
+            const workspaces = await workController.getWorkspaces(token);
             callback(workspaces);
         });
 
@@ -38,9 +39,9 @@ module.exports = (io) => {
         });
 
         socket.on('addMemberToWorkspace', async (data, callback) => {
-            const { id, members } = data;
-            const updatedWorkspace = await workController.addMemberToWorkspace(id, members);
-            callback(updatedWorkspace);
+            const { id, members, token } = data;
+            const response = await workController.addMemberToWorkspace(id, members, token);
+            callback(response);
         });
 
         // Board events

@@ -1,11 +1,14 @@
+const jwt = require('jsonwebtoken');
 const workspaceService = require('../services/workspace');
 const workService = require('../services/workservice');
 const { Module } = require('../models/schema');
 const moduleId = "67766a5150a4edf07d7fc25b";
 
-async function getWorkspaces() {
+async function getWorkspaces(token) {
     try {
-        const filterBy = { moduleId };
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const userId = decoded._id;
+        const filterBy = { moduleId, userId };
         const workspaces = await workspaceService.query(filterBy);
         return workspaces;
     } catch (err) {
@@ -54,10 +57,12 @@ async function deleteWorkspace(id) {
     }
 }
 
-async function addMemberToWorkspace(id, members) {
+async function addMemberToWorkspace(id, userId, token) {
     try {
-        const updatedWorkspace = await workspaceService.addMember(id, members);
-        return updatedWorkspace;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const adminId = decoded._id;
+        const response = await workspaceService.addMember(id, userId, adminId);
+        return response;
     } catch (err) {
         console.log('Failed to add member to workspace: ' + err.message);
     }
