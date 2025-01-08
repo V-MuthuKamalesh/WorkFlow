@@ -11,7 +11,7 @@ async function query(filterBy) {
         if (!module) {
             throw new Error('Module not found');
         }
-        console.log(module);
+        // console.log(module);
         
         const transformedWorkspaces = module.workspaces
         .filter(workspace => {
@@ -21,7 +21,7 @@ async function query(filterBy) {
             const { _id, workspaceName } = workspace.toObject();
             return { workspaceId: _id, workspaceName };
         });
-        console.log(transformedWorkspaces);
+        // console.log(transformedWorkspaces);
         return transformedWorkspaces;
     } catch (err) {
         console.error('Error fetching workspaces:', err);
@@ -249,6 +249,7 @@ async function addGroup(boardId, groupData) {
         if (!board) {
             throw new Error('Board not found');
         }
+        groupData.boardId = boardId;
         const group = new Group(groupData);
         await group.save();
         board.groups.push(group._id);

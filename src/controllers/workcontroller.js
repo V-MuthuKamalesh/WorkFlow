@@ -8,9 +8,10 @@ async function getWorkspaces(token) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
-        console.log(userId);
+        // console.log(userId);
         const filterBy = { moduleId, userId };
         const workspaces = await workspaceService.query(filterBy);
+        // console.log("Workspaces",workspaces);
         return workspaces;
     } catch (err) {
         console.log('Failed to get workspaces: ' + err.message);
@@ -20,7 +21,7 @@ async function getWorkspaces(token) {
 async function getWorkspaceById(id) {
     try {
         const workspace = await workspaceService.getById(id);
-        console.log(workspace);
+        // console.log(workspace);
         
         if (!workspace) console.log('Workspace not found');
         return workspace;
