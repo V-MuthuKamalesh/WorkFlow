@@ -96,9 +96,22 @@ async function update(workspaceData) {
 
 async function remove(workspaceId, moduleId) {
     try {
-        await Workspace.findOneAndDelete({ _id: workspaceId, moduleId });
+        const moduleUpdate = await Module.findOneAndUpdate(
+            { _id: moduleId }, 
+            { $pull: { workspaces: workspaceId } }, 
+            { new: true } 
+        );
+        if (!moduleUpdate) {
+            throw new Error('Module not found');
+        }
+        const workspaceDelete = await Workspace.findByIdAndDelete(workspaceId);
+        if (!workspaceDelete) {
+            throw new Error('Workspace not found');
+        }
+        console.log(`Workspace with ID ${workspaceId} successfully removed from Module and deleted.`);
         return workspaceId;
     } catch (err) {
+        console.error('Error removing workspace:', err);
         throw err;
     }
 }

@@ -6,12 +6,8 @@ exports.signup = async (req, res) => {
   try {
     const { email, password, fullname} = req.body;
     const user = await userService.findUserByEmail(email);
-    const Nuser = await userService.findUserByUserName(username);
     if (user) {
       return res.status(400).json({ message: 'User already found!' });
-    }
-    if (Nuser) {
-      return res.status(400).json({ message: 'Username already found! Try With Some new user name' });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
 
