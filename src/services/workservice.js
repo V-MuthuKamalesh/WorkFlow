@@ -90,9 +90,46 @@ async function addMembersToItem(itemId, userId) {
     }
 }
 
+async function removeMembersFromItem(itemId, userId) {
+    try {
+        const item = await Item.findById(itemId);
+        if (!item) {
+            throw new Error('Item not found');
+        }
+
+        let user = await User.findById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const userIndex = item.assignedToId.findIndex(
+            (id) => id.toString() === user._id.toString()
+        );
+
+        if (userIndex === -1) {
+            return 'User is not assigned to this item';
+        }
+
+        item.assignedToId.splice(userIndex, 1);
+
+        const updatedItem = await item.save();
+
+        const message = `Hello ${user.fullname},\n\nYou have been removed from the item "${item.itemName}".\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+
+        return updatedItem;
+    } catch (err) {
+        console.error('Error removing members from item:', err);
+        throw err;
+    }
+}
+
+
 module.exports = {
     addItemToGroup,
     removeItemFromGroup,
     updateItemInGroup,
     addMembersToItem,
+    removeMembersFromItem,
 };

@@ -184,6 +184,17 @@ async function addMembersToItem(itemId, userId) {
     }
 }
 
+async function removeMembersFromItem(itemId, userId) {
+    try {
+        const updatedItem = await workService.removeMembersFromItem(itemId, userId);
+        return updatedItem;
+    } catch (err) {
+        console.log('Failed to remove members from item: ' + err.message);
+        throw err;
+    }
+}
+
+
 module.exports = {
     getWorkspaces,
     getWorkspaceById,
@@ -202,5 +213,6 @@ module.exports = {
     addItemToGroup,
     removeItemFromGroup,
     updateItemInGroup,
-    addMembersToItem
+    addMembersToItem,
+    removeMembersFromItem,
 };

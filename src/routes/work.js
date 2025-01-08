@@ -119,6 +119,16 @@ module.exports = (io) => {
             callback(updatedItem);
         });
 
+        socket.on('removeMembersFromItem', async (data, callback) => {
+            const { itemId, userId } = data;
+            try {
+                const updatedItem = await workController.removeMembersFromItem(itemId, userId);
+                callback(updatedItem);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });        
+
         socket.on('disconnect', () => {
             console.log('A user disconnected');
         });
