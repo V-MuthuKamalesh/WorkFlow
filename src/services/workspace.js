@@ -19,7 +19,7 @@ async function query(filterBy) {
           })
         .map(workspace => {
             const { _id, workspaceName } = workspace.toObject();
-            return { workspaceId: _id, workspaceName };
+            return { workspaceId: _id.toString(), workspaceName };
         });
         // console.log(transformedWorkspaces);
         return transformedWorkspaces;
