@@ -17,6 +17,17 @@ async function addTaskToGroup(groupId, taskData) {
     }
 }
 
+async function addTask(taskData) {
+    try {
+        const task = new Task(taskData);
+        await task.save();
+        return {taskId:task._id};
+    } catch (err) {
+        console.error('Error creating task:', err);
+        throw { error: 'Failed to create task ', details: err.message };
+    }
+}
+
 async function removeTaskFromGroup(taskId) {
     try {
         const task = await Task.findById(taskId);
@@ -70,6 +81,17 @@ async function addSprintToGroup(groupId, sprintData) {
     } catch (err) {
         console.error('Error adding sprint to group:', err);
         throw { error: 'Failed to add sprint to group', details: err.message };
+    }
+}
+
+async function addSprint(sprintData) {
+    try {
+        const sprint = new Sprint(sprintData);
+        await sprint.save();
+        return {sprintId:sprint._id};
+    } catch (err) {
+        console.error('Error creating sprint:', err);
+        throw { error: 'Failed to create sprint ', details: err.message };
     }
 }
 
@@ -129,6 +151,17 @@ async function addBugToGroup(groupId, bugData) {
     }
 }
 
+async function addBug(bugData) {
+    try {
+        const bug = new Bug(bugData);
+        await bug.save();
+        return {bugId:bug._id};
+    } catch (err) {
+        console.error('Error creating item:', err);
+        throw { error: 'Failed to create item ', details: err.message };
+    }
+}
+
 async function removeBugFromGroup(bugId) {
     try {
         const bug = await Bug.findById(bugId);
@@ -169,12 +202,15 @@ async function updateBugInGroup(bugData) {
 
 module.exports = {
     addTaskToGroup,
+    addTask,
     removeTaskFromGroup,
     updateTaskInGroup,
     addSprintToGroup,
+    addSprint,
     removeSprintFromGroup,
     updateSprintInGroup,
     addBugToGroup,
+    addBug,
     removeBugFromGroup,
     updateBugInGroup,
 };

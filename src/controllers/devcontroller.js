@@ -136,6 +136,15 @@ async function addTaskToGroup(groupId, taskData) {
     }
 }
 
+async function addTask(taskData) {
+    try {
+        const task = await workService.addTask(taskData);
+        return task;
+    } catch (err) {
+        console.log('Failed to create task '+ err.message );
+    }
+}
+
 async function removeTaskFromGroup(taskId) {
     try {
         const updatedGroup = await devService.removeTaskFromGroup(taskId);
@@ -165,6 +174,15 @@ async function addSprintToGroup(groupId, sprintData) {
     }
 }
 
+async function addSprint(sprintData) {
+    try {
+        const sprint = await workService.addSprint(sprintData);
+        return sprint;
+    } catch (err) {
+        console.log('Failed to create sprint '+ err.message );
+    }
+}
+
 async function removeSprintFromGroup(sprintId) {
     try {
         const updatedGroup = await devService.removeSprintFromGroup(sprintId);
@@ -191,6 +209,15 @@ async function addBugToGroup(groupId, bugData) {
         return updatedGroup;
     } catch (err) {
         console.log('Failed to add bug to group'+ err.message );
+    }
+}
+
+async function addBug(itemData) {
+    try {
+        const bug = await workService.addBug(itemData);
+        return bug;
+    } catch (err) {
+        console.log('Failed to create bug '+ err.message );
     }
 }
 
@@ -229,12 +256,15 @@ module.exports = {
     removeGroupFromBoard,
     updateGroupInBoard,
     addTaskToGroup,
+    addTask,
     removeTaskFromGroup,
     updateTaskInGroup,
     addSprintToGroup,
+    addSprint,
     removeSprintFromGroup,
     updateSprintInGroup,
     addBugToGroup,
+    addBug,
     removeBugFromGroup,
     updateBugInGroup,
 };

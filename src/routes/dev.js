@@ -94,6 +94,12 @@ module.exports = (io) => {
             callback(updatedGroup);
         });
 
+        socket.on('createTask', async (data, callback) => {
+            const { task } = data;
+            const taskData = await devController.addTask(task);
+            callback(taskData);
+        });
+
         socket.on('removeTaskFromGroup', async (data, callback) => {
             const { taskId } = data;
             const updatedGroup = await devController.removeTaskFromGroup(taskId);
@@ -113,6 +119,12 @@ module.exports = (io) => {
             callback(updatedGroup);
         });
 
+        socket.on('createSprint', async (data, callback) => {
+            const { sprint } = data;
+            const sprintData = await devController.addSprint(sprint);
+            callback(sprintData);
+        });
+
         socket.on('removeSprintFromGroup', async (data, callback) => {
             const { sprintId } = data;
             const updatedGroup = await devController.removeSprintFromGroup(sprintId);
@@ -130,6 +142,12 @@ module.exports = (io) => {
             const { groupId, bug } = data;
             const updatedGroup = await devController.addBugToGroup(groupId, bug);
             callback(updatedGroup);
+        });
+
+        socket.on('createSprint', async (data, callback) => {
+            const { sprint } = data;
+            const sprintData = await devController.addSprint(sprint);
+            callback(sprintData);
         });
 
         socket.on('removeBugFromGroup', async (data, callback) => {
