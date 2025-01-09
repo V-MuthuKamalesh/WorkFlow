@@ -254,7 +254,34 @@ async function addGroup(boardId, groupData) {
         await group.save();
         board.groups.push(group._id);
         await board.save();
-        return board;
+        const populatedBoard = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'items',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+
+        return {
+            boardId: populatedBoard._id,
+            boardName: populatedBoard.boardName,
+            workspaceName: populatedBoard.workspaceName,
+            groups: populatedBoard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                items: group.items.map((item) => ({
+                    itemId: item._id,
+                    itemName: item.itemName,
+                    assignedToId: item.assignedToId,
+                    status: item.status || "",
+                    dueDate: item.dueDate || "",
+                })),
+            })),
+        };
     } catch (err) {
         console.error('Error adding group to board:', err);
         throw { error: 'Failed to add group to board', details: err.message };
