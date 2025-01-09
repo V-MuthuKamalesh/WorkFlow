@@ -72,7 +72,7 @@ const itemSchema = new Schema({
   priority: { type: String },
   dueDate: { type: Date },
   assignedToId: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
-  groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true },
+  groupId: { type: mongoose.Schema.Types.ObjectId, ref: 'Group' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
