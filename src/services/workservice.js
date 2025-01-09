@@ -23,7 +23,7 @@ async function addItem(itemData) {
     try {
         const item = new Item(itemData);
         await item.save();
-        return item;
+        return {itemId:item._id};
     } catch (err) {
         console.error('Error creating item:', err);
         throw { error: 'Failed to create item ', details: err.message };

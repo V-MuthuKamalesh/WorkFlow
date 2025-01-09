@@ -101,9 +101,9 @@ module.exports = (io) => {
             callback(updatedGroup);
         });
 
-        socket.on('addItem', async (data, callback) => {
+        socket.on('createItem', async (data, callback) => {
             const { item } = data;
-            const itemData = await workController.addItemToGroup(item);
+            const itemData = await workController.addItem(item);
             callback(itemData);
         });
 
