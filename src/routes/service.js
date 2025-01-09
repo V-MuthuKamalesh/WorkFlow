@@ -1,5 +1,5 @@
 const express = require('express');
-const serviceController = require('../controllers/serviceController');
+const serviceController = require('../controllers/servicecontroller');
 
 const router = express.Router();
 
@@ -87,78 +87,53 @@ module.exports = (io) => {
             callback(updatedGroup);
         });
 
-        // Task events
-        socket.on('addTaskToGroup', async (data, callback) => {
-            const { groupId, task } = data;
-            const updatedGroup = await serviceController.addTaskToGroup(groupId, task);
+        // Ticket events
+        socket.on('addTicketToGroup', async (data, callback) => {
+            const { groupId, ticket } = data;
+            const updatedGroup = await serviceController.addTicketToGroup(groupId, ticket);
             callback(updatedGroup);
         });
 
-        socket.on('createTask', async (data, callback) => {
-            const { task } = data;
-            const taskData = await serviceController.addTask(task);
-            callback(taskData);
+        socket.on('createTicket', async (data, callback) => {
+            const { ticket } = data;
+            const ticketData = await serviceController.addTicket(ticket);
+            callback(ticketData);
         });
 
-        socket.on('removeTaskFromGroup', async (data, callback) => {
-            const { taskId } = data;
-            const updatedGroup = await serviceController.removeTaskFromGroup(taskId);
+        socket.on('removeTicketFromGroup', async (data, callback) => {
+            const { ticketId } = data;
+            const updatedGroup = await serviceController.removeTicketFromGroup(ticketId);
             callback(updatedGroup);
         });
 
-        socket.on('updateTaskInGroup', async (data, callback) => {
-            const { taskId, updateData } = data;
-            const updatedItem = await serviceController.updateTaskInGroup(taskId, updateData);
+        socket.on('updateTicketInGroup', async (data, callback) => {
+            const { ticketId, updateData } = data;
+            const updatedItem = await serviceController.updateTicketInGroup(ticketId, updateData);
             callback(updatedItem);
         });
 
-        // Sprint events
-        socket.on('addSprintToGroup', async (data, callback) => {
-            const { groupId, sprint } = data;
-            const updatedGroup = await serviceController.addSprintToGroup(groupId, sprint);
+        // Incident events
+        socket.on('addIncidentToGroup', async (data, callback) => {
+            const { groupId, incident } = data;
+            const updatedGroup = await serviceController.addIncidentToGroup(groupId, incident);
             callback(updatedGroup);
         });
 
-        socket.on('createSprint', async (data, callback) => {
-            const { sprint } = data;
-            const sprintData = await serviceController.addSprint(sprint);
-            callback(sprintData);
+        socket.on('createIncident', async (data, callback) => {
+            const { incident } = data;
+            const incidentData = await serviceController.addSncident(incident);
+            callback(incidentData);
         });
 
-        socket.on('removeSprintFromGroup', async (data, callback) => {
-            const { sprintId } = data;
-            const updatedGroup = await serviceController.removeSprintFromGroup(sprintId);
+        socket.on('removeIncidentFromGroup', async (data, callback) => {
+            const { incidentId } = data;
+            const updatedGroup = await serviceController.removeIncidentFromGroup(incidentId);
             callback(updatedGroup);
         });
 
-        socket.on('updateSprintInGroup', async (data, callback) => {
-            const { sprintId, updateData } = data;
-            const updatedItem = await serviceController.updateSprintInGroup(sprintId, updateData);
-            callback(updatedItem);
-        });
-
-        // Bug events
-        socket.on('addBugToGroup', async (data, callback) => {
-            const { groupId, bug } = data;
-            const updatedGroup = await serviceController.addBugToGroup(groupId, bug);
-            callback(updatedGroup);
-        });
-
-        socket.on('createSprint', async (data, callback) => {
-            const { sprint } = data;
-            const sprintData = await serviceController.addSprint(sprint);
-            callback(sprintData);
-        });
-
-        socket.on('removeBugFromGroup', async (data, callback) => {
-            const { bugId } = data;
-            const updatedGroup = await serviceController.removeBugFromGroup(bugId);
-            callback(updatedGroup);
-        });
-
-        socket.on('updateBugInGroup', async (data, callback) => {
-            const { bugId, updateData } = data;
-            const updatedItem = await serviceController.updateBugInGroup(bugId, updateData);
+        socket.on('updateIncidentInGroup', async (data, callback) => {
+            const { incidentId, updateData } = data;
+            const updatedItem = await serviceController.updateIncidentInGroup(incidentId, updateData);
             callback(updatedItem);
         });
 

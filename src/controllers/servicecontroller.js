@@ -126,120 +126,81 @@ async function updateGroupInBoard(groupId, groupData) {
     }
 }
 
-//Task
-async function addTaskToGroup(groupId, taskData) {
+//Ticket
+async function addTicketToGroup(groupId, ticketData) {
     try {
-        const updatedGroup = await service.addTaskToGroup(groupId, taskData);
+        const updatedGroup = await service.addTicketToGroup(groupId, ticketData);
         return updatedGroup;
     } catch (err) {
-        console.log('Failed to add task to group'+ err.message );
+        console.log('Failed to add ticket to group'+ err.message );
     }
 }
 
-async function addTask(taskData) {
+async function addTicket(ticketData) {
     try {
-        const task = await workService.addTask(taskData);
-        return task;
+        const ticket = await workService.addTicket(ticketData);
+        return ticket;
     } catch (err) {
-        console.log('Failed to create task '+ err.message );
+        console.log('Failed to create ticket '+ err.message );
     }
 }
 
-async function removeTaskFromGroup(taskId) {
+async function removeTicketFromGroup(ticketId) {
     try {
-        const updatedGroup = await service.removeTaskFromGroup(taskId);
+        const updatedGroup = await service.removeTicketFromGroup(ticketId);
         return updatedGroup;
     } catch (err) {
-        console.log('Failed to remove task from group' + err.message );
+        console.log('Failed to remove ticket from group' + err.message );
     }
 }
 
-async function updateTaskInGroup(taskId, taskData) {
+async function updateTicketInGroup(ticketId, ticketData) {
     try {
-        taskData._id=taskId;
-        const updatedTask = await service.updateTaskInGroup(taskData);
-        return updatedTask;
+        ticketData._id=ticketId;
+        const updatedTicket = await service.updateTicketInGroup(ticketData);
+        return updatedTicket;
     } catch (err) {
-        console.log('Failed to update task in group'+err.message );
+        console.log('Failed to update ticket in group'+err.message );
     }
 }
 
-// Sprint
-async function addSprintToGroup(groupId, sprintData) {
+// Incident
+async function addIncidentToGroup(groupId, incidentData) {
     try {
-        const updatedGroup = await service.addSprintToGroup(groupId, sprintData);
+        const updatedGroup = await service.addIncidentToGroup(groupId, incidentData);
         return updatedGroup;
     } catch (err) {
-        console.log('Failed to add sprint to group'+ err.message );
+        console.log('Failed to add incident to group'+ err.message );
     }
 }
 
-async function addSprint(sprintData) {
+async function addIncident(incidentData) {
     try {
-        const sprint = await workService.addSprint(sprintData);
-        return sprint;
+        const incident = await workService.addSncident(incidentData);
+        return incident;
     } catch (err) {
-        console.log('Failed to create sprint '+ err.message );
+        console.log('Failed to create incident '+ err.message );
     }
 }
 
-async function removeSprintFromGroup(sprintId) {
+async function removeIncidentFromGroup(incidentId) {
     try {
-        const updatedGroup = await service.removeSprintFromGroup(sprintId);
+        const updatedGroup = await service.removeIncidentFromGroup(incidentId);
         return updatedGroup;
     } catch (err) {
-        console.log('Failed to remove sprint from group' + err.message );
+        console.log('Failed to remove incident from group' + err.message );
     }
 }
 
-async function updateSprintInGroup(sprintId, sprintData) {
+async function updateIncidentInGroup(incidentId, incidentData) {
     try {
-        sprintData._id=sprintId;
-        const updatedSprint = await service.updateSprintInGroup(sprintData);
-        return updatedSprint;
+        incidentData._id=incidentId;
+        const updatedIncident = await service.updateIncidentInGroup(incidentData);
+        return updatedIncident;
     } catch (err) {
-        console.log('Failed to update sprint in group'+err.message );
+        console.log('Failed to update incident in group'+err.message );
     }
 }
-
-// Bug
-async function addBugToGroup(groupId, bugData) {
-    try {
-        const updatedGroup = await service.addBugToGroup(groupId, bugData);
-        return updatedGroup;
-    } catch (err) {
-        console.log('Failed to add bug to group'+ err.message );
-    }
-}
-
-async function addBug(itemData) {
-    try {
-        const bug = await workService.addBug(itemData);
-        return bug;
-    } catch (err) {
-        console.log('Failed to create bug '+ err.message );
-    }
-}
-
-async function removeBugFromGroup(bugId) {
-    try {
-        const updatedGroup = await service.removeBugFromGroup(bugId);
-        return updatedGroup;
-    } catch (err) {
-        console.log('Failed to remove bug from group' + err.message );
-    }
-}
-
-async function updateBugInGroup(bugId, bugData) {
-    try {
-        bugData._id=bugId;
-        const updatedBug = await service.updateBugInGroup(bugData);
-        return updatedBug;
-    } catch (err) {
-        console.log('Failed to update bug in group'+err.message );
-    }
-}
-
 
 module.exports = {
     getWorkspaces,
@@ -255,16 +216,12 @@ module.exports = {
     addGroupToBoard,
     removeGroupFromBoard,
     updateGroupInBoard,
-    addTaskToGroup,
-    addTask,
-    removeTaskFromGroup,
-    updateTaskInGroup,
-    addSprintToGroup,
-    addSprint,
-    removeSprintFromGroup,
-    updateSprintInGroup,
-    addBugToGroup,
-    addBug,
-    removeBugFromGroup,
-    updateBugInGroup,
+    addTicketToGroup,
+    addTicket,
+    removeTicketFromGroup,
+    updateTicketInGroup,
+    addIncidentToGroup,
+    addIncident,
+    removeIncidentFromGroup,
+    updateIncidentInGroup,
 };
