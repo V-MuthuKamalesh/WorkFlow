@@ -176,7 +176,7 @@ async function addIncidentToGroup(groupId, incidentData) {
 
 async function addIncident(incidentData) {
     try {
-        const incident = await workService.addSncident(incidentData);
+        const incident = await workService.addIncident(incidentData);
         return incident;
     } catch (err) {
         console.log('Failed to create incident '+ err.message );

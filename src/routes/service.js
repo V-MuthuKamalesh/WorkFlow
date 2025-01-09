@@ -121,7 +121,7 @@ module.exports = (io) => {
 
         socket.on('createIncident', async (data, callback) => {
             const { incident } = data;
-            const incidentData = await serviceController.addSncident(incident);
+            const incidentData = await serviceController.addIncident(incident);
             callback(incidentData);
         });
 
