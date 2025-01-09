@@ -19,6 +19,17 @@ async function addItemToGroup(groupId, itemData) {
     }
 }
 
+async function addItem(itemData) {
+    try {
+        const item = new Item(itemData);
+        await item.save();
+        return item;
+    } catch (err) {
+        console.error('Error creating item:', err);
+        throw { error: 'Failed to create item ', details: err.message };
+    }
+}
+
 async function removeItemFromGroup(itemId) {
     try {
         const item = await Item.findById(itemId);
@@ -128,6 +139,7 @@ async function removeMembersFromItem(itemId, userId) {
 
 module.exports = {
     addItemToGroup,
+    addItem,
     removeItemFromGroup,
     updateItemInGroup,
     addMembersToItem,

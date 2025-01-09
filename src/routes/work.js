@@ -101,6 +101,12 @@ module.exports = (io) => {
             callback(updatedGroup);
         });
 
+        socket.on('addItem', async (data, callback) => {
+            const { item } = data;
+            const itemData = await workController.addItemToGroup(item);
+            callback(itemData);
+        });
+
         socket.on('removeItemFromGroup', async (data, callback) => {
             const { itemId } = data;
             const updatedGroup = await workController.removeItemFromGroup(itemId);

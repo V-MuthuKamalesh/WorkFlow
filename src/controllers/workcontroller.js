@@ -156,6 +156,15 @@ async function addItemToGroup(groupId, itemData) {
     }
 }
 
+async function addItem(itemData) {
+    try {
+        const item = await workService.addItem(itemData);
+        return item;
+    } catch (err) {
+        console.log('Failed to create item '+ err.message );
+    }
+}
+
 async function removeItemFromGroup(itemId) {
     try {
         const updatedGroup = await workService.removeItemFromGroup(itemId);
@@ -211,6 +220,7 @@ module.exports = {
     removeGroupFromBoard,
     updateGroupInBoard,
     addItemToGroup,
+    addItem,
     removeItemFromGroup,
     updateItemInGroup,
     addMembersToItem,
