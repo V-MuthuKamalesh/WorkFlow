@@ -1,7 +1,7 @@
 const workspaceService = require('../services/workspace');
 const service = require('../services/service');
 const { Module } = require('../models/schema');
-const moduleId = "67766a5150a4edf07d7fc25d";
+const moduleId = "67766a5150a4edf07d7fc25e";
 
 async function getWorkspaces() {
     try {
