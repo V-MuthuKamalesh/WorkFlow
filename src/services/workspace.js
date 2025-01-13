@@ -35,6 +35,10 @@ async function getById(workspaceId) {
             .populate({
                 path: 'boards',
                 select: 'boardName', 
+            })
+            .populate({
+                path: 'members.userId', 
+                select: 'email fullname', 
             });
         if (!detailedWorkspace) {
             throw new Error('Workspace not found');
@@ -43,7 +47,15 @@ async function getById(workspaceId) {
             const { _id, boardName } = board.toObject();
             return { boardId: _id, boardName };
         });
-        return {workspaceId:workspaceId, workspaceName: detailedWorkspace.workspaceName, boards: transformedBoards }; 
+        const transformedMembers = detailedWorkspace.members.map(member => {
+            const { userId, role } = member.toObject();
+            return {
+                email: userId?.email || null,
+                fullname: userId?.fullname || null,
+                role, 
+            };
+        });
+        return {workspaceId:workspaceId, workspaceName: detailedWorkspace.workspaceName, boards: transformedBoards, members: transformedMembers, }; 
     } catch (err) {
         console.error('Error fetching workspace by ID:', err);
         throw err;
@@ -172,12 +184,13 @@ async function removeBoard(boardId) {
         if (!workspace) {
             throw new Error('Workspace not found for the specified board');
         }
+        const workspaceId = workspace._id;
         workspace.boards = workspace.boards.filter(
             (id) => id.toString() !== boardId
         );
         await workspace.save();
         await Board.findByIdAndDelete(boardId);
-        return workspace;
+        return await getById(workspaceId);
     } catch (err) {
         console.error('Error removing board:', err);
         throw err;
