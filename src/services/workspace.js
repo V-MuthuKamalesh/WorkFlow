@@ -167,7 +167,7 @@ async function addBoard(workspaceId, boardData) {
         await board.save();
         workspace.boards.push(board._id);
         const updatedWorkspace = await workspace.save();
-        return updatedWorkspace;
+        return {boardId:board.id, boardName};
     } catch (err) {
         console.error('Error adding board to workspace:', err);
         throw err;
