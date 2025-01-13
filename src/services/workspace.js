@@ -301,7 +301,7 @@ async function removeGroup(groupId) {
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
         await Group.findByIdAndDelete(groupId);
-        const updatedBoard = board
+        const newboard = await Board.findById(group.boardId)
             .populate({
                 path: 'groups',
                 populate: {
@@ -312,14 +312,14 @@ async function removeGroup(groupId) {
                     },
                 },
             });
-        if (!updatedBoard) {
+        if (!board) {
             throw new Error('Board not found');
         }
         return {
-            boardId: updatedBoard._id,
-            boardName: updatedBoard.boardName,
-            workspaceName: updatedBoard.workspaceName,
-            groups: updatedBoard.groups.map((group) => ({
+            boardId: newboard._id,
+            boardName: newboard.boardName,
+            workspaceName: newboard.workspaceName,
+            groups: newboard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.items.map((item) => ({
