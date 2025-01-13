@@ -1,4 +1,4 @@
-const { Board, Group, Item, User } = require('../models/schema'); 
+const {  Group, Item, User } = require('../models/schema'); 
 const { sendSlackNotification } = require('../utils/slack');
 
 // Item Functions
@@ -43,36 +43,7 @@ async function removeItemFromGroup(itemId) {
         group.items = group.items.filter((id) => id.toString() !== itemId);
         await group.save();
         await Item.findByIdAndDelete(itemId);
-        const board = await Board.findById(group.boardId)
-            .populate({
-                path: 'groups',
-                populate: {
-                    path: 'items',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
-                },
-            });
-        if (!board) {
-            throw new Error('Board not found');
-        }
-        return {
-            boardId: board._id,
-            boardName: board.boardName,
-            workspaceName: board.workspaceName,
-            groups: board.groups.map((group) => ({
-                groupId: group._id,
-                groupName: group.groupName,
-                items: group.items.map((item) => ({
-                    itemId: item._id,
-                    itemName: item.itemName,
-                    assignedToId: item.assignedToId,
-                    status: item.status || "",
-                    dueDate: item.dueDate || "",
-                })),
-            })),
-        };
+        return group;
     } catch (err) {
         console.error('Error removing item from group:', err);
         throw { error: 'Failed to remove item from group', details: err.message };

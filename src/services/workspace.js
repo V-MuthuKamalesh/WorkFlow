@@ -301,7 +301,36 @@ async function removeGroup(groupId) {
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
         await Group.findByIdAndDelete(groupId);
-        return board;
+        const updatedBoard = board
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'items',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!updatedBoard) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: updatedBoard._id,
+            boardName: updatedBoard.boardName,
+            workspaceName: updatedBoard.workspaceName,
+            groups: updatedBoard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                items: group.items.map((item) => ({
+                    itemId: item._id,
+                    itemName: item.itemName,
+                    assignedToId: item.assignedToId,
+                    status: item.status || "",
+                    dueDate: item.dueDate || "",
+                })),
+            })),
+        };
     } catch (err) {
         console.error('Error removing group from board:', err);
         throw { error: 'Failed to remove group', details: err.message };
