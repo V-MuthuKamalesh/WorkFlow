@@ -43,7 +43,7 @@ async function getById(workspaceId) {
             const { _id, boardName } = board.toObject();
             return { boardId: _id, boardName };
         });
-        return { workspaceName: detailedWorkspace.workspaceName, boards: transformedBoards }; 
+        return {workspaceId:workspaceId, workspaceName: detailedWorkspace.workspaceName, boards: transformedBoards }; 
     } catch (err) {
         console.error('Error fetching workspace by ID:', err);
         throw err;
