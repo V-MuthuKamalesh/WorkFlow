@@ -3,6 +3,7 @@ const router = express.Router();
 const userController = require('../controllers/usercontroller');
 const { validationMiddleware } = require('../middlewares/validationMiddleware.js');
 const { validateUser } = require('../utils/joi.js');
+router.post('/checkRole',userController.checkRole);
 router.post('/signup', validationMiddleware(validateUser), userController.signup);
 router.post('/email',userController.email);
 router.post('/oauth', userController.OAuth);

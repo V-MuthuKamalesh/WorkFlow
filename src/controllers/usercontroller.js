@@ -144,3 +144,14 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ message: 'Something went wrong!' });
   }
 };
+
+exports.checkRole = async (req, res) => {
+  try {
+    const { workspaceId, userId } = req.body;
+    const role = await userService.checkRole(workspaceId, userId);
+    res.status(200).json(role);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error occured!' });
+  }
+}

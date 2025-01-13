@@ -1,4 +1,4 @@
-const { User } = require('../models/schema'); 
+const { User, Workspace } = require('../models/schema'); 
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const { JWT_SECRET, SALT_ROUNDS } = process.env;
@@ -83,5 +83,27 @@ exports.getAllUsers = async () => {
     return await User.find(); 
   } catch (error) {
     throw new Error('Error fetching users');
+  }
+};
+
+exports.checkRole = async (workspaceId, userId) => {
+  try {
+      const workspace = await Workspace.findById(workspaceId).populate({
+          path: 'members.userId',
+          select: 'email fullname',
+      });
+      if (!workspace) {
+          throw new Error('Workspace not found');
+      }
+      const member = workspace.members.find(
+          (member) => member.userId && member.userId._id.toString() === userId
+      );
+      if (!member) {
+          throw new Error('User not found in this workspace');
+      }
+      return { role: member.role };
+  } catch (error) {
+      console.error('Error checking role:', error);
+      throw { error: 'Failed to check role', details: error.message };
   }
 };
