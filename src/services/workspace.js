@@ -190,7 +190,7 @@ async function removeBoard(boardId) {
         );
         await workspace.save();
         await Board.findByIdAndDelete(boardId);
-        return await getById(workspaceId);
+        return await boardId;
     } catch (err) {
         console.error('Error removing board:', err);
         throw err;
