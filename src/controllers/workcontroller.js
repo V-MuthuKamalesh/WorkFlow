@@ -24,7 +24,7 @@ async function getWorkspaceById(id) {
         // console.log(workspace);
         
         if (!workspace) console.log('Workspace not found');
-        return workspace;
+        return {workspaceId:id,workspace};
     } catch (err) {
         console.log('Failed to get workspace: ' + err.message);
     }
