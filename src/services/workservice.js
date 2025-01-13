@@ -12,7 +12,7 @@ async function addItemToGroup(groupId, itemData) {
         await item.save();
         group.items.push(item._id);
         await group.save();
-        return item;
+        return {itemId:item._id, itemName: item.itemName, assignedToId: item.assignedToId, status: item.status || "", dueDate: item.dueDate || "",};
     } catch (err) {
         console.error('Error adding item to group:', err);
         throw { error: 'Failed to add item to group', details: err.message };
