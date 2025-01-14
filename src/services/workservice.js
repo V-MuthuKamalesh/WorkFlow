@@ -147,7 +147,18 @@ async function removeMembersFromItem(itemId, userId) {
         const message = `Hello ${user.fullname},\n\nYou have been removed from the item "${item.itemName}".\n\nThank you!`;
         await sendSlackNotification(user.email, message);
 
-        return updatedItem;
+        await item.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = item.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error removing members from item:', err);
         throw err;
