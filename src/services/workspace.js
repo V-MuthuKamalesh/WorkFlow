@@ -38,7 +38,7 @@ async function getById(workspaceId) {
             })
             .populate({
                 path: 'members.userId', 
-                select: 'email fullname', 
+                select: 'email fullname _id', 
             });
         if (!detailedWorkspace) {
             throw new Error('Workspace not found');
@@ -50,6 +50,7 @@ async function getById(workspaceId) {
         const transformedMembers = detailedWorkspace.members.map(member => {
             const { userId, role } = member.toObject();
             return {
+                userId: userId || null,
                 email: userId?.email || null,
                 fullname: userId?.fullname || null,
                 role, 
