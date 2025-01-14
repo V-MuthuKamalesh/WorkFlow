@@ -50,7 +50,7 @@ async function getById(workspaceId) {
         const transformedMembers = detailedWorkspace.members.map(member => {
             const { userId, role } = member.toObject();
             return {
-                userId: userId || null,
+                userId: userId._id || null,
                 email: userId?.email || null,
                 fullname: userId?.fullname || null,
                 role, 
