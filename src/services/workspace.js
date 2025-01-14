@@ -241,13 +241,22 @@ async function getBoard(boardId) {
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                items: group.items.map((item) => ({
-                    itemId: item._id,
-                    itemName: item.itemName,
-                    assignedToId: item.assignedToId,
-                    status: item.status || "",
-                    dueDate: item.dueDate || "",
-                })),
+                items: group.items.map((item) => {
+                    const transformedAssignedTo = Array.isArray(item.assignedToId)
+                        ? item.assignedToId.map((assigned) => ({
+                              userId: assigned._id, 
+                              email: assigned.email,
+                              fullname: assigned.fullname,
+                          }))
+                        : null;
+                    return {
+                        itemId: item._id,
+                        itemName: item.itemName,
+                        assignedToId: transformedAssignedTo, 
+                        status: item.status || "",
+                        dueDate: item.dueDate || "",
+                    };
+                }),
             })),
         };
     } catch (err) {
@@ -255,6 +264,7 @@ async function getBoard(boardId) {
         throw { error: 'Failed to fetch board', details: err.message };
     }
 }
+
 
 // Group Functions
 async function addGroup(boardId, groupData) {
