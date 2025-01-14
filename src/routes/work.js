@@ -49,6 +49,13 @@ module.exports = (io) => {
             const response = await workController.addMemberToWorkspace(id, members, token);
             callback(response);
         });
+        
+        
+        socket.on('addMemberToWorkspace', async (data, callback) => {
+            const { id, members, token } = data;
+            const response = await workController.removeMemberToWorkspace(id, members, token);
+            callback(response);
+        });
 
         // Board events
         socket.on('addBoardToWorkspace', async (data, callback) => {
