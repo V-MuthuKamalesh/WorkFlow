@@ -101,7 +101,18 @@ async function addMembersToItem(itemId, userId) {
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the item "${item.itemName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
-        return updatedItem;
+        await item.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = item.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error adding members to item:', err);
         throw err;
