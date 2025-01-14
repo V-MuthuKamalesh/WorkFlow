@@ -12,7 +12,14 @@ async function addItemToGroup(groupId, itemData) {
         await item.save();
         group.items.push(item._id);
         await group.save();
-        return {itemId:item._id, itemName: item.itemName, assignedToId: item.assignedToId, status: item.status || "", dueDate: item.dueDate || "",};
+        const transformedAssignedTo = Array.isArray(item.assignedToId)
+            ? item.assignedToId.map(assigned => ({
+                  userId: assigned._id, 
+                  email: assigned.email,
+                  fullname: assigned.fullname,
+              }))
+            : null;
+        return {itemId:item._id, itemName: item.itemName, assignedToId: transformedAssignedTo, status: item.status || "", dueDate: item.dueDate || "",};
     } catch (err) {
         console.error('Error adding item to group:', err);
         throw { error: 'Failed to add item to group', details: err.message };
