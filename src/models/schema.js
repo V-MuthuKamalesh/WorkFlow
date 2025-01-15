@@ -21,6 +21,20 @@ const moduleSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
+const favouritesSchema = new Schema({
+  favouriteName: {
+    type: String,
+    enum: ['Workmanagement', 'CRM', 'Dev', 'Service'],
+    required: true,
+  },
+  description: { type: String, default: '' },
+  workspaces: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Workspace' }],
+  boards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Board' }],
+  createdAt: { type: Date, default: Date.now },
+  updatedAt: { type: Date, default: Date.now },
+});
+
+
 const workspaceSchema = new Schema({
   workspaceName: { type: String, required: true },
   description: { type: String },
@@ -243,6 +257,7 @@ const incidentSchema = new Schema({
 module.exports = {
   User : mongoose.model('User', userSchema),
   Module : mongoose.model('Module', moduleSchema),
+  Favourite : mongoose.model('Favourite', favouritesSchema),
   Workspace : mongoose.model('Workspace', workspaceSchema),
   Board : mongoose.model('Board', boardSchema),
   Group : mongoose.model('Group', groupSchema),

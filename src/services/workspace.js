@@ -96,10 +96,10 @@ async function add(workspaceData) {
     }
 }
 
-async function update(workspaceData) {
+async function update(id, workspaceData) {
     try {
         const updatedWorkspace = await Workspace.findByIdAndUpdate(
-            workspaceData._id,
+            id,
             { $set: workspaceData },
             { new: true }
         );
