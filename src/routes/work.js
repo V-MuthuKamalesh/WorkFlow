@@ -1,6 +1,6 @@
 const express = require('express');
 const workController = require('../controllers/workcontroller');
-
+const workspaceController = require('../controllers/workspacecontroller');
 const router = express.Router();
 
 module.exports = (io) => {
@@ -10,94 +10,96 @@ module.exports = (io) => {
 
         // Work-related events
         socket.on('getWorkspaces', async (data, callback) => {
-            const {token} = data;
-            const workspaces = await workController.getWorkspaces(token);
+            const {moduleId, token} = data;
+            const workspaces = await workspaceController.getWorkspaces(token, moduleId);
             callback(workspaces);
         });
 
         socket.on('getBoardsByWorkspaceById', async (data, callback) => {
             const {id}=data;
-            const workspace = await workController.getWorkspaceById(id);
+            const workspace = await workspaceController.getWorkspaceById(id);
             callback(workspace);
         });
         
         socket.on('getWorkspaceDetailsById', async (data, callback) => {
             const {id}=data;
-            const workspace = await workController.getWorkspaceDetailsById(id);
+            const workspace = await workspaceController.getWorkspaceDetailsById(id);
             callback(workspace);
         });
 
         socket.on('createWorkspace', async (data, callback) => {
-            const workspace = await workController.createWorkspace(data);
+            const {moduleId , workspaceData} =data;
+            workspaceData.moduleId = moduleId;
+            const workspace = await workspaceController.createWorkspace(workspaceData);
             callback(workspace);
         });
 
         socket.on('updateWorkspaceById', async (data, callback) => {
             const { id, updateData } = data;
-            const updatedWorkspace = await workController.updateWorkspace(id, updateData);
+            const updatedWorkspace = await workspaceController.updateWorkspace(id, updateData);
             callback(updatedWorkspace);
         });
 
         socket.on('deleteWorkspaceById', async (data, callback) => {
-            const  {id}  = data;
-            const result = await workController.deleteWorkspace(id);
+            const  {id, moduleId}  = data;
+            const result = await workspaceController.deleteWorkspace(id, moduleId);
             callback(result);
         });
 
         socket.on('addMemberToWorkspace', async (data, callback) => {
             const { id, members, token } = data;
-            const response = await workController.addMemberToWorkspace(id, members, token);
+            const response = await workspaceController.addMemberToWorkspace(id, members, token);
             callback(response);
         });
         
         
         socket.on('addMemberToWorkspace', async (data, callback) => {
             const { id, members, token } = data;
-            const response = await workController.removeMemberToWorkspace(id, members, token);
+            const response = await workspaceController.removeMemberToWorkspace(id, members, token);
             callback(response);
         });
 
         // Board events
         socket.on('addBoardToWorkspace', async (data, callback) => {
             const { id, board } = data;
-            const updatedWorkspace = await workController.addBoardToWorkspace(id, board);
+            const updatedWorkspace = await workspaceController.addBoardToWorkspace(id, board);
             callback(updatedWorkspace);
         });
 
         socket.on('removeBoardFromWorkspace', async (data, callback) => {
             const { boardId } = data;
-            const updatedWorkspace = await workController.removeBoardFromWorkspace(boardId);
+            const updatedWorkspace = await workspaceController.removeBoardFromWorkspace(boardId);
             callback(updatedWorkspace);
         });
 
         socket.on('updateBoardInWorkspace', async (data, callback) => {
             const { boardId, updateData } = data;
-            const updatedBoard = await workController.updateBoardInWorkspace(boardId, updateData);
+            const updatedBoard = await workspaceController.updateBoardInWorkspace(boardId, updateData);
             callback(updatedBoard);
         });
 
         socket.on('getBoardById', async (data, callback) => {
             const { boardId } = data;
-            const board = await workController.getBoardById(boardId);
+            const board = await workspaceController.getBoardById(boardId);
             callback(board);
         });
 
         // Group events
         socket.on('addGroupToBoard', async (data, callback) => {
             const { boardId, group } = data;
-            const updatedBoard = await workController.addGroupToBoard(boardId, group);
+            const updatedBoard = await workspaceController.addGroupToBoard(boardId, group);
             callback(updatedBoard);
         });
 
         socket.on('removeGroupFromBoard', async (data, callback) => {
             const { groupId } = data;
-            const updatedBoard = await workController.removeGroupFromBoard(groupId);
+            const updatedBoard = await workspaceController.removeGroupFromBoard(groupId);
             callback(updatedBoard);
         });
 
         socket.on('updateGroupInBoard', async (data, callback) => {
             const { groupId, updateData } = data;
-            const updatedGroup = await workController.updateGroupInBoard(groupId, updateData);
+            const updatedGroup = await workspaceController.updateGroupInBoard(groupId, updateData);
             callback(updatedGroup);
         });
 
