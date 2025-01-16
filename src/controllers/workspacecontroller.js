@@ -124,7 +124,7 @@ async function updateBoardInWorkspace(boardId, boardData) {
 
 async function getBoardById(boardId) {
     try {
-        const type = workService.getType(boardId);
+        const type = await workService.getType(boardId);
         let boardData;
         if(type=="Bug"){
             boardData = await devService.getBugBoard(boardId);
@@ -153,7 +153,7 @@ async function getBoardById(boardId) {
 
 async function addGroupToBoard(boardId, groupData, itemId) {
     try {
-        const type = workService.getType(boardId);
+        const type = await workService.getType(boardId);
         let boardData;
         if(type=="Bug"){
             boardData = await devService.addBugGroup(boardId, groupData, itemId);

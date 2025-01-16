@@ -613,7 +613,7 @@ async function addSprint(sprintData) {
     try {
         const sprint = new Sprint(sprintData);
         await sprint.save();
-        return {itemtId:sprint._id};
+        return {itemId:sprint._id};
     } catch (err) {
         console.error('Error creating sprint:', err);
         throw { error: 'Failed to create sprint ', details: err.message };
