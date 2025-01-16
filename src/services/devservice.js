@@ -1,4 +1,441 @@
-const { Group, Task, Sprint, Bug } = require('../models/schema'); 
+const { User, Board, Group, Task, Sprint, Bug } = require('../models/schema'); 
+
+async function getBugBoard(boardId) {
+    try {
+        const board = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'bugs',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: board._id,
+            boardName: board.boardName,
+            type: board.type || "",
+            workspaceName: board.workspaceName,
+            groups: board.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                bugs: group.bugs.map((bug) => {
+                    const transformedAssignedTo = Array.isArray(bug.assignedToId)
+                        ? bug.assignedToId.map((assigned) => ({
+                              userId: assigned._id, 
+                              email: assigned.email,
+                              fullname: assigned.fullname,
+                          }))
+                        : null;
+                    return {
+                        itemId: bug._id,
+                        bugName: bug.bugName,
+                        assignedToId: transformedAssignedTo, 
+                        status: bug.status || "",
+                        dueDate: bug.dueDate || "",
+                    };
+                }),
+            })),
+        };
+    } catch (err) {
+        console.error('Error fetching board:', err);
+        throw { error: 'Failed to fetch board', details: err.message };
+    }
+}
+
+
+// Group Functions
+async function addBugGroup(boardId, groupData) {
+    try {
+        const board = await Board.findById(boardId);
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        groupData.boardId = boardId;
+        const group = new Group(groupData);
+        await group.save();
+        board.groups.push(group._id);
+        await board.save();
+        const populatedBoard = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'bugs',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+
+        return {
+            boardId: populatedBoard._id,
+            boardName: populatedBoard.boardName,
+            type: populatedBoard.type || "",
+            workspaceName: populatedBoard.workspaceName,
+            groups: populatedBoard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                bugs: group.bugs.map((bug) => ({
+                    itemId: bug._id,
+                    bugName: bug.bugName,
+                    assignedToId: bug.assignedToId,
+                    status: bug.status || "",
+                    dueDate: bug.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error adding group to board:', err);
+        throw { error: 'Failed to add group to board', details: err.message };
+    }
+}
+
+async function removeBugGroup(groupId) {
+    try {
+        const group = await Group.findById(groupId);
+        if (!group) {
+            throw new Error('Group not found');
+        }
+        const board = await Board.findOne({ groups: groupId });
+        if (!board) {
+            throw new Error('Board containing the group not found');
+        }
+        board.groups = board.groups.filter(group => group.toString() !== groupId);
+        await board.save();
+        await Group.findByIdAndDelete(groupId);
+        const newboard = await Board.findById(group.boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'bugs',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: newboard._id,
+            boardName: newboard.boardName,
+            type: newboard.type || "",
+            workspaceName: newboard.workspaceName,
+            groups: newboard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                bugs: group.bugs.map((bug) => ({
+                    itemId: bug._id,
+                    bugName: bug.bugName,
+                    assignedToId: bug.assignedToId,
+                    status: bug.status || "",
+                    dueDate: bug.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error removing group from board:', err);
+        throw { error: 'Failed to remove group', details: err.message };
+    }
+}
+
+async function getSprintBoard(boardId) {
+    try {
+        const board = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'sprints',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: board._id,
+            boardName: board.boardName,
+            type: board.type || "",
+            workspaceName: board.workspaceName,
+            groups: board.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                sprints: group.sprints.map((sprint) => {
+                    const transformedAssignedTo = Array.isArray(sprint.assignedToId)
+                        ? sprint.assignedToId.map((assigned) => ({
+                              userId: assigned._id, 
+                              email: assigned.email,
+                              fullname: assigned.fullname,
+                          }))
+                        : null;
+                    return {
+                        itemId: sprint._id,
+                        sprintName: sprint.sprintName,
+                        assignedToId: transformedAssignedTo, 
+                        status: sprint.status || "",
+                        dueDate: sprint.dueDate || "",
+                    };
+                }),
+            })),
+        };
+    } catch (err) {
+        console.error('Error fetching board:', err);
+        throw { error: 'Failed to fetch board', details: err.message };
+    }
+}
+
+
+// Group Functions
+async function addSprintGroup(boardId, groupData) {
+    try {
+        const board = await Board.findById(boardId);
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        groupData.boardId = boardId;
+        const group = new Group(groupData);
+        await group.save();
+        board.groups.push(group._id);
+        await board.save();
+        const populatedBoard = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'sprints',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+
+        return {
+            boardId: populatedBoard._id,
+            boardName: populatedBoard.boardName,
+            type: populatedBoard.type || "",
+            workspaceName: populatedBoard.workspaceName,
+            groups: populatedBoard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                sprints: group.sprints.map((sprint) => ({
+                    itemId: sprint._id,
+                    sprintName: sprint.sprintName,
+                    assignedToId: sprint.assignedToId,
+                    status: sprint.status || "",
+                    dueDate: sprint.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error adding group to board:', err);
+        throw { error: 'Failed to add group to board', details: err.message };
+    }
+}
+
+async function removeSprintGroup(groupId) {
+    try {
+        const group = await Group.findById(groupId);
+        if (!group) {
+            throw new Error('Group not found');
+        }
+        const board = await Board.findOne({ groups: groupId });
+        if (!board) {
+            throw new Error('Board containing the group not found');
+        }
+        board.groups = board.groups.filter(group => group.toString() !== groupId);
+        await board.save();
+        await Group.findByIdAndDelete(groupId);
+        const newboard = await Board.findById(group.boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'sprints',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: newboard._id,
+            boardName: newboard.boardName,
+            type: newboard.type || "",
+            workspaceName: newboard.workspaceName,
+            groups: newboard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                sprints: group.sprints.map((sprint) => ({
+                    itemId: sprint._id,
+                    sprintName: sprint.sprintName,
+                    assignedToId: sprint.assignedToId,
+                    status: sprint.status || "",
+                    dueDate: sprint.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error removing group from board:', err);
+        throw { error: 'Failed to remove group', details: err.message };
+    }
+}
+
+async function getTaskBoard(boardId) {
+    try {
+        const board = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'tasks',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: board._id,
+            boardName: board.boardName,
+            type: board.type || "",
+            workspaceName: board.workspaceName,
+            groups: board.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                tasks: group.tasks.map((task) => {
+                    const transformedAssignedTo = Array.isArray(task.assignedToId)
+                        ? task.assignedToId.map((assigned) => ({
+                              userId: assigned._id, 
+                              email: assigned.email,
+                              fullname: assigned.fullname,
+                          }))
+                        : null;
+                    return {
+                        itemId: task._id,
+                        taskName: task.taskName,
+                        assignedToId: transformedAssignedTo, 
+                        status: task.status || "",
+                        dueDate: task.dueDate || "",
+                    };
+                }),
+            })),
+        };
+    } catch (err) {
+        console.error('Error fetching board:', err);
+        throw { error: 'Failed to fetch board', details: err.message };
+    }
+}
+
+
+// Group Functions
+async function addTaskGroup(boardId, groupData) {
+    try {
+        const board = await Board.findById(boardId);
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        groupData.boardId = boardId;
+        const group = new Group(groupData);
+        await group.save();
+        board.groups.push(group._id);
+        await board.save();
+        const populatedBoard = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'tasks',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+
+        return {
+            boardId: populatedBoard._id,
+            boardName: populatedBoard.boardName,
+            workspaceName: populatedBoard.workspaceName,
+            groups: populatedBoard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                tasks: group.tasks.map((task) => ({
+                    itemId: task._id,
+                    taskName: task.taskName,
+                    assignedToId: task.assignedToId,
+                    status: task.status || "",
+                    dueDate: task.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error adding group to board:', err);
+        throw { error: 'Failed to add group to board', details: err.message };
+    }
+}
+
+async function removeTaskGroup(groupId) {
+    try {
+        const group = await Group.findById(groupId);
+        if (!group) {
+            throw new Error('Group not found');
+        }
+        const board = await Board.findOne({ groups: groupId });
+        if (!board) {
+            throw new Error('Board containing the group not found');
+        }
+        board.groups = board.groups.filter(group => group.toString() !== groupId);
+        await board.save();
+        await Group.findByIdAndDelete(groupId);
+        const newboard = await Board.findById(group.boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'tasks',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: newboard._id,
+            boardName: newboard.boardName,
+            workspaceName: newboard.workspaceName,
+            groups: newboard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                tasks: group.tasks.map((task) => ({
+                    itemId: task._id,
+                    taskName: task.taskName,
+                    assignedToId: task.assignedToId,
+                    status: task.status || "",
+                    dueDate: task.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error removing group from board:', err);
+        throw { error: 'Failed to remove group', details: err.message };
+    }
+}
+
 // Task Functions
 async function addTaskToGroup(groupId, taskData) {
     try {
@@ -65,6 +502,91 @@ async function updateTaskInGroup(taskData) {
         throw { error: 'Failed to update task in group', details: err.message };
     }
 }
+
+async function addMembersToTask(itemId, userId) {
+    try {
+        const task = await Task.findById(itemId);
+        if (!task) {
+            throw new Error('Task not found');
+        }
+        const userAlreadyAssigned = task.assignedToId.some(
+            (id) => id.toString() === userId
+        );
+        if (userAlreadyAssigned) {
+            throw new Error('User is already assigned to this task');
+        }
+        task.assignedToId.push(userId);
+        await task.save();
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const message = `Hello ${user.fullname},\n\nYou have been assigned to the task "${task.taskName}". Please check the details and take necessary actions.\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+        await task.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = task.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error adding members to task:', err);
+        throw err;
+    }
+}
+
+async function removeMembersFromTask(itemId, userId) {
+    try {
+        const task = await Task.findById(itemId);
+        if (!task) {
+            throw new Error('Task not found');
+        }
+
+        let user = await User.findById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const userIndex = task.assignedToId.findIndex(
+            (id) => id.toString() === user._id.toString()
+        );
+
+        if (userIndex === -1) {
+            return 'User is not assigned to this task';
+        }
+
+        task.assignedToId.splice(userIndex, 1);
+
+        await task.save();
+
+        const message = `Hello ${user.fullname},\n\nYou have been removed from the task "${task.taskName}".\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+
+        await task.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = task.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error removing members from task:', err);
+        throw err;
+    }
+}
+
 
 // Sprint Functions
 async function addSprintToGroup(groupId, sprintData) {
@@ -133,6 +655,91 @@ async function updateSprintInGroup(sprintData) {
     }
 }
 
+async function addMembersToSprint(itemId, userId) {
+    try {
+        const sprint = await Sprint.findById(itemId);
+        if (!sprint) {
+            throw new Error('Sprint not found');
+        }
+        const userAlreadyAssigned = sprint.assignedToId.some(
+            (id) => id.toString() === userId
+        );
+        if (userAlreadyAssigned) {
+            throw new Error('User is already assigned to this sprint');
+        }
+        sprint.assignedToId.push(userId);
+        await sprint.save();
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const message = `Hello ${user.fullname},\n\nYou have been assigned to the sprint "${sprint.sprintName}". Please check the details and take necessary actions.\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+        await sprint.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = sprint.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error adding members to sprint:', err);
+        throw err;
+    }
+}
+
+async function removeMembersFromSprint(itemId, userId) {
+    try {
+        const sprint = await Sprint.findById(itemId);
+        if (!sprint) {
+            throw new Error('Sprint not found');
+        }
+
+        let user = await User.findById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const userIndex = sprint.assignedToId.findIndex(
+            (id) => id.toString() === user._id.toString()
+        );
+
+        if (userIndex === -1) {
+            return 'User is not assigned to this sprint';
+        }
+
+        sprint.assignedToId.splice(userIndex, 1);
+
+        await sprint.save();
+
+        const message = `Hello ${user.fullname},\n\nYou have been removed from the sprint "${sprint.sprintName}".\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+
+        await sprint.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = sprint.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error removing members from sprint:', err);
+        throw err;
+    }
+}
+
+
 // Bug Functions
 async function addBugToGroup(groupId, bugData) {
     try {
@@ -200,17 +807,117 @@ async function updateBugInGroup(bugData) {
     }
 }
 
+async function addMembersToBug(itemId, userId) {
+    try {
+        const bug = await Bug.findById(itemId);
+        if (!bug) {
+            throw new Error('Bug not found');
+        }
+        const userAlreadyAssigned = bug.assignedToId.some(
+            (id) => id.toString() === userId
+        );
+        if (userAlreadyAssigned) {
+            throw new Error('User is already assigned to this bug');
+        }
+        bug.assignedToId.push(userId);
+        const updatedItem = await bug.save();
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const message = `Hello ${user.fullname},\n\nYou have been assigned to the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+        await bug.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = bug.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error adding members to bug:', err);
+        throw err;
+    }
+}
+
+async function removeMembersFromBug(itemId, userId) {
+    try {
+        const bug = await Bug.findById(itemId);
+        if (!bug) {
+            throw new Error('Bug not found');
+        }
+
+        let user = await User.findById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const userIndex = bug.assignedToId.findIndex(
+            (id) => id.toString() === user._id.toString()
+        );
+
+        if (userIndex === -1) {
+            return 'User is not assigned to this bug';
+        }
+
+        bug.assignedToId.splice(userIndex, 1);
+
+        await bug.save();
+
+        const message = `Hello ${user.fullname},\n\nYou have been removed from the bug "${bug.bugName}".\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+
+        await bug.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = bug.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error removing members from bug:', err);
+        throw err;
+    }
+}
+
+
 module.exports = {
+    getBugBoard,
+    addBugGroup,
+    removeBugGroup,
+    getSprintBoard,
+    addSprintGroup,
+    removeSprintGroup,
+    getTaskBoard,
+    addTaskGroup,
+    removeTaskGroup,
     addTaskToGroup,
     addTask,
     removeTaskFromGroup,
     updateTaskInGroup,
+    addMembersToTask,
+    removeMembersFromTask,
     addSprintToGroup,
     addSprint,
     removeSprintFromGroup,
     updateSprintInGroup,
+    addMembersToSprint,
+    removeMembersFromSprint,
     addBugToGroup,
     addBug,
     removeBugFromGroup,
     updateBugInGroup,
+    addMembersToBug,
+    removeMembersFromBug,
 };

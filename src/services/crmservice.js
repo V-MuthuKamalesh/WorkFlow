@@ -1,4 +1,291 @@
 const { Group, Lead, Contact } = require('../models/schema'); 
+
+async function getBoard(boardId) {
+    try {
+        const board = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'items',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: board._id,
+            boardName: board.boardName,
+            workspaceName: board.workspaceName,
+            groups: board.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                items: group.items.map((item) => {
+                    const transformedAssignedTo = Array.isArray(item.assignedToId)
+                        ? item.assignedToId.map((assigned) => ({
+                              userId: assigned._id, 
+                              email: assigned.email,
+                              fullname: assigned.fullname,
+                          }))
+                        : null;
+                    return {
+                        itemId: item._id,
+                        itemName: item.itemName,
+                        assignedToId: transformedAssignedTo, 
+                        status: item.status || "",
+                        dueDate: item.dueDate || "",
+                    };
+                }),
+            })),
+        };
+    } catch (err) {
+        console.error('Error fetching board:', err);
+        throw { error: 'Failed to fetch board', details: err.message };
+    }
+}
+
+
+// Group Functions
+async function addGroup(boardId, groupData) {
+    try {
+        const board = await Board.findById(boardId);
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        groupData.boardId = boardId;
+        const group = new Group(groupData);
+        await group.save();
+        board.groups.push(group._id);
+        await board.save();
+        const populatedBoard = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'items',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+
+        return {
+            boardId: populatedBoard._id,
+            boardName: populatedBoard.boardName,
+            workspaceName: populatedBoard.workspaceName,
+            groups: populatedBoard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                items: group.items.map((item) => ({
+                    itemId: item._id,
+                    itemName: item.itemName,
+                    assignedToId: item.assignedToId,
+                    status: item.status || "",
+                    dueDate: item.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error adding group to board:', err);
+        throw { error: 'Failed to add group to board', details: err.message };
+    }
+}
+
+async function removeGroup(groupId) {
+    try {
+        const group = await Group.findById(groupId);
+        if (!group) {
+            throw new Error('Group not found');
+        }
+        const board = await Board.findOne({ groups: groupId });
+        if (!board) {
+            throw new Error('Board containing the group not found');
+        }
+        board.groups = board.groups.filter(group => group.toString() !== groupId);
+        await board.save();
+        await Group.findByIdAndDelete(groupId);
+        const newboard = await Board.findById(group.boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'items',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: newboard._id,
+            boardName: newboard.boardName,
+            workspaceName: newboard.workspaceName,
+            groups: newboard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                items: group.items.map((item) => ({
+                    itemId: item._id,
+                    itemName: item.itemName,
+                    assignedToId: item.assignedToId,
+                    status: item.status || "",
+                    dueDate: item.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error removing group from board:', err);
+        throw { error: 'Failed to remove group', details: err.message };
+    }
+}
+
+async function getBoard(boardId) {
+    try {
+        const board = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'items',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: board._id,
+            boardName: board.boardName,
+            workspaceName: board.workspaceName,
+            groups: board.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                items: group.items.map((item) => {
+                    const transformedAssignedTo = Array.isArray(item.assignedToId)
+                        ? item.assignedToId.map((assigned) => ({
+                              userId: assigned._id, 
+                              email: assigned.email,
+                              fullname: assigned.fullname,
+                          }))
+                        : null;
+                    return {
+                        itemId: item._id,
+                        itemName: item.itemName,
+                        assignedToId: transformedAssignedTo, 
+                        status: item.status || "",
+                        dueDate: item.dueDate || "",
+                    };
+                }),
+            })),
+        };
+    } catch (err) {
+        console.error('Error fetching board:', err);
+        throw { error: 'Failed to fetch board', details: err.message };
+    }
+}
+
+
+// Group Functions
+async function addGroup(boardId, groupData) {
+    try {
+        const board = await Board.findById(boardId);
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        groupData.boardId = boardId;
+        const group = new Group(groupData);
+        await group.save();
+        board.groups.push(group._id);
+        await board.save();
+        const populatedBoard = await Board.findById(boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'items',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+
+        return {
+            boardId: populatedBoard._id,
+            boardName: populatedBoard.boardName,
+            workspaceName: populatedBoard.workspaceName,
+            groups: populatedBoard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                items: group.items.map((item) => ({
+                    itemId: item._id,
+                    itemName: item.itemName,
+                    assignedToId: item.assignedToId,
+                    status: item.status || "",
+                    dueDate: item.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error adding group to board:', err);
+        throw { error: 'Failed to add group to board', details: err.message };
+    }
+}
+
+async function removeGroup(groupId) {
+    try {
+        const group = await Group.findById(groupId);
+        if (!group) {
+            throw new Error('Group not found');
+        }
+        const board = await Board.findOne({ groups: groupId });
+        if (!board) {
+            throw new Error('Board containing the group not found');
+        }
+        board.groups = board.groups.filter(group => group.toString() !== groupId);
+        await board.save();
+        await Group.findByIdAndDelete(groupId);
+        const newboard = await Board.findById(group.boardId)
+            .populate({
+                path: 'groups',
+                populate: {
+                    path: 'items',
+                    populate: {
+                        path: 'assignedToId',
+                        select: '_id email fullname',
+                    },
+                },
+            });
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return {
+            boardId: newboard._id,
+            boardName: newboard.boardName,
+            workspaceName: newboard.workspaceName,
+            groups: newboard.groups.map((group) => ({
+                groupId: group._id,
+                groupName: group.groupName,
+                items: group.items.map((item) => ({
+                    itemId: item._id,
+                    itemName: item.itemName,
+                    assignedToId: item.assignedToId,
+                    status: item.status || "",
+                    dueDate: item.dueDate || "",
+                })),
+            })),
+        };
+    } catch (err) {
+        console.error('Error removing group from board:', err);
+        throw { error: 'Failed to remove group', details: err.message };
+    }
+}
+
 // Lead Functions
 async function addLeadToGroup(groupId, leadData) {
     try {

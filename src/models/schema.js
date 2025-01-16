@@ -53,6 +53,7 @@ const workspaceSchema = new Schema({
 const boardSchema = new Schema({
   boardName: { type: String, required: true },
   workspaceName: { type: String }, 
+  type: { type: String},
   description: { type: String },
   createdById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
@@ -65,13 +66,10 @@ const groupSchema = new Schema({
   boardId: { type: mongoose.Schema.Types.ObjectId, ref: 'Board', required: true },
   items: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }],
   contacts: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Contact' }],
-  deals: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Deal' }],
   leads: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Lead' }],
-  projects: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Project' }],
   sprints: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Sprint' }],
   tasks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Task' }],
   bugs: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Bug' }],
-  epics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Epic' }],
   tickets: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Ticket' }],
   incidents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Incident' }],
   createdAt: { type: Date, default: Date.now },
@@ -92,6 +90,7 @@ const itemSchema = new Schema({
 });
 
 const contactSchema = new Schema({
+  contactName: { type: String, required: true },
   type: { type: String, required: true },
   deals: [
     {
@@ -99,7 +98,6 @@ const contactSchema = new Schema({
       dealTitle: { type: String },
     },
   ],
-  title: { type: String, required: true },
   priority: { type: String },
   phone: { type: String },
   email: { type: String },
@@ -109,33 +107,8 @@ const contactSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const dealSchema = new Schema({
-  stage: { type: String, required: true },
-  owner: {
-    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    username: { type: String },
-    fullname: { type: String },
-  },
-  dealValue: { type: Number },
-  contacts: [
-    {
-      contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
-      contactName: { type: String },
-    },
-  ],
-  priority: { type: String },
-  dealLength: { type: Number },
-  expectedCloseDate: { type: Date },
-  closeProbability: { type: Number },
-  forecastValue: { type: Number },
-  closeDate: { type: Date },
-  actualDealValue: { type: Number },
-  dealCreationDate: { type: Date },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
-
 const leadSchema = new Schema({
+  leadName: { type: String, required: true },
   status: { type: String, required: true },
   owner: {
     _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -147,7 +120,6 @@ const leadSchema = new Schema({
     contactName: { type: String },
   },
   company: { type: String },
-  title: { type: String },
   email: { type: String },
   phone: { type: String },
   location: { type: String },
@@ -156,43 +128,11 @@ const leadSchema = new Schema({
   updatedAt: { type: Date, default: Date.now },
 });
 
-const projectSchema = new Schema({
-  owner: {
-    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    username: { type: String },
-    fullname: { type: String },
-  },
-  priority: { type: String },
-  timeline: {
-    startDate: { type: Date },
-    endDate: { type: Date },
-  },
-  opportunity: {
-    dealId: { type: mongoose.Schema.Types.ObjectId, ref: 'Deal' },
-    dealTitle: { type: String },
-  },
-  status: { type: String },
-  phone: { type: String },
-  email: { type: String },
-  file: {
-    fileId: { type: mongoose.Schema.Types.ObjectId },
-    fileName: { type: String },
-    filePath: { type: String },
-  },
-  contact: {
-    contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
-    contactName: { type: String },
-  },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
-
 const taskSchema = new Schema({
   taskName: { type: String, required: true },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, 
-  status: { type: String, enum: ['Pending', 'In Progress', 'Completed'], default: 'Pending' },
-  priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
-  dueDate: { type: Date },
+  assignedToId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }], 
+  status: { type: String },
+  priority: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -200,59 +140,34 @@ const taskSchema = new Schema({
 const sprintSchema = new Schema({
   sprintName: { type: String, required: true },
   sprintGoals: { type: String, required: true },
-  sprintTimeline: {
-    startDate: { type: Date },
-    endDate: { type: Date },
-  },
-  connectedTasks: [
-    {
-      taskId: { type: mongoose.Schema.Types.ObjectId },
-      taskTitle: { type: String },
-    },
-  ],
+  startDate: { type: Date },
+  endDate: { type: Date },
+  connectedGroup: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
 const bugSchema = new Schema({
   bugName: { type: String, required: true },
-  reporter: {
-    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    username: { type: String },
-    fullname: { type: String },
-  },
-  reportDate: { type: Date },
-  developer: {
-    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    username: { type: String },
-    fullname: { type: String },
-  },
+  reporter: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+  developer: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
   priority: { type: String },
   status: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
 
-const epicSchema = new Schema(bugSchema.obj); 
-
-const ticketSchema = new Schema(bugSchema.obj); 
-
-const incidentSchema = new Schema({
-  status: { type: String, required: true },
-  text: { type: String },
-  people: [
-    {
-      _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      username: { type: String },
-      fullname: { type: String },
-    },
-  ],
-  dropdown: { type: String },
-  date: { type: Date },
-  numbers: { type: Number },
+const ticketSchema = new Schema({
+  ticketName: { type: String, required: true },
+  description: { type: String },
+  Employee: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+  Agent: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+  requestType: { type: String },
+  priority: { type: String },
+  status: { type: String },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
-});
+}); 
 
 module.exports = {
   User : mongoose.model('User', userSchema),
@@ -263,14 +178,10 @@ module.exports = {
   Group : mongoose.model('Group', groupSchema),
   Item : mongoose.model('Item', itemSchema),
   Contact: mongoose.model('Contact', contactSchema),
-  Deal: mongoose.model('Deal', dealSchema),
   Lead: mongoose.model('Lead', leadSchema),
-  Project: mongoose.model('Project', projectSchema),
   Sprint: mongoose.model('Sprint', sprintSchema),
   Bug: mongoose.model('Bug', bugSchema),
-  Epic: mongoose.model('Epic', epicSchema),
   Ticket: mongoose.model('Ticket', ticketSchema),
-  Incident: mongoose.model('Incident', incidentSchema),
   Task: mongoose.model('Task', taskSchema),
 };
 

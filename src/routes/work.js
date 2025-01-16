@@ -1,5 +1,4 @@
 const express = require('express');
-const workController = require('../controllers/workcontroller');
 const workspaceController = require('../controllers/workspacecontroller');
 const router = express.Router();
 
@@ -79,21 +78,21 @@ module.exports = (io) => {
         });
 
         socket.on('getBoardById', async (data, callback) => {
-            const { boardId } = data;
-            const board = await workspaceController.getBoardById(boardId);
+            const { boardId, type} = data;
+            const board = await workspaceController.getBoardById(boardId, type);
             callback(board);
         });
 
         // Group events
         socket.on('addGroupToBoard', async (data, callback) => {
-            const { boardId, group } = data;
-            const updatedBoard = await workspaceController.addGroupToBoard(boardId, group);
+            const { boardId, group, type } = data;
+            const updatedBoard = await workspaceController.addGroupToBoard(boardId, group, type);
             callback(updatedBoard);
         });
 
         socket.on('removeGroupFromBoard', async (data, callback) => {
-            const { groupId } = data;
-            const updatedBoard = await workspaceController.removeGroupFromBoard(groupId);
+            const { groupId, type } = data;
+            const updatedBoard = await workspaceController.removeGroupFromBoard(groupId, type);
             callback(updatedBoard);
         });
 
@@ -105,39 +104,39 @@ module.exports = (io) => {
 
         // Item events
         socket.on('addItemToGroup', async (data, callback) => {
-            const { groupId, item } = data;
-            const updatedGroup = await workController.addItemToGroup(groupId, item);
+            const { groupId, item, type } = data;
+            const updatedGroup = await workspaceController.addItemToGroup(groupId, item, type);
             callback(updatedGroup);
         });
 
         socket.on('createItem', async (data, callback) => {
-            const { item } = data;
-            const itemData = await workController.addItem(item);
+            const { item, type } = data;
+            const itemData = await workspaceController.addItem(item, type);
             callback(itemData);
         });
 
         socket.on('removeItemFromGroup', async (data, callback) => {
-            const { itemId } = data;
-            const updatedGroup = await workController.removeItemFromGroup(itemId);
+            const { itemId, group, type } = data;
+            const updatedGroup = await workspaceController.removeItemFromGroup(itemId, group, type);
             callback(updatedGroup);
         });
 
         socket.on('updateItemInGroup', async (data, callback) => {
-            const { itemId, updateData } = data;
-            const updatedItem = await workController.updateItemInGroup(itemId, updateData);
+            const { itemId, updateData, type } = data;
+            const updatedItem = await workspaceController.updateItemInGroup(itemId, updateData, type);
             callback(updatedItem);
         });
 
         socket.on('addMembersToItem', async (data, callback) => {
-            const { itemId, userId } = data;
-            const updatedItem = await workController.addMembersToItem(itemId, userId);
+            const { itemId, userId, type } = data;
+            const updatedItem = await workspaceController.addMembersToItem(itemId, userId, type);
             callback(updatedItem);
         });
 
         socket.on('removeMembersFromItem', async (data, callback) => {
-            const { itemId, userId } = data;
+            const { itemId, userId, type } = data;
             try {
-                const updatedItem = await workController.removeMembersFromItem(itemId, userId);
+                const updatedItem = await workspaceController.removeMembersFromItem(itemId, userId, type);
                 callback(updatedItem);
             } catch (err) {
                 callback({ error: err.message });

@@ -7,7 +7,7 @@ const { Server } = require('socket.io');
 
 const userRoutes = require('./src/routes/user');
 const workRoutes = require('./src/routes/work');
-const devRoutes = require('./src/routes/dev');
+// const devRoutes = require('./src/routes/dev');
 
 const app = express();
 const server = http.createServer(app); 
@@ -21,7 +21,7 @@ mongoose.connect(process.env.DATABASE_URL)
 
 app.use('/api/users', userRoutes); 
 app.use('/api/work', workRoutes(io)); 
-app.use('/api/dev', devRoutes(io)); 
+// app.use('/api/dev', devRoutes(io)); 
 
 const PORT = process.env.PORT;
 server.listen(PORT, () => {
