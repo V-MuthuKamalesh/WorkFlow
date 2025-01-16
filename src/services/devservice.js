@@ -22,15 +22,15 @@ async function getBugBoard(boardId) {
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.bugs.map((bug) => {
-                    const transformedReporter = Array.isArray(item.reporter)
-                    ? item.reporter.map((assigned) => ({
+                    const transformedReporter = Array.isArray(bug.reporter)
+                    ? bug.reporter.map((assigned) => ({
                           userId: assigned._id, 
                           email: assigned.email,
                           fullname: assigned.fullname,
                       }))
                     : [];
-                    const transformedDeveloper = Array.isArray(item.developer)
-                    ? item.developer.map((assigned) => ({
+                    const transformedDeveloper = Array.isArray(bug.developer)
+                    ? bug.developer.map((assigned) => ({
                           userId: assigned._id, 
                           email: assigned.email,
                           fullname: assigned.fullname,
