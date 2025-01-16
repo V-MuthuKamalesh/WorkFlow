@@ -122,8 +122,9 @@ async function updateBoardInWorkspace(boardId, boardData) {
     }
 }
 
-async function getBoardById(boardId, type) {
+async function getBoardById(boardId) {
     try {
+        const type = workService.getType(boardId);
         let boardData;
         if(type=="Bug"){
             boardData = await devService.getBugBoard(boardId);
@@ -150,8 +151,9 @@ async function getBoardById(boardId, type) {
 
 // Group Functions
 
-async function addGroupToBoard(boardId, groupData, type) {
+async function addGroupToBoard(boardId, groupData) {
     try {
+        const type = workService.getType(boardId);
         let boardData;
         if(type=="Bug"){
             boardData = await devService.addBugGroup(boardId, groupData);
@@ -175,7 +177,7 @@ async function addGroupToBoard(boardId, groupData, type) {
     }
 }
 
-async function removeGroupFromBoard(groupId, type) {
+async function removeGroupFromBoard(groupId,type) {
     try {
         let boardData;
         if(type=="Bug"){

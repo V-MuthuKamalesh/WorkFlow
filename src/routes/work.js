@@ -78,14 +78,14 @@ module.exports = (io) => {
         });
 
         socket.on('getBoardById', async (data, callback) => {
-            const { boardId, type} = data;
-            const board = await workspaceController.getBoardById(boardId, type);
+            const { boardId} = data;
+            const board = await workspaceController.getBoardById(boardId);
             callback(board);
         });
 
         // Group events
         socket.on('addGroupToBoard', async (data, callback) => {
-            const { boardId, group, type } = data;
+            const { boardId, group } = data;
             const updatedBoard = await workspaceController.addGroupToBoard(boardId, group, type);
             callback(updatedBoard);
         });

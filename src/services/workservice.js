@@ -49,6 +49,19 @@ async function getBoard(boardId) {
     }
 }
 
+async function getType(boardId) {
+    try {
+        const board = await Board.findById(boardId);
+        if (!board) {
+            throw new Error('Board not found');
+        }
+        return board.type || "";
+    } catch (err) {
+        console.error('Error fetching board:', err);
+        throw { error: 'Failed to fetch board', details: err.message };
+    }
+}
+
 
 // Group Functions
 async function addGroup(boardId, groupData) {
@@ -314,6 +327,7 @@ async function removeMembersFromItem(itemId, userId) {
 
 module.exports = {
     getBoard,
+    getType,
     addGroup,
     removeGroup,
     addItemToGroup,
