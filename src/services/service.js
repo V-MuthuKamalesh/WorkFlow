@@ -101,31 +101,31 @@ async function removeTicketGroup(groupId) {
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
         await Group.findByIdAndDelete(groupId);
-        const populatedBoard = await Board.findById(boardId)
+        const newboard = await Board.findById(group.boardId)
             .populate({
                 path: 'groups',
                 populate: {
                     path: 'tickets',
                 },
             });
-
+        if (!board) {
+            throw new Error('Board not found');
+        }
         return {
-            boardId: populatedBoard._id,
-            boardName: populatedBoard.boardName,
-            type: board.type || "",
-            workspaceName: populatedBoard.workspaceName,
-            groups: populatedBoard.groups.map((group) => ({
+            boardId: newboard._id,
+            boardName: newboard.boardName,
+            type: newboard.type || "",
+            workspaceName: newboard.workspaceName,
+            groups: newboard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.tickets.map((ticket) => ({
                     itemId: ticket._id,
                     ticketName: ticket.ticketName,
-                    description: ticket.description || "",
-                    employee: ticket.employee || [],
-                    agent: ticket.agent || [],
+                    reporter: ticket.reporter || [],
+                    developer: ticket.developer || [],
                     priority: ticket.priority || "",
                     status: ticket.status || "",
-                    requestType: ticket.requestType || "",
                 })),
             })),
         };
