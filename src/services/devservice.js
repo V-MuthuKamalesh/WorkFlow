@@ -24,7 +24,7 @@ async function getBugBoard(boardId) {
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                bugs: group.bugs.map((bug) => {
+                items: group.bugs.map((bug) => {
                     const transformedAssignedTo = Array.isArray(bug.assignedToId)
                         ? bug.assignedToId.map((assigned) => ({
                               userId: assigned._id, 
@@ -50,12 +50,13 @@ async function getBugBoard(boardId) {
 
 
 // Group Functions
-async function addBugGroup(boardId, groupData) {
+async function addBugGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
             throw new Error('Board not found');
         }
+        groupData.bugs=[itemId];
         groupData.boardId = boardId;
         const group = new Group(groupData);
         await group.save();
@@ -81,7 +82,7 @@ async function addBugGroup(boardId, groupData) {
             groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                bugs: group.bugs.map((bug) => ({
+                items: group.bugs.map((bug) => ({
                     itemId: bug._id,
                     bugName: bug.bugName,
                     assignedToId: bug.assignedToId,
@@ -131,7 +132,7 @@ async function removeBugGroup(groupId) {
             groups: newboard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                bugs: group.bugs.map((bug) => ({
+                items: group.bugs.map((bug) => ({
                     itemId: bug._id,
                     bugName: bug.bugName,
                     assignedToId: bug.assignedToId,
@@ -170,7 +171,7 @@ async function getSprintBoard(boardId) {
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                sprints: group.sprints.map((sprint) => {
+                items: group.sprints.map((sprint) => {
                     const transformedAssignedTo = Array.isArray(sprint.assignedToId)
                         ? sprint.assignedToId.map((assigned) => ({
                               userId: assigned._id, 
@@ -196,12 +197,13 @@ async function getSprintBoard(boardId) {
 
 
 // Group Functions
-async function addSprintGroup(boardId, groupData) {
+async function addSprintGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
             throw new Error('Board not found');
         }
+        groupData.sprints=[itemId];
         groupData.boardId = boardId;
         const group = new Group(groupData);
         await group.save();
@@ -227,7 +229,7 @@ async function addSprintGroup(boardId, groupData) {
             groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                sprints: group.sprints.map((sprint) => ({
+                items: group.sprints.map((sprint) => ({
                     itemId: sprint._id,
                     sprintName: sprint.sprintName,
                     assignedToId: sprint.assignedToId,
@@ -277,7 +279,7 @@ async function removeSprintGroup(groupId) {
             groups: newboard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                sprints: group.sprints.map((sprint) => ({
+                items: group.sprints.map((sprint) => ({
                     itemId: sprint._id,
                     sprintName: sprint.sprintName,
                     assignedToId: sprint.assignedToId,
@@ -316,7 +318,7 @@ async function getTaskBoard(boardId) {
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                tasks: group.tasks.map((task) => {
+                items: group.tasks.map((task) => {
                     const transformedAssignedTo = Array.isArray(task.assignedToId)
                         ? task.assignedToId.map((assigned) => ({
                               userId: assigned._id, 
@@ -342,12 +344,13 @@ async function getTaskBoard(boardId) {
 
 
 // Group Functions
-async function addTaskGroup(boardId, groupData) {
+async function addTaskGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
             throw new Error('Board not found');
         }
+        groupData.tasks=[itemId];
         groupData.boardId = boardId;
         const group = new Group(groupData);
         await group.save();
@@ -372,7 +375,7 @@ async function addTaskGroup(boardId, groupData) {
             groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                tasks: group.tasks.map((task) => ({
+                items: group.tasks.map((task) => ({
                     itemId: task._id,
                     taskName: task.taskName,
                     assignedToId: task.assignedToId,
@@ -421,7 +424,7 @@ async function removeTaskGroup(groupId) {
             groups: newboard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                tasks: group.tasks.map((task) => ({
+                items: group.tasks.map((task) => ({
                     itemId: task._id,
                     taskName: task.taskName,
                     assignedToId: task.assignedToId,

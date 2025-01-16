@@ -156,19 +156,19 @@ async function addGroupToBoard(boardId, groupData) {
         const type = workService.getType(boardId);
         let boardData;
         if(type=="Bug"){
-            boardData = await devService.addBugGroup(boardId, groupData);
+            boardData = await devService.addBugGroup(boardId, groupData, itemId);
         }else if(type=="Task"){
-            boardData = await devService.addTaskGroup(boardId, groupData);
+            boardData = await devService.addTaskGroup(boardId, groupData, itemId);
         }else if(type=="Sprint"){
-            boardData = await devService.addSprintGroup(boardId, groupData);
+            boardData = await devService.addSprintGroup(boardId, groupData, itemId);
         }else if(type=="Contact"){
-            boardData = await crmService.addContactGroup(boardId, groupData);
+            boardData = await crmService.addContactGroup(boardId, groupData, itemId);
         }else if(type=="Lead"){
-            boardData = await crmService.addLeadGroup(boardId, groupData);
+            boardData = await crmService.addLeadGroup(boardId, groupData, itemId);
         }else if(type=="Ticket"){
-            boardData = await service.addTicketGroup(boardId, groupData);
+            boardData = await service.addTicketGroup(boardId, groupData, itemId);
         }else{
-            boardData = await workService.addGroup(boardId, groupData);
+            boardData = await workService.addGroup(boardId, groupData, itemId);
         }
         
         return boardData;

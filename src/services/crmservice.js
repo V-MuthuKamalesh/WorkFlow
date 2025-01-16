@@ -23,7 +23,7 @@ async function getLeadBoard(boardId) {
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                leads: group.leads.map((lead) => {
+                items: group.leads.map((lead) => {
                     const transformedAssignedTo = Array.isArray(lead.assignedToId)
                         ? lead.assignedToId.map((assigned) => ({
                               userId: assigned._id, 
@@ -48,12 +48,13 @@ async function getLeadBoard(boardId) {
 }
 
 
-async function addLeadGroup(boardId, groupData) {
+async function addLeadGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
             throw new Error('Board not found');
         }
+        groupData.leads = [itemId];
         groupData.boardId = boardId;
         const group = new Group(groupData);
         await group.save();
@@ -78,7 +79,7 @@ async function addLeadGroup(boardId, groupData) {
             groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                leads: group.leads.map((lead) => ({
+                items: group.leads.map((lead) => ({
                     itemId: lead._id,
                     leadName: lead.leadName,
                     assignedToId: lead.assignedToId,
@@ -127,7 +128,7 @@ async function removeLeadGroup(groupId) {
             groups: newboard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                leads: group.leads.map((lead) => ({
+                items: group.leads.map((lead) => ({
                     itemId: lead._id,
                     leadName: lead.leadName,
                     assignedToId: lead.assignedToId,
@@ -190,12 +191,13 @@ async function getContactBoard(boardId) {
 }
 
 
-async function addContactGroup(boardId, groupData) {
+async function addContactGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
             throw new Error('Board not found');
         }
+        groupData.contacts=[itemId];
         groupData.boardId = boardId;
         const group = new Group(groupData);
         await group.save();
@@ -220,7 +222,7 @@ async function addContactGroup(boardId, groupData) {
             groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                contacts: group.contacts.map((contact) => ({
+                items: group.contacts.map((contact) => ({
                     itemId: contact._id,
                     contactName: contact.contactName,
                     assignedToId: contact.assignedToId,

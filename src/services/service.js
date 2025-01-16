@@ -23,7 +23,7 @@ async function getTicketBoard(boardId) {
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                tickets: group.tickets.map((ticket) => {
+                items: group.tickets.map((ticket) => {
                     const transformedAssignedTo = Array.isArray(ticket.assignedToId)
                         ? ticket.assignedToId.map((assigned) => ({
                               userId: assigned._id, 
@@ -49,12 +49,13 @@ async function getTicketBoard(boardId) {
 
 
 // Group Functions
-async function addTicketGroup(boardId, groupData) {
+async function addTicketGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
             throw new Error('Board not found');
         }
+        groupData.tickets = [itemId];
         groupData.boardId = boardId;
         const group = new Group(groupData);
         await group.save();
@@ -79,7 +80,7 @@ async function addTicketGroup(boardId, groupData) {
             groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                tickets: group.tickets.map((ticket) => ({
+                items: group.tickets.map((ticket) => ({
                     itemId: ticket._id,
                     ticketName: ticket.ticketName,
                     assignedToId: ticket.assignedToId,
@@ -128,7 +129,7 @@ async function removeTicketGroup(groupId) {
             groups: newboard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                tickets: group.tickets.map((ticket) => ({
+                items: group.tickets.map((ticket) => ({
                     itemId: ticket._id,
                     ticketName: ticket.ticketName,
                     assignedToId: ticket.assignedToId,

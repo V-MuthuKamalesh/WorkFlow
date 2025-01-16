@@ -64,12 +64,13 @@ async function getType(boardId) {
 
 
 // Group Functions
-async function addGroup(boardId, groupData) {
+async function addGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
             throw new Error('Board not found');
         }
+        groupData.items = [itemId];
         groupData.boardId = boardId;
         const group = new Group(groupData);
         await group.save();
