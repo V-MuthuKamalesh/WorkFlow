@@ -94,29 +94,27 @@ async function removeTicketGroup(groupId) {
         if (!group) {
             throw new Error('Group not found');
         }
-        const board = await Board.findOne({ groups: groupId });
+        const board = await Board.findOne(group.boardId);
         if (!board) {
             throw new Error('Board containing the group not found');
         }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
         await Group.findByIdAndDelete(groupId);
-        const newboard = await Board.findById(group.boardId)
+        const populatedBoard = await Board.findById(boardId)
             .populate({
                 path: 'groups',
                 populate: {
                     path: 'tickets',
                 },
             });
-        if (!board) {
-            throw new Error('Board not found');
-        }
+
         return {
-            boardId: newboard._id,
-            boardName: newboard.boardName,
+            boardId: populatedBoard._id,
+            boardName: populatedBoard.boardName,
             type: board.type || "",
-            workspaceName: newboard.workspaceName,
-            groups: newboard.groups.map((group) => ({
+            workspaceName: populatedBoard.workspaceName,
+            groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.tickets.map((ticket) => ({
