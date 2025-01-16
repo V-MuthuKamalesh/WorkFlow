@@ -161,7 +161,7 @@ const ticketSchema = new Schema({
   ticketName: { type: String, required: true },
   description: { type: String },
   employee: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
-  addEventListenergent: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+  agent: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
   requestType: { type: String },
   priority: { type: String },
   status: { type: String },
