@@ -7,10 +7,6 @@ async function getBugBoard(boardId) {
                 path: 'groups',
                 populate: {
                     path: 'bugs',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
                 },
             });
         if (!board) {
@@ -25,17 +21,9 @@ async function getBugBoard(boardId) {
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.bugs.map((bug) => {
-                    const transformedAssignedTo = Array.isArray(bug.assignedToId)
-                        ? bug.assignedToId.map((assigned) => ({
-                              userId: assigned._id, 
-                              email: assigned.email,
-                              fullname: assigned.fullname,
-                          }))
-                        : null;
                     return {
                         itemId: bug._id,
                         bugName: bug.bugName,
-                        assignedToId: transformedAssignedTo, 
                         status: bug.status || "",
                         dueDate: bug.dueDate || "",
                     };
