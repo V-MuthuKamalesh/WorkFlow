@@ -91,7 +91,7 @@ const itemSchema = new Schema({
 
 const leadSchema = new Schema({
   leadName: { type: String, required: true },
-  status: { type: String, required: true },
+  status: { type: String },
   company: { type: String },
   title: { type: String},
   email: { type: String },
