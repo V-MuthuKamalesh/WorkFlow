@@ -151,7 +151,7 @@ async function getBoardById(boardId) {
 
 // Group Functions
 
-async function addGroupToBoard(boardId, groupData) {
+async function addGroupToBoard(boardId, groupData, itemId) {
     try {
         const type = workService.getType(boardId);
         let boardData;
