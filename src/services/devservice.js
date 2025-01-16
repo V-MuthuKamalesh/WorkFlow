@@ -24,8 +24,10 @@ async function getBugBoard(boardId) {
                     return {
                         itemId: bug._id,
                         bugName: bug.bugName,
+                        reporter: bug.reporter || [],
+                        developer: bug.developer || [],
+                        priority: bug.priority || "",
                         status: bug.status || "",
-                        dueDate: bug.dueDate || "",
                     };
                 }),
             })),
@@ -69,8 +71,10 @@ async function addBugGroup(boardId, groupData, itemId) {
                 items: group.bugs.map((bug) => ({
                     itemId: bug._id,
                     bugName: bug.bugName,
+                    reporter: bug.reporter || [],
+                    developer: bug.developer || [],
+                    priority: bug.priority || "",
                     status: bug.status || "",
-                    dueDate: bug.dueDate || "",
                 })),
             })),
         };
@@ -114,8 +118,10 @@ async function removeBugGroup(groupId) {
                 items: group.bugs.map((bug) => ({
                     itemId: bug._id,
                     bugName: bug.bugName,
+                    reporter: bug.reporter || [],
+                    developer: bug.developer || [],
+                    priority: bug.priority || "",
                     status: bug.status || "",
-                    dueDate: bug.dueDate || "",
                 })),
             })),
         };

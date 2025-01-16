@@ -149,8 +149,8 @@ const sprintSchema = new Schema({
 
 const bugSchema = new Schema({
   bugName: { type: String, required: true },
-  reporter: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
-  developer: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+  reporter: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+  developer: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
   priority: { type: String },
   status: { type: String },
   createdAt: { type: Date, default: Date.now },
