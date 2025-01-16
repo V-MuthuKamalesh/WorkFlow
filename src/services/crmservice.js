@@ -63,6 +63,7 @@ async function addLeadGroup(boardId, groupData, itemId) {
         return {
             boardId: populatedBoard._id,
             boardName: populatedBoard.boardName,
+            type: board.type || "",
             workspaceName: populatedBoard.workspaceName,
             groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
@@ -110,6 +111,7 @@ async function removeLeadGroup(groupId) {
         return {
             boardId: newboard._id,
             boardName: newboard.boardName,
+            type: board.type || "",
             workspaceName: newboard.workspaceName,
             groups: newboard.groups.map((group) => ({
                 groupId: group._id,
