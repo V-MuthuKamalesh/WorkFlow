@@ -567,7 +567,7 @@ async function addSprintToGroup(groupId, sprintData) {
         await sprint.save();
         group.sprints.push(sprint._id);
         await group.save();
-        return group;
+        return {itemId:sprint._id, itemName: sprint.sprintName, sprintGoals: sprint.sprintGoals || "", startDate: sprint.startDate || "", endDate: sprint.endDate || "",};
     } catch (err) {
         console.error('Error adding sprint to group:', err);
         throw { error: 'Failed to add sprint to group', details: err.message };
@@ -719,7 +719,21 @@ async function addBugToGroup(groupId, bugData) {
         await bug.save();
         group.bugs.push(bug._id);
         await group.save();
-        return group;
+        const transformedReporter = Array.isArray(bug.reporter)
+            ? bug.reporter.map(assigned => ({
+                  userId: assigned._id, 
+                  email: assigned.email,
+                  fullname: assigned.fullname,
+              }))
+            : null;
+        const transformedDeveloper = Array.isArray(bug.developer)
+            ? bug.developer.map(assigned => ({
+                  userId: assigned._id, 
+                  email: assigned.email,
+                  fullname: assigned.fullname,
+              }))
+            : null;
+        return {itemId:bug._id, bugName: bug.bugName, reporter: transformedReporter, developer: transformedDeveloper, priority: bug.priority || "",status: bug.status || "",};
     } catch (err) {
         console.error('Error adding bug to group:', err);
         throw { error: 'Failed to add bug to group', details: err.message };
