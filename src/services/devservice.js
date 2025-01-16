@@ -55,10 +55,6 @@ async function addBugGroup(boardId, groupData, itemId) {
                 path: 'groups',
                 populate: {
                     path: 'bugs',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
                 },
             });
 
@@ -73,7 +69,6 @@ async function addBugGroup(boardId, groupData, itemId) {
                 items: group.bugs.map((bug) => ({
                     itemId: bug._id,
                     bugName: bug.bugName,
-                    assignedToId: bug.assignedToId,
                     status: bug.status || "",
                     dueDate: bug.dueDate || "",
                 })),
@@ -103,10 +98,6 @@ async function removeBugGroup(groupId) {
                 path: 'groups',
                 populate: {
                     path: 'bugs',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
                 },
             });
         if (!board) {
@@ -123,7 +114,6 @@ async function removeBugGroup(groupId) {
                 items: group.bugs.map((bug) => ({
                     itemId: bug._id,
                     bugName: bug.bugName,
-                    assignedToId: bug.assignedToId,
                     status: bug.status || "",
                     dueDate: bug.dueDate || "",
                 })),
