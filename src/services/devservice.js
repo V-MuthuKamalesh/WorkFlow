@@ -630,32 +630,32 @@ async function updateSprintInGroup(sprintData) {
     }
 }
 
-async function addMembersToSprint(itemId, userId) {
+async function addMembersToDeveloper(itemId, userId) {
     try {
-        const sprint = await Sprint.findById(itemId);
-        if (!sprint) {
-            throw new Error('Sprint not found');
+        const bug = await Bug.findById(itemId);
+        if (!bug) {
+            throw new Error('Bug not found');
         }
-        const userAlreadyAssigned = sprint.assignedToId.some(
+        const userAlreadyAssigned = bug.developer.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
-            throw new Error('User is already assigned to this sprint');
+            throw new Error('User is already assigned to this bug');
         }
-        sprint.assignedToId.push(userId);
-        await sprint.save();
+        bug.developer.push(userId);
+        await bug.save();
         const user = await User.findById(userId);
         if (!user) {
             throw new Error('User not found');
         }
-        const message = `Hello ${user.fullname},\n\nYou have been assigned to the sprint "${sprint.sprintName}". Please check the details and take necessary actions.\n\nThank you!`;
+        const message = `Hello ${user.fullname},\n\nYou have been assigned as a Developer to the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
-        await sprint.populate({
-            path: 'assignedToId',
+        await bug.populate({
+            path: 'developer',
             select: '_id email fullname',
         });
 
-        const transformedAssignedTo = sprint.assignedToId.map((assignedUser) => ({
+        const transformedAssignedTo = bug.developer.map((assignedUser) => ({
             userId: assignedUser._id,
             email: assignedUser.email,
             fullname: assignedUser.fullname,
@@ -663,16 +663,16 @@ async function addMembersToSprint(itemId, userId) {
 
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
-        console.error('Error adding members to sprint:', err);
+        console.error('Error adding members to bug:', err);
         throw err;
     }
 }
 
-async function removeMembersFromSprint(itemId, userId) {
+async function removeMembersFromDeveloper(itemId, userId) {
     try {
-        const sprint = await Sprint.findById(itemId);
-        if (!sprint) {
-            throw new Error('Sprint not found');
+        const bug = await Bug.findById(itemId);
+        if (!bug) {
+            throw new Error('Bug not found');
         }
 
         let user = await User.findById(userId);
@@ -681,27 +681,27 @@ async function removeMembersFromSprint(itemId, userId) {
             throw new Error('User not found');
         }
 
-        const userIndex = sprint.assignedToId.findIndex(
+        const userIndex = bug.developer.findIndex(
             (id) => id.toString() === user._id.toString()
         );
 
         if (userIndex === -1) {
-            return 'User is not assigned to this sprint';
+            return 'User is not assigned to this bug';
         }
 
-        sprint.assignedToId.splice(userIndex, 1);
+        bug.developer.splice(userIndex, 1);
 
-        await sprint.save();
+        await bug.save();
 
-        const message = `Hello ${user.fullname},\n\nYou have been removed from the sprint "${sprint.sprintName}".\n\nThank you!`;
+        const message = `Hello ${user.fullname},\n\nYou have been removed as a Developer from the bug "${bug.bugName}".\n\nThank you!`;
         await sendSlackNotification(user.email, message);
 
-        await sprint.populate({
-            path: 'assignedToId',
+        await bug.populate({
+            path: 'developer',
             select: '_id email fullname',
         });
 
-        const transformedAssignedTo = sprint.assignedToId.map((assignedUser) => ({
+        const transformedAssignedTo = bug.developer.map((assignedUser) => ({
             userId: assignedUser._id,
             email: assignedUser.email,
             fullname: assignedUser.fullname,
@@ -709,7 +709,7 @@ async function removeMembersFromSprint(itemId, userId) {
 
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
-        console.error('Error removing members from sprint:', err);
+        console.error('Error removing members from bug:', err);
         throw err;
     }
 }
@@ -796,32 +796,32 @@ async function updateBugInGroup(bugData) {
     }
 }
 
-async function addMembersToBug(itemId, userId) {
+async function addMembersToReporter(itemId, userId) {
     try {
         const bug = await Bug.findById(itemId);
         if (!bug) {
             throw new Error('Bug not found');
         }
-        const userAlreadyAssigned = bug.assignedToId.some(
+        const userAlreadyAssigned = bug.reporter.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
             throw new Error('User is already assigned to this bug');
         }
-        bug.assignedToId.push(userId);
-        const updatedItem = await bug.save();
+        bug.reporter.push(userId);
+        await bug.save();
         const user = await User.findById(userId);
         if (!user) {
             throw new Error('User not found');
         }
-        const message = `Hello ${user.fullname},\n\nYou have been assigned to the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
+        const message = `Hello ${user.fullname},\n\nYou have been assigned as Reporterto the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
         await bug.populate({
-            path: 'assignedToId',
+            path: 'reporter',
             select: '_id email fullname',
         });
 
-        const transformedAssignedTo = bug.assignedToId.map((assignedUser) => ({
+        const transformedAssignedTo = bug.reporter.map((assignedUser) => ({
             userId: assignedUser._id,
             email: assignedUser.email,
             fullname: assignedUser.fullname,
@@ -834,7 +834,7 @@ async function addMembersToBug(itemId, userId) {
     }
 }
 
-async function removeMembersFromBug(itemId, userId) {
+async function removeMembersFromReporter(itemId, userId) {
     try {
         const bug = await Bug.findById(itemId);
         if (!bug) {
@@ -847,27 +847,27 @@ async function removeMembersFromBug(itemId, userId) {
             throw new Error('User not found');
         }
 
-        const userIndex = bug.assignedToId.findIndex(
+        const userIndex = bug.reporter.findIndex(
             (id) => id.toString() === user._id.toString()
         );
 
         if (userIndex === -1) {
-            return 'User is not assigned to this bug';
+            return 'User is not assigned as Reporter to this bug';
         }
 
-        bug.assignedToId.splice(userIndex, 1);
+        bug.reporter.splice(userIndex, 1);
 
         await bug.save();
 
-        const message = `Hello ${user.fullname},\n\nYou have been removed from the bug "${bug.bugName}".\n\nThank you!`;
+        const message = `Hello ${user.fullname},\n\nYou have been removed as Reporter from the bug "${bug.bugName}".\n\nThank you!`;
         await sendSlackNotification(user.email, message);
 
         await bug.populate({
-            path: 'assignedToId',
+            path: 'reporter',
             select: '_id email fullname',
         });
 
-        const transformedAssignedTo = bug.assignedToId.map((assignedUser) => ({
+        const transformedAssignedTo = bug.reporter.map((assignedUser) => ({
             userId: assignedUser._id,
             email: assignedUser.email,
             fullname: assignedUser.fullname,
@@ -901,12 +901,12 @@ module.exports = {
     addSprint,
     removeSprintFromGroup,
     updateSprintInGroup,
-    addMembersToSprint,
-    removeMembersFromSprint,
+    addMembersToDeveloper,
+    removeMembersFromDeveloper,
     addBugToGroup,
     addBug,
     removeBugFromGroup,
     updateBugInGroup,
-    addMembersToBug,
-    removeMembersFromBug,
+    addMembersToReporter,
+    removeMembersFromReporter,
 };

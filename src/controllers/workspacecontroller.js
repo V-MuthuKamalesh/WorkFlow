@@ -297,16 +297,16 @@ async function updateItemInGroup(itemId, itemData, type) {
 async function addMembersToItem(itemId, userId, type) {
     try {
         let item;
-        if(type=="Bug"){
-            item = await devService.addMembersToBug(itemId, userId);
-        }else if(type=="Task"){
+        if(type=="reporter"){
+            item = await devService.addMembersToReporter(itemId, userId);
+        }else if(type=="task"){
             item = await devService.addMembersToTask(itemId, userId);
-        }else if(type=="Sprint"){
-            item = await devService.addMembersToSprint(itemId, userId);
-        }else if(type=="Lead"){
-            item = await crmService.addMembersToLead(itemId, userId);
-        }else if(type=="Ticket"){
-            item = await service.addMembersToTicket(itemId, userId);
+        }else if(type=="developer"){
+            item = await devService.addMembersToDeveloper(itemId, userId);
+        }else if(type=="agent"){
+            item = await service.addMembersToAgent(itemId, userId);
+        }else if(type=="employee"){
+            item = await service.addMembersToEmployee(itemId, userId);
         }else{
             item = await workService.addMembersToItem(itemId, userId);
         }
@@ -319,16 +319,16 @@ async function addMembersToItem(itemId, userId, type) {
 async function removeMembersFromItem(itemId, userId, type) {
     try {
         let item;
-        if(type=="Bug"){
-            item = await devService.removeMembersFromBug(itemId, userId);
-        }else if(type=="Task"){
+        if(type=="reporter"){
+            item = await devService.removeMembersFromReporter(itemId, userId);
+        }else if(type=="task"){
             item = await devService.removeMembersFromTask(itemId, userId);
-        }else if(type=="Sprint"){
-            item = await devService.removeMembersFromSprint(itemId, userId);
-        }else if(type=="Lead"){
-            item = await crmService.removeMembersFromLead(itemId, userId);
-        }else if(type=="Ticket"){
-            item = await service.removeMembersFromTicket(itemId, userId);
+        }else if(type=="developer"){
+            item = await devService.removeMembersFromDeveloper(itemId, userId);
+        }else if(type=="agent"){
+            item = await service.removeMembersFromAgent(itemId, userId);
+        }else if(type=="employee"){
+            item = await service.removeMembersFromEmployee(itemId, userId);
         }else{
             item = await workService.removeMembersFromItem(itemId, userId);
         }

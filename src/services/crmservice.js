@@ -200,89 +200,6 @@ async function updateLeadInGroup(leadData) {
     }
 }
 
-async function addMembersToLead(itemId, userId) {
-    try {
-        const lead = await Lead.findById(itemId);
-        if (!lead) {
-            throw new Error('Lead not found');
-        }
-        const userAlreadyAssigned = lead.assignedToId.some(
-            (id) => id.toString() === userId
-        );
-        if (userAlreadyAssigned) {
-            throw new Error('User is already assigned to this lead');
-        }
-        lead.assignedToId.push(userId);
-        await lead.save();
-        const user = await User.findById(userId);
-        if (!user) {
-            throw new Error('User not found');
-        }
-        const message = `Hello ${user.fullname},\n\nYou have been assigned to the lead "${lead.leadName}". Please check the details and take necessary actions.\n\nThank you!`;
-        await sendSlackNotification(user.email, message);
-        await lead.populate({
-            path: 'assignedToId',
-            select: '_id email fullname',
-        });
-
-        const transformedAssignedTo = lead.assignedToId.map((assignedUser) => ({
-            userId: assignedUser._id,
-            email: assignedUser.email,
-            fullname: assignedUser.fullname,
-        }));
-
-        return { assignedToId: transformedAssignedTo };
-    } catch (err) {
-        console.error('Error adding members to lead:', err);
-        throw err;
-    }
-}
-
-async function removeMembersFromLead(itemId, userId) {
-    try {
-        const lead = await Lead.findById(itemId);
-        if (!lead) {
-            throw new Error('Lead not found');
-        }
-
-        let user = await User.findById(userId);
-
-        if (!user) {
-            throw new Error('User not found');
-        }
-
-        const userIndex = lead.assignedToId.findIndex(
-            (id) => id.toString() === user._id.toString()
-        );
-
-        if (userIndex === -1) {
-            return 'User is not assigned to this lead';
-        }
-
-        lead.assignedToId.splice(userIndex, 1);
-
-        await lead.save();
-
-        const message = `Hello ${user.fullname},\n\nYou have been removed from the lead "${lead.leadName}".\n\nThank you!`;
-        await sendSlackNotification(user.email, message);
-
-        await lead.populate({
-            path: 'assignedToId',
-            select: '_id email fullname',
-        });
-
-        const transformedAssignedTo = lead.assignedToId.map((assignedUser) => ({
-            userId: assignedUser._id,
-            email: assignedUser.email,
-            fullname: assignedUser.fullname,
-        }));
-
-        return { assignedToId: transformedAssignedTo };
-    } catch (err) {
-        console.error('Error removing members from lead:', err);
-        throw err;
-    }
-}
 
 module.exports = {
     getLeadBoard,
@@ -292,6 +209,4 @@ module.exports = {
     addLead,
     removeLeadFromGroup,
     updateLeadInGroup,
-    addMembersToLead,
-    removeMembersFromLead,
 };

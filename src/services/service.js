@@ -216,7 +216,7 @@ async function updateTicketInGroup(ticketData) {
     }
 }
 
-async function addMembersToTicket(itemId, userId) {
+async function addMembersToAgent(itemId, userId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
@@ -254,7 +254,7 @@ async function addMembersToTicket(itemId, userId) {
     }
 }
 
-async function removeMembersFromTicket(itemId, userId) {
+async function removeMembersFromAgent(itemId, userId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
@@ -267,7 +267,7 @@ async function removeMembersFromTicket(itemId, userId) {
             throw new Error('User not found');
         }
 
-        const userIndex = ticket.assignedToId.findIndex(
+        const userIndex = ticket.agent.findIndex(
             (id) => id.toString() === user._id.toString()
         );
 
@@ -275,7 +275,7 @@ async function removeMembersFromTicket(itemId, userId) {
             return 'User is not assigned to this ticket';
         }
 
-        ticket.assignedToId.splice(userIndex, 1);
+        ticket.agent.splice(userIndex, 1);
 
         await ticket.save();
 
@@ -283,11 +283,11 @@ async function removeMembersFromTicket(itemId, userId) {
         await sendSlackNotification(user.email, message);
 
         await ticket.populate({
-            path: 'assignedToId',
+            path: 'agent',
             select: '_id email fullname',
         });
 
-        const transformedAssignedTo = ticket.assignedToId.map((assignedUser) => ({
+        const transformedAssignedTo = ticket.agent.map((assignedUser) => ({
             userId: assignedUser._id,
             email: assignedUser.email,
             fullname: assignedUser.fullname,
@@ -300,6 +300,89 @@ async function removeMembersFromTicket(itemId, userId) {
     }
 }
 
+async function addMembersToEmployee(itemId, userId) {
+    try {
+        const ticket = await Ticket.findById(itemId);
+        if (!ticket) {
+            throw new Error('Ticket not found');
+        }
+        const userAlreadyAssigned = ticket.employee.some(
+            (id) => id.toString() === userId
+        );
+        if (userAlreadyAssigned) {
+            throw new Error('User is already assigned to this ticket');
+        }
+        ticket.employee.push(userId);
+        await ticket.save();
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+        await ticket.populate({
+            path: 'employee',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = ticket.employee.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error adding members to ticket:', err);
+        throw err;
+    }
+}
+
+async function removeMembersFromEmployee(itemId, userId) {
+    try {
+        const ticket = await Ticket.findById(itemId);
+        if (!ticket) {
+            throw new Error('Ticket not found');
+        }
+
+        let user = await User.findById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const userIndex = ticket.employee.findIndex(
+            (id) => id.toString() === user._id.toString()
+        );
+
+        if (userIndex === -1) {
+            return 'User is not assigned to this ticket';
+        }
+
+        ticket.employee.splice(userIndex, 1);
+
+        await ticket.save();
+
+        const message = `Hello ${user.fullname},\n\nYou have been removed from the ticket "${ticket.ticketName}".\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+
+        await ticket.populate({
+            path: 'employee',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = ticket.employee.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error removing members from ticket:', err);
+        throw err;
+    }
+}
 
 module.exports = {
     getTicketBoard,
@@ -309,6 +392,8 @@ module.exports = {
     addTicket,
     removeTicketFromGroup,
     updateTicketInGroup,
-    addMembersToTicket,
-    removeMembersFromTicket,
+    addMembersToEmployee,
+    removeMembersFromEmployee,
+    addMembersToAgent,
+    removeMembersFromAgent,
 };
