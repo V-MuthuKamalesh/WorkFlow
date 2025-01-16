@@ -8,6 +8,14 @@ async function getBugBoard(boardId) {
                 path: 'groups',
                 populate: {
                     path: 'bugs',
+                    populate: {
+                        path: 'reporter',
+                        select: '_id email fullname',
+                    },
+                    populate: {
+                        path: 'developer',
+                        select: '_id email fullname',
+                    },
                 },
             });
         if (!board) {
@@ -35,7 +43,7 @@ async function getBugBoard(boardId) {
                           email: assigned.email,
                           fullname: assigned.fullname,
                       }))
-                    : null;
+                    : [];
                     return {
                         itemId: bug._id,
                         bugName: bug.bugName,
