@@ -1,4 +1,5 @@
 const { User, Board, Group, Task, Sprint, Bug } = require('../models/schema'); 
+const { sendSlackNotification } = require('../utils/slack');
 
 async function getBugBoard(boardId) {
     try {

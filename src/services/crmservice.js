@@ -1,4 +1,4 @@
-const { User, Board, Group, Lead } = require('../models/schema'); 
+const { Board, Group, Lead } = require('../models/schema'); 
 
 async function getLeadBoard(boardId) {
     try {
