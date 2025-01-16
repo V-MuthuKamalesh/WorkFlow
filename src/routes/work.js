@@ -86,7 +86,7 @@ module.exports = (io) => {
         // Group events
         socket.on('addGroupToBoard', async (data, callback) => {
             const { boardId, group } = data;
-            const updatedBoard = await workspaceController.addGroupToBoard(boardId, group, type);
+            const updatedBoard = await workspaceController.addGroupToBoard(boardId, group);
             callback(updatedBoard);
         });
 
