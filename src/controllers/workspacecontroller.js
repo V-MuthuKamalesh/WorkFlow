@@ -135,8 +135,6 @@ async function getBoardById(boardId, type) {
             boardData = await crmService.getContactBoard(boardId);
         }else if(type=="Lead"){
             boardData = await crmService.getLeadBoard(boardId);
-        }else if(type=="Incident"){
-            boardData = await service.getIncidentBoard(boardId);
         }else if(type=="Ticket"){
             boardData = await service.getTicketBoard(boardId);
         }else{
@@ -165,8 +163,6 @@ async function addGroupToBoard(boardId, groupData, type) {
             boardData = await crmService.addContactGroup(boardId, groupData);
         }else if(type=="Lead"){
             boardData = await crmService.addLeadGroup(boardId, groupData);
-        }else if(type=="Incident"){
-            boardData = await service.addIncidentGroup(boardId, groupData);
         }else if(type=="Ticket"){
             boardData = await service.addTicketGroup(boardId, groupData);
         }else{
@@ -192,8 +188,6 @@ async function removeGroupFromBoard(groupId, type) {
             boardData = await crmService.removeContactGroup(groupId);
         }else if(type=="Lead"){
             boardData = await crmService.removeLeadGroup(groupId);
-        }else if(type=="Incident"){
-            boardData = await service.removeIncidentGroup(groupId);
         }else if(type=="Ticket"){
             boardData = await service.removeTicketGroup(groupId);
         }else{
@@ -228,8 +222,6 @@ async function addItemToGroup(groupId, itemData, type) {
             updatedGroup = await crmService.addContactToGroup(groupId,itemData);
         }else if(type=="Lead"){
             updatedGroup = await crmService.addLeadToGroup(groupId,itemData);
-        }else if(type=="Incident"){
-            updatedGroup = await service.addIncidentToGroup(groupId,itemData);
         }else if(type=="Ticket"){
             updatedGroup = await service.addTicketToGroup(groupId,itemData);
         }else{
@@ -254,8 +246,6 @@ async function addItem(itemData, type) {
             item = await crmService.addContact(itemData);
         }else if(type=="Lead"){
             item = await crmService.addLead(itemData);
-        }else if(type=="Incident"){
-            item = await service.addIncident(itemData);
         }else if(type=="Ticket"){
             item = await service.addTicket(itemData);
         }else{
@@ -280,8 +270,6 @@ async function removeItemFromGroup(itemId, type) {
             updatedGroup = await crmService.removeContactFromGroup(itemId);
         }else if(type=="Lead"){
             updatedGroup = await crmService.removeLeadFromGroup(itemId);
-        }else if(type=="Incident"){
-            updatedGroup = await service.removeIncidentFromGroup(itemId);
         }else if(type=="Ticket"){
             updatedGroup = await service.removeTicketFromGroup(itemId);
         }else{
@@ -307,8 +295,6 @@ async function updateItemInGroup(itemId, itemData, type) {
             item = await crmService.updateContactInGroup(itemData);
         }else if(type=="Lead"){
             item = await crmService.updateLeadInGroup(itemData);
-        }else if(type=="Incident"){
-            item = await service.updateIncidentInGroup(itemData);
         }else if(type=="Ticket"){
             item = await service.updateTicketInGroup(itemData);
         }else{
@@ -333,8 +319,6 @@ async function addMembersToItem(itemId, userId, type) {
             item = await crmService.addMembersToContact(itemId, userId);
         }else if(type=="Lead"){
             item = await crmService.addMembersToLead(itemId, userId);
-        }else if(type=="Incident"){
-            item = await service.addMembersToIncident(itemId, userId);
         }else if(type=="Ticket"){
             item = await service.addMembersToTicket(itemId, userId);
         }else{
@@ -359,8 +343,6 @@ async function removeMembersFromItem(itemId, userId, type) {
             item = await crmService.removeMembersFromContact(itemId, userId);
         }else if(type=="Lead"){
             item = await crmService.removeMembersFromLead(itemId, userId);
-        }else if(type=="Incident"){
-            item = await service.removeMembersFromIncident(itemId, userId);
         }else if(type=="Ticket"){
             item = await service.removeMembersFromTicket(itemId, userId);
         }else{

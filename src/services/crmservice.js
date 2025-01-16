@@ -1,12 +1,12 @@
-const { Group, Lead, Contact } = require('../models/schema'); 
+const { User, Board, Group, Lead, Contact } = require('../models/schema'); 
 
-async function getBoard(boardId) {
+async function getLeadBoard(boardId) {
     try {
         const board = await Board.findById(boardId)
             .populate({
                 path: 'groups',
                 populate: {
-                    path: 'items',
+                    path: 'leads',
                     populate: {
                         path: 'assignedToId',
                         select: '_id email fullname',
@@ -23,20 +23,20 @@ async function getBoard(boardId) {
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                items: group.items.map((item) => {
-                    const transformedAssignedTo = Array.isArray(item.assignedToId)
-                        ? item.assignedToId.map((assigned) => ({
+                leads: group.leads.map((lead) => {
+                    const transformedAssignedTo = Array.isArray(lead.assignedToId)
+                        ? lead.assignedToId.map((assigned) => ({
                               userId: assigned._id, 
                               email: assigned.email,
                               fullname: assigned.fullname,
                           }))
                         : null;
                     return {
-                        itemId: item._id,
-                        itemName: item.itemName,
+                        itemId: lead._id,
+                        leadName: lead.leadName,
                         assignedToId: transformedAssignedTo, 
-                        status: item.status || "",
-                        dueDate: item.dueDate || "",
+                        status: lead.status || "",
+                        dueDate: lead.dueDate || "",
                     };
                 }),
             })),
@@ -48,8 +48,7 @@ async function getBoard(boardId) {
 }
 
 
-// Group Functions
-async function addGroup(boardId, groupData) {
+async function addLeadGroup(boardId, groupData) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
@@ -64,7 +63,7 @@ async function addGroup(boardId, groupData) {
             .populate({
                 path: 'groups',
                 populate: {
-                    path: 'items',
+                    path: 'leads',
                     populate: {
                         path: 'assignedToId',
                         select: '_id email fullname',
@@ -79,12 +78,12 @@ async function addGroup(boardId, groupData) {
             groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                items: group.items.map((item) => ({
-                    itemId: item._id,
-                    itemName: item.itemName,
-                    assignedToId: item.assignedToId,
-                    status: item.status || "",
-                    dueDate: item.dueDate || "",
+                leads: group.leads.map((lead) => ({
+                    itemId: lead._id,
+                    leadName: lead.leadName,
+                    assignedToId: lead.assignedToId,
+                    status: lead.status || "",
+                    dueDate: lead.dueDate || "",
                 })),
             })),
         };
@@ -94,7 +93,7 @@ async function addGroup(boardId, groupData) {
     }
 }
 
-async function removeGroup(groupId) {
+async function removeLeadGroup(groupId) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
@@ -111,7 +110,7 @@ async function removeGroup(groupId) {
             .populate({
                 path: 'groups',
                 populate: {
-                    path: 'items',
+                    path: 'leads',
                     populate: {
                         path: 'assignedToId',
                         select: '_id email fullname',
@@ -128,12 +127,12 @@ async function removeGroup(groupId) {
             groups: newboard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                items: group.items.map((item) => ({
-                    itemId: item._id,
-                    itemName: item.itemName,
-                    assignedToId: item.assignedToId,
-                    status: item.status || "",
-                    dueDate: item.dueDate || "",
+                leads: group.leads.map((lead) => ({
+                    itemId: lead._id,
+                    leadName: lead.leadName,
+                    assignedToId: lead.assignedToId,
+                    status: lead.status || "",
+                    dueDate: lead.dueDate || "",
                 })),
             })),
         };
@@ -143,13 +142,13 @@ async function removeGroup(groupId) {
     }
 }
 
-async function getBoard(boardId) {
+async function getContactBoard(boardId) {
     try {
         const board = await Board.findById(boardId)
             .populate({
                 path: 'groups',
                 populate: {
-                    path: 'items',
+                    path: 'contacts',
                     populate: {
                         path: 'assignedToId',
                         select: '_id email fullname',
@@ -166,20 +165,20 @@ async function getBoard(boardId) {
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                items: group.items.map((item) => {
-                    const transformedAssignedTo = Array.isArray(item.assignedToId)
-                        ? item.assignedToId.map((assigned) => ({
+                contacts: group.contacts.map((contact) => {
+                    const transformedAssignedTo = Array.isArray(contact.assignedToId)
+                        ? contact.assignedToId.map((assigned) => ({
                               userId: assigned._id, 
                               email: assigned.email,
                               fullname: assigned.fullname,
                           }))
                         : null;
                     return {
-                        itemId: item._id,
-                        itemName: item.itemName,
+                        itemId: contact._id,
+                        contactName: contact.contactName,
                         assignedToId: transformedAssignedTo, 
-                        status: item.status || "",
-                        dueDate: item.dueDate || "",
+                        status: contact.status || "",
+                        dueDate: contact.dueDate || "",
                     };
                 }),
             })),
@@ -191,8 +190,7 @@ async function getBoard(boardId) {
 }
 
 
-// Group Functions
-async function addGroup(boardId, groupData) {
+async function addContactGroup(boardId, groupData) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
@@ -207,7 +205,7 @@ async function addGroup(boardId, groupData) {
             .populate({
                 path: 'groups',
                 populate: {
-                    path: 'items',
+                    path: 'contacts',
                     populate: {
                         path: 'assignedToId',
                         select: '_id email fullname',
@@ -222,12 +220,12 @@ async function addGroup(boardId, groupData) {
             groups: populatedBoard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                items: group.items.map((item) => ({
-                    itemId: item._id,
-                    itemName: item.itemName,
-                    assignedToId: item.assignedToId,
-                    status: item.status || "",
-                    dueDate: item.dueDate || "",
+                contacts: group.contacts.map((contact) => ({
+                    itemId: contact._id,
+                    contactName: contact.contactName,
+                    assignedToId: contact.assignedToId,
+                    status: contact.status || "",
+                    dueDate: contact.dueDate || "",
                 })),
             })),
         };
@@ -237,7 +235,7 @@ async function addGroup(boardId, groupData) {
     }
 }
 
-async function removeGroup(groupId) {
+async function removeContactGroup(groupId) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
@@ -254,7 +252,7 @@ async function removeGroup(groupId) {
             .populate({
                 path: 'groups',
                 populate: {
-                    path: 'items',
+                    path: 'contacts',
                     populate: {
                         path: 'assignedToId',
                         select: '_id email fullname',
@@ -271,12 +269,12 @@ async function removeGroup(groupId) {
             groups: newboard.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                items: group.items.map((item) => ({
-                    itemId: item._id,
-                    itemName: item.itemName,
-                    assignedToId: item.assignedToId,
-                    status: item.status || "",
-                    dueDate: item.dueDate || "",
+                contacts: group.contacts.map((contact) => ({
+                    itemId: contact._id,
+                    contactName: contact.contactName,
+                    assignedToId: contact.assignedToId,
+                    status: contact.status || "",
+                    dueDate: contact.dueDate || "",
                 })),
             })),
         };
@@ -353,6 +351,90 @@ async function updateLeadInGroup(leadData) {
     }
 }
 
+async function addMembersToLead(itemId, userId) {
+    try {
+        const lead = await Lead.findById(itemId);
+        if (!lead) {
+            throw new Error('Lead not found');
+        }
+        const userAlreadyAssigned = lead.assignedToId.some(
+            (id) => id.toString() === userId
+        );
+        if (userAlreadyAssigned) {
+            throw new Error('User is already assigned to this lead');
+        }
+        lead.assignedToId.push(userId);
+        await lead.save();
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const message = `Hello ${user.fullname},\n\nYou have been assigned to the lead "${lead.leadName}". Please check the details and take necessary actions.\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+        await lead.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = lead.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error adding members to lead:', err);
+        throw err;
+    }
+}
+
+async function removeMembersFromLead(itemId, userId) {
+    try {
+        const lead = await Lead.findById(itemId);
+        if (!lead) {
+            throw new Error('Lead not found');
+        }
+
+        let user = await User.findById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const userIndex = lead.assignedToId.findIndex(
+            (id) => id.toString() === user._id.toString()
+        );
+
+        if (userIndex === -1) {
+            return 'User is not assigned to this lead';
+        }
+
+        lead.assignedToId.splice(userIndex, 1);
+
+        await lead.save();
+
+        const message = `Hello ${user.fullname},\n\nYou have been removed from the lead "${lead.leadName}".\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+
+        await lead.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = lead.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error removing members from lead:', err);
+        throw err;
+    }
+}
+
 // Contact Functions
 async function addContactToGroup(groupId, contactData) {
     try {
@@ -420,13 +502,107 @@ async function updateContactInGroup(contactData) {
     }
 }
 
+async function addMembersToContact(itemId, userId) {
+    try {
+        const contact = await Contact.findById(itemId);
+        if (!contact) {
+            throw new Error('Contact not found');
+        }
+        const userAlreadyAssigned = contact.assignedToId.some(
+            (id) => id.toString() === userId
+        );
+        if (userAlreadyAssigned) {
+            throw new Error('User is already assigned to this contact');
+        }
+        contact.assignedToId.push(userId);
+        await contact.save();
+        const user = await User.findById(userId);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        const message = `Hello ${user.fullname},\n\nYou have been assigned to the contact "${contact.contactName}". Please check the details and take necessary actions.\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+        await contact.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = contact.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error adding members to contact:', err);
+        throw err;
+    }
+}
+
+async function removeMembersFromContact(itemId, userId) {
+    try {
+        const contact = await Contact.findById(itemId);
+        if (!contact) {
+            throw new Error('Contact not found');
+        }
+
+        let user = await User.findById(userId);
+
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        const userIndex = contact.assignedToId.findIndex(
+            (id) => id.toString() === user._id.toString()
+        );
+
+        if (userIndex === -1) {
+            return 'User is not assigned to this contact';
+        }
+
+        contact.assignedToId.splice(userIndex, 1);
+
+        await contact.save();
+
+        const message = `Hello ${user.fullname},\n\nYou have been removed from the contact "${contact.contactName}".\n\nThank you!`;
+        await sendSlackNotification(user.email, message);
+
+        await contact.populate({
+            path: 'assignedToId',
+            select: '_id email fullname',
+        });
+
+        const transformedAssignedTo = contact.assignedToId.map((assignedUser) => ({
+            userId: assignedUser._id,
+            email: assignedUser.email,
+            fullname: assignedUser.fullname,
+        }));
+
+        return { assignedToId: transformedAssignedTo };
+    } catch (err) {
+        console.error('Error removing members from contact:', err);
+        throw err;
+    }
+}
+
 module.exports = {
+    getLeadBoard,
+    addLeadGroup,
+    removeLeadGroup,
+    getContactBoard,
+    addContactGroup,
+    removeContactGroup,
     addLeadToGroup,
     addLead,
     removeLeadFromGroup,
     updateLeadInGroup,
+    addMembersToLead,
+    removeMembersFromLead,
     addContactToGroup,
     addContact,
     removeContactFromGroup,
     updateContactInGroup,
+    addMembersToContact,
+    removeMembersFromContact,
 };
