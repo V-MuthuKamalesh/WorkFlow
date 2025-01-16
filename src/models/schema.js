@@ -139,10 +139,10 @@ const taskSchema = new Schema({
 
 const sprintSchema = new Schema({
   sprintName: { type: String, required: true },
-  sprintGoals: { type: String, required: true },
+  sprintGoals: { type: String },
   startDate: { type: Date },
   endDate: { type: Date },
-  connectedGroup: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group', required: true }],
+  connectedGroup: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

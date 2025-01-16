@@ -306,7 +306,7 @@ async function addLead(leadData) {
     try {
         const lead = new Lead(leadData);
         await lead.save();
-        return {leadId:lead._id};
+        return {itemId:lead._id};
     } catch (err) {
         console.error('Error creating lead:', err);
         throw { error: 'Failed to create lead ', details: err.message };
@@ -457,7 +457,7 @@ async function addContact(contactData) {
     try {
         const contact = new Contact(contactData);
         await contact.save();
-        return {contactId:contact._id};
+        return {itemId:contact._id};
     } catch (err) {
         console.error('Error creating contact:', err);
         throw { error: 'Failed to create contact ', details: err.message };

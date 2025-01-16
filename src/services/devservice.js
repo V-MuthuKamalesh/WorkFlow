@@ -458,7 +458,7 @@ async function addTask(taskData) {
     try {
         const task = new Task(taskData);
         await task.save();
-        return {taskId:task._id};
+        return {itemId:task._id};
     } catch (err) {
         console.error('Error creating task:', err);
         throw { error: 'Failed to create task ', details: err.message };
@@ -610,7 +610,7 @@ async function addSprint(sprintData) {
     try {
         const sprint = new Sprint(sprintData);
         await sprint.save();
-        return {sprintId:sprint._id};
+        return {itemtId:sprint._id};
     } catch (err) {
         console.error('Error creating sprint:', err);
         throw { error: 'Failed to create sprint ', details: err.message };
@@ -762,7 +762,7 @@ async function addBug(bugData) {
     try {
         const bug = new Bug(bugData);
         await bug.save();
-        return {bugId:bug._id};
+        return {itemId:bug._id};
     } catch (err) {
         console.error('Error creating item:', err);
         throw { error: 'Failed to create item ', details: err.message };

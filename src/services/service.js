@@ -165,7 +165,7 @@ async function addTicket(ticketData) {
     try {
         const ticket = new Ticket(ticketData);
         await ticket.save();
-        return {ticketId:ticket._id};
+        return {itemId:ticket._id};
     } catch (err) {
         console.error('Error creating ticket:', err);
         throw { error: 'Failed to create ticket ', details: err.message };
