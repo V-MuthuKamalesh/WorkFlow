@@ -567,7 +567,7 @@ async function addSprintToGroup(groupId, sprintData) {
         await sprint.save();
         group.sprints.push(sprint._id);
         await group.save();
-        return {itemId:sprint._id, itemName: sprint.sprintName, sprintGoals: sprint.sprintGoals || "", startDate: sprint.startDate || "", endDate: sprint.endDate || "",};
+        return {itemId:sprint._id, sprintName: sprint.sprintName, sprintGoals: sprint.sprintGoals || "", startDate: sprint.startDate || "", endDate: sprint.endDate || "",};
     } catch (err) {
         console.error('Error adding sprint to group:', err);
         throw { error: 'Failed to add sprint to group', details: err.message };
