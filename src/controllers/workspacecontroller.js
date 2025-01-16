@@ -132,8 +132,6 @@ async function getBoardById(boardId) {
             boardData = await devService.getTaskBoard(boardId);
         }else if(type=="Sprint"){
             boardData = await devService.getSprintBoard(boardId);
-        }else if(type=="Contact"){
-            boardData = await crmService.getContactBoard(boardId);
         }else if(type=="Lead"){
             boardData = await crmService.getLeadBoard(boardId);
         }else if(type=="Ticket"){
@@ -161,8 +159,6 @@ async function addGroupToBoard(boardId, groupData, itemId) {
             boardData = await devService.addTaskGroup(boardId, groupData, itemId);
         }else if(type=="Sprint"){
             boardData = await devService.addSprintGroup(boardId, groupData, itemId);
-        }else if(type=="Contact"){
-            boardData = await crmService.addContactGroup(boardId, groupData, itemId);
         }else if(type=="Lead"){
             boardData = await crmService.addLeadGroup(boardId, groupData, itemId);
         }else if(type=="Ticket"){
@@ -186,8 +182,6 @@ async function removeGroupFromBoard(groupId,type) {
             boardData = await devService.removeTaskGroup(groupId);
         }else if(type=="Sprint"){
             boardData = await devService.removeSprintGroup(groupId);
-        }else if(type=="Contact"){
-            boardData = await crmService.removeContactGroup(groupId);
         }else if(type=="Lead"){
             boardData = await crmService.removeLeadGroup(groupId);
         }else if(type=="Ticket"){
@@ -220,8 +214,6 @@ async function addItemToGroup(groupId, itemData, type) {
             updatedGroup = await devService.addTaskToGroup(groupId,itemData);
         }else if(type=="Sprint"){
             updatedGroup = await devService.addSprintToGroup(groupId,itemData);
-        }else if(type=="Contact"){
-            updatedGroup = await crmService.addContactToGroup(groupId,itemData);
         }else if(type=="Lead"){
             updatedGroup = await crmService.addLeadToGroup(groupId,itemData);
         }else if(type=="Ticket"){
@@ -244,8 +236,6 @@ async function addItem(itemData, type) {
             item = await devService.addTask(itemData);
         }else if(type=="Sprint"){
             item = await devService.addSprint(itemData);
-        }else if(type=="Contact"){
-            item = await crmService.addContact(itemData);
         }else if(type=="Lead"){
             item = await crmService.addLead(itemData);
         }else if(type=="Ticket"){
@@ -268,8 +258,6 @@ async function removeItemFromGroup(itemId, type) {
             updatedGroup = await devService.removeTaskFromGroup(itemId);
         }else if(type=="Sprint"){
             updatedGroup = await devService.removeSprintFromGroup(itemId);
-        }else if(type=="Contact"){
-            updatedGroup = await crmService.removeContactFromGroup(itemId);
         }else if(type=="Lead"){
             updatedGroup = await crmService.removeLeadFromGroup(itemId);
         }else if(type=="Ticket"){
@@ -293,8 +281,6 @@ async function updateItemInGroup(itemId, itemData, type) {
             item = await devService.updateTaskInGroup(itemData);
         }else if(type=="Sprint"){
             item = await devService.updateSprintInGroup(itemData);
-        }else if(type=="Contact"){
-            item = await crmService.updateContactInGroup(itemData);
         }else if(type=="Lead"){
             item = await crmService.updateLeadInGroup(itemData);
         }else if(type=="Ticket"){
@@ -317,8 +303,6 @@ async function addMembersToItem(itemId, userId, type) {
             item = await devService.addMembersToTask(itemId, userId);
         }else if(type=="Sprint"){
             item = await devService.addMembersToSprint(itemId, userId);
-        }else if(type=="Contact"){
-            item = await crmService.addMembersToContact(itemId, userId);
         }else if(type=="Lead"){
             item = await crmService.addMembersToLead(itemId, userId);
         }else if(type=="Ticket"){
@@ -341,8 +325,6 @@ async function removeMembersFromItem(itemId, userId, type) {
             item = await devService.removeMembersFromTask(itemId, userId);
         }else if(type=="Sprint"){
             item = await devService.removeMembersFromSprint(itemId, userId);
-        }else if(type=="Contact"){
-            item = await crmService.removeMembersFromContact(itemId, userId);
         }else if(type=="Lead"){
             item = await crmService.removeMembersFromLead(itemId, userId);
         }else if(type=="Ticket"){

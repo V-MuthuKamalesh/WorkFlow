@@ -89,41 +89,13 @@ const itemSchema = new Schema({
   updatedAt: { type: Date, default: Date.now }
 });
 
-const contactSchema = new Schema({
-  contactName: { type: String, required: true },
-  type: { type: String, required: true },
-  deals: [
-    {
-      dealId: { type: mongoose.Schema.Types.ObjectId, ref: 'Deal' },
-      dealTitle: { type: String },
-    },
-  ],
-  priority: { type: String },
-  phone: { type: String },
-  email: { type: String },
-  company: { type: String },
-  dealsValue: { type: Number },
-  createdAt: { type: Date, default: Date.now },
-  updatedAt: { type: Date, default: Date.now },
-});
-
 const leadSchema = new Schema({
   leadName: { type: String, required: true },
   status: { type: String, required: true },
-  owner: {
-    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    username: { type: String },
-    fullname: { type: String },
-  },
-  contact: {
-    contactId: { type: mongoose.Schema.Types.ObjectId, ref: 'Contact' },
-    contactName: { type: String },
-  },
   company: { type: String },
+  title: { type: String},
   email: { type: String },
-  phone: { type: String },
-  location: { type: String },
-  comments: { type: String },
+  lastInteraction: {type: Date},
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
@@ -177,7 +149,6 @@ module.exports = {
   Board : mongoose.model('Board', boardSchema),
   Group : mongoose.model('Group', groupSchema),
   Item : mongoose.model('Item', itemSchema),
-  Contact: mongoose.model('Contact', contactSchema),
   Lead: mongoose.model('Lead', leadSchema),
   Sprint: mongoose.model('Sprint', sprintSchema),
   Bug: mongoose.model('Bug', bugSchema),
