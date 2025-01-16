@@ -1,4 +1,4 @@
-const { User, Board, Group, Ticket, Incident } = require('../models/schema'); 
+const { User, Board, Group, Ticket } = require('../models/schema'); 
 
 async function getTicketBoard(boardId) {
     try {
@@ -7,10 +7,6 @@ async function getTicketBoard(boardId) {
                 path: 'groups',
                 populate: {
                     path: 'tickets',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
                 },
             });
         if (!board) {
@@ -25,19 +21,15 @@ async function getTicketBoard(boardId) {
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.tickets.map((ticket) => {
-                    const transformedAssignedTo = Array.isArray(ticket.assignedToId)
-                        ? ticket.assignedToId.map((assigned) => ({
-                              userId: assigned._id, 
-                              email: assigned.email,
-                              fullname: assigned.fullname,
-                          }))
-                        : null;
                     return {
                         itemId: ticket._id,
                         ticketName: ticket.ticketName,
-                        assignedToId: transformedAssignedTo, 
+                        description: ticket.description || "",
+                        employee: ticket.employee || [],
+                        agent: ticket.agent || [],
+                        priority: ticket.priority || "",
                         status: ticket.status || "",
-                        dueDate: ticket.dueDate || "",
+                        requestType: ticket.requestType || "",
                     };
                 }),
             })),
@@ -67,10 +59,6 @@ async function addTicketGroup(boardId, groupData, itemId) {
                 path: 'groups',
                 populate: {
                     path: 'tickets',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
                 },
             });
 
@@ -84,9 +72,12 @@ async function addTicketGroup(boardId, groupData, itemId) {
                 items: group.tickets.map((ticket) => ({
                     itemId: ticket._id,
                     ticketName: ticket.ticketName,
-                    assignedToId: ticket.assignedToId,
+                    description: ticket.description || "",
+                    employee: ticket.employee || [],
+                    agent: ticket.agent || [],
+                    priority: ticket.priority || "",
                     status: ticket.status || "",
-                    dueDate: ticket.dueDate || "",
+                    requestType: ticket.requestType || "",
                 })),
             })),
         };
@@ -114,10 +105,6 @@ async function removeTicketGroup(groupId) {
                 path: 'groups',
                 populate: {
                     path: 'tickets',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
                 },
             });
         if (!board) {
@@ -133,9 +120,12 @@ async function removeTicketGroup(groupId) {
                 items: group.tickets.map((ticket) => ({
                     itemId: ticket._id,
                     ticketName: ticket.ticketName,
-                    assignedToId: ticket.assignedToId,
+                    description: ticket.description || "",
+                    employee: ticket.employee || [],
+                    agent: ticket.agent || [],
+                    priority: ticket.priority || "",
                     status: ticket.status || "",
-                    dueDate: ticket.dueDate || "",
+                    requestType: ticket.requestType || "",
                 })),
             })),
         };
