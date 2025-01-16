@@ -152,14 +152,14 @@ async function addTicketToGroup(groupId, ticketData) {
                   email: assigned.email,
                   fullname: assigned.fullname,
               }))
-            : null;
+            : [];
         const transformedAgent = Array.isArray(ticket.developer)
             ? ticket.agent.map(assigned => ({
                   userId: assigned._id, 
                   email: assigned.email,
                   fullname: assigned.fullname,
               }))
-            : null;
+            : [];
         return {itemId:ticket._id, ticketName: ticket.ticketName, description: ticket.description || "", status: ticket.status || "", priority: ticket.priority || "",requestType: ticket.requestType || "", employee: transformedEmployee, agent: transformedAgent,};
     } catch (err) {
         console.error('Error adding ticket to group:', err);
