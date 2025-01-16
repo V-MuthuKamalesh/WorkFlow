@@ -149,8 +149,9 @@ async function getSprintBoard(boardId) {
                     return {
                         itemId: sprint._id,
                         sprintName: sprint.sprintName,
-                        status: sprint.status || "",
-                        dueDate: sprint.dueDate || "",
+                        sprintGoals: sprint.sprintGoals || "",
+                        startDate: sprint.startDate || "",
+                        endDate: sprint.endDate || "",
                     };
                 }),
             })),
@@ -194,8 +195,9 @@ async function addSprintGroup(boardId, groupData, itemId) {
                 items: group.sprints.map((sprint) => ({
                     itemId: sprint._id,
                     sprintName: sprint.sprintName,
-                    status: sprint.status || "",
-                    dueDate: sprint.dueDate || "",
+                    sprintGoals: sprint.sprintGoals || "",
+                    startDate: sprint.startDate || "",
+                    endDate: sprint.endDate || "",
                 })),
             })),
         };
@@ -239,8 +241,9 @@ async function removeSprintGroup(groupId) {
                 items: group.sprints.map((sprint) => ({
                     itemId: sprint._id,
                     sprintName: sprint.sprintName,
-                    status: sprint.status || "",
-                    dueDate: sprint.dueDate || "",
+                    sprintGoals: sprint.sprintGoals || "",
+                    startDate: sprint.startDate || "",
+                    endDate: sprint.endDate || "",
                 })),
             })),
         };
