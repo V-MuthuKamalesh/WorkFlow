@@ -146,7 +146,21 @@ async function addTicketToGroup(groupId, ticketData) {
         await ticket.save();
         group.tickets.push(ticket._id);
         await group.save();
-        return group;
+        const transformedEmployee = Array.isArray(ticket.reporter)
+            ? ticket.employee.map(assigned => ({
+                  userId: assigned._id, 
+                  email: assigned.email,
+                  fullname: assigned.fullname,
+              }))
+            : null;
+        const transformedAgent = Array.isArray(ticket.developer)
+            ? ticket.agent.map(assigned => ({
+                  userId: assigned._id, 
+                  email: assigned.email,
+                  fullname: assigned.fullname,
+              }))
+            : null;
+        return {itemId:ticket._id, ticketName: ticket.ticketName, description: ticket.description || "", status: ticket.status || "", priority: ticket.priority || "",requestType: ticket.requestType || "", employee: transformedEmployee, agent: transformedAgent,};
     } catch (err) {
         console.error('Error adding ticket to group:', err);
         throw { error: 'Failed to add ticket to group', details: err.message };

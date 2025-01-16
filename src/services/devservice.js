@@ -415,7 +415,14 @@ async function addTaskToGroup(groupId, taskData) {
         await task.save();
         group.tasks.push(task._id);
         await group.save();
-        return group;
+        const transformedAssignedTo = Array.isArray(task.assignedToId)
+            ? task.assignedToId.map(assigned => ({
+                  userId: assigned._id, 
+                  email: assigned.email,
+                  fullname: assigned.fullname,
+              }))
+            : null;
+        return {itemId:task._id, taskName: task.taskName, assignedToId: transformedAssignedTo, status: task.status || "", priority: task.priority || "",};
     } catch (err) {
         console.error('Error adding task to group:', err);
         throw { error: 'Failed to add task to group', details: err.message };

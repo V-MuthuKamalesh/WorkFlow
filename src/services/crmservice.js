@@ -144,7 +144,7 @@ async function addLeadToGroup(groupId, leadData) {
         await lead.save();
         group.leads.push(lead._id);
         await group.save();
-        return group;
+        return {itemId:lead._id, leadName: lead.leadName, status: lead.status || "", company: lead.company || "", title: lead.title || "",email: lead.email || "", lastInteraction: lead.lastInteraction || "",};
     } catch (err) {
         console.error('Error adding lead to group:', err);
         throw { error: 'Failed to add lead to group', details: err.message };
