@@ -132,10 +132,6 @@ async function getSprintBoard(boardId) {
                 path: 'groups',
                 populate: {
                     path: 'sprints',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
                 },
             });
         if (!board) {
@@ -150,17 +146,9 @@ async function getSprintBoard(boardId) {
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.sprints.map((sprint) => {
-                    const transformedAssignedTo = Array.isArray(sprint.assignedToId)
-                        ? sprint.assignedToId.map((assigned) => ({
-                              userId: assigned._id, 
-                              email: assigned.email,
-                              fullname: assigned.fullname,
-                          }))
-                        : null;
                     return {
                         itemId: sprint._id,
                         sprintName: sprint.sprintName,
-                        assignedToId: transformedAssignedTo, 
                         status: sprint.status || "",
                         dueDate: sprint.dueDate || "",
                     };
@@ -192,10 +180,6 @@ async function addSprintGroup(boardId, groupData, itemId) {
                 path: 'groups',
                 populate: {
                     path: 'sprints',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
                 },
             });
 
@@ -210,7 +194,6 @@ async function addSprintGroup(boardId, groupData, itemId) {
                 items: group.sprints.map((sprint) => ({
                     itemId: sprint._id,
                     sprintName: sprint.sprintName,
-                    assignedToId: sprint.assignedToId,
                     status: sprint.status || "",
                     dueDate: sprint.dueDate || "",
                 })),
@@ -240,10 +223,6 @@ async function removeSprintGroup(groupId) {
                 path: 'groups',
                 populate: {
                     path: 'sprints',
-                    populate: {
-                        path: 'assignedToId',
-                        select: '_id email fullname',
-                    },
                 },
             });
         if (!board) {
@@ -260,7 +239,6 @@ async function removeSprintGroup(groupId) {
                 items: group.sprints.map((sprint) => ({
                     itemId: sprint._id,
                     sprintName: sprint.sprintName,
-                    assignedToId: sprint.assignedToId,
                     status: sprint.status || "",
                     dueDate: sprint.dueDate || "",
                 })),
