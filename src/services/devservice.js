@@ -80,6 +80,14 @@ async function addBugGroup(boardId, groupData, itemId) {
                 path: 'groups',
                 populate: {
                     path: 'bugs',
+                    populate: {
+                        path: 'reporter',
+                        select: '_id email fullname',
+                    },
+                    populate: {
+                        path: 'developer',
+                        select: '_id email fullname',
+                    },
                 },
             });
 
@@ -125,6 +133,14 @@ async function removeBugGroup(groupId) {
                 path: 'groups',
                 populate: {
                     path: 'bugs',
+                    populate: {
+                        path: 'reporter',
+                        select: '_id email fullname',
+                    },
+                    populate: {
+                        path: 'developer',
+                        select: '_id email fullname',
+                    },
                 },
             });
         if (!board) {
