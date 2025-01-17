@@ -82,6 +82,14 @@ async function addTicketGroup(boardId, groupData, itemId) {
                 path: 'groups',
                 populate: {
                     path: 'tickets',
+                    populate: {
+                        path: 'employee',
+                        select: '_id email fullname',
+                    },
+                    populate: {
+                        path: 'agent',
+                        select: '_id email fullname',
+                    },
                 },
             });
 
@@ -129,6 +137,14 @@ async function removeTicketGroup(groupId) {
                 path: 'groups',
                 populate: {
                     path: 'tickets',
+                    populate: {
+                        path: 'employee',
+                        select: '_id email fullname',
+                    },
+                    populate: {
+                        path: 'agent',
+                        select: '_id email fullname',
+                    },
                 },
             });
         if (!board) {
