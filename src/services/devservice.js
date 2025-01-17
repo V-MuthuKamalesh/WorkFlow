@@ -503,7 +503,7 @@ async function removeTaskFromGroup(taskId) {
 
 async function updateTaskInGroup(taskData) {
     try {
-        const task = await task.findById(taskData._id);
+        const task = await Task.findById(taskData._id);
         if (!task) {
             throw new Error('task not found');
         }
@@ -511,7 +511,7 @@ async function updateTaskInGroup(taskData) {
             ...taskData,
             assignedToId: taskData.assignedToId.map(user => user.userId),
         };
-        const updatedTask = await task.findByIdAndUpdate(
+        const updatedTask = await Task.findByIdAndUpdate(
             taskData._id,
             { $set: taskData },
             { new: true }

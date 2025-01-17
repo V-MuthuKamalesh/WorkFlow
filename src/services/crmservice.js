@@ -184,11 +184,11 @@ async function removeLeadFromGroup(leadId) {
 
 async function updateLeadInGroup(leadData) {
     try {
-        const lead = await lead.findById(leadData._id);
+        const lead = await Lead.findById(leadData._id);
         if (!leadead) {
             throw new Error('lead not found');
         }
-        const updatedLead = await lead.findByIdAndUpdate(
+        const updatedLead = await Lead.findByIdAndUpdate(
             leadData._id,
             { $set: leadData },
             { new: true }
