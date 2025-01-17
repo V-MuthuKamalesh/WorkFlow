@@ -8,6 +8,14 @@ async function getTicketBoard(boardId) {
                 path: 'groups',
                 populate: {
                     path: 'tickets',
+                    populate: {
+                        path: 'employee',
+                        select: '_id email fullname',
+                    },
+                    populate: {
+                        path: 'agent',
+                        select: '_id email fullname',
+                    },
                 },
             });
         if (!board) {
@@ -22,12 +30,26 @@ async function getTicketBoard(boardId) {
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.tickets.map((ticket) => {
+                    const transformedEmployee = Array.isArray(ticket.employee)
+                        ? ticket.employee.map((assigned) => ({
+                              userId: assigned._id, 
+                              email: assigned.email,
+                              fullname: assigned.fullname,
+                          }))
+                        : [];
+                    const transformedAgent = Array.isArray(ticket.agent)
+                        ? ticket.agent.map((assigned) => ({
+                              userId: assigned._id, 
+                              email: assigned.email,
+                              fullname: assigned.fullname,
+                          }))
+                        : [];
                     return {
                         itemId: ticket._id,
                         ticketName: ticket.ticketName,
                         description: ticket.description || "",
-                        employee: ticket.employee || [],
-                        agent: ticket.agent || [],
+                        employee: transformedEmployee,
+                        agent: transformedAgent,
                         priority: ticket.priority || "",
                         status: ticket.status || "",
                         requestType: ticket.requestType || "",
