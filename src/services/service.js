@@ -201,7 +201,7 @@ async function removeTicketFromGroup(ticketId) {
 
 async function updateTicketInGroup(ticketData) {
     try {
-        const ticket = await ticket.findById(ticketData._id);
+        const ticket = await Ticket.findById(ticketData._id);
         if (!ticket) {
             throw new Error('ticket not found');
         }
