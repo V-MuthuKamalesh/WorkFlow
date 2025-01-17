@@ -210,7 +210,7 @@ async function updateTicketInGroup(ticketData) {
             employee: ticketData.employee.map(user => user.userId),
             agent: ticketData.agent.map(user => user.userId),
         };
-        const updatedTicket = await ticket.findByIdAndUpdate(
+        const updatedTicket = await Ticket.findByIdAndUpdate(
             ticketData._id,
             { $set: ticketData },
             { new: true }
