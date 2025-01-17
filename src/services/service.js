@@ -259,13 +259,13 @@ async function addMembersToAgent(itemId, userId) {
         if (!ticket) {
             throw new Error('Ticket not found');
         }
-        const userAlreadyAssigned = ticket.assignedToId.some(
+        const userAlreadyAssigned = ticket.agent.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
             throw new Error('User is already assigned to this ticket');
         }
-        ticket.assignedToId.push(userId);
+        ticket.agent.push(userId);
         await ticket.save();
         const user = await User.findById(userId);
         if (!user) {
@@ -274,11 +274,11 @@ async function addMembersToAgent(itemId, userId) {
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
         await ticket.populate({
-            path: 'assignedToId',
+            path: 'agent',
             select: '_id email fullname',
         });
 
-        const transformedAssignedTo = ticket.assignedToId.map((assignedUser) => ({
+        const transformedAssignedTo = ticket.agent.map((assignedUser) => ({
             userId: assignedUser._id,
             email: assignedUser.email,
             fullname: assignedUser.fullname,

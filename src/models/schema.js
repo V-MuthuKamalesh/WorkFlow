@@ -6,6 +6,7 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   fullname: { type: String, required: true },
   imgUrl: { type: String },
+  notification: { type: String },
   createdAt: { type: Date, default: Date.now }
 });
 
@@ -102,7 +103,7 @@ const leadSchema = new Schema({
 
 const taskSchema = new Schema({
   taskName: { type: String, required: true },
-  assignedToId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }], 
+  assignedToId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}], 
   status: { type: String },
   priority: { type: String },
   createdAt: { type: Date, default: Date.now },
@@ -132,8 +133,8 @@ const bugSchema = new Schema({
 const ticketSchema = new Schema({
   ticketName: { type: String, required: true },
   description: { type: String },
-  employee: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
-  agent: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }],
+  employee: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+  agent: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
   requestType: { type: String },
   priority: { type: String },
   status: { type: String },

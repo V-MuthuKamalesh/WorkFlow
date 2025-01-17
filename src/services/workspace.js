@@ -1,4 +1,4 @@
-const { Module, Workspace, Board, Group } = require('../models/schema'); 
+const { User, Module, Workspace, Board, Group } = require('../models/schema'); 
 
 
 async function query(filterBy) {
@@ -130,6 +130,10 @@ async function remove(workspaceId, moduleId) {
         console.error('Error removing workspace:', err);
         throw err;
     }
+}
+
+async function findUser(userId){
+
 }
 
 async function addMember(workspaceId, userId, adminId, role = 'member') {
