@@ -216,7 +216,14 @@ async function removeTicketFromGroup(ticketId) {
         if (!ticket) {
             throw new Error('ticket not found');
         }
-        const group = await Group.findOne({ tickets: ticketId }).populate({
+        let group = await Group.findOne({ tickets: ticketId });
+        if (!group) {
+            throw new Error('Group containing the ticket not found');
+        }
+        group.tickets = group.tickets.filter((id) => id.toString() !== ticketId);
+        await group.save();
+        await Ticket.findByIdAndDelete(ticketId);
+        group = await Group.findById(group._id).populate({
             path: 'tickets',
             populate: [
                 {
@@ -229,12 +236,6 @@ async function removeTicketFromGroup(ticketId) {
                 },
             ],
         });
-        if (!group) {
-            throw new Error('Group containing the ticket not found');
-        }
-        group.tickets = group.tickets.filter((id) => id.toString() !== ticketId);
-        await group.save();
-        await Ticket.findByIdAndDelete(ticketId);
         return {
             groupId: group._id,
             groupName: group.groupName,

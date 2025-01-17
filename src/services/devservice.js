@@ -478,19 +478,20 @@ async function removeTaskFromGroup(taskId) {
         if (!task) {
             throw new Error('task not found');
         }
-        const group = await Group.findOne({ tasks: taskId }).populate({
-            path: 'tasks',
-            populate: {
-                path: 'assignedToId',
-                select: '_id email fullname',
-            },
-        });
+        let group = await Group.findOne({ tasks: taskId });
         if (!group) {
             throw new Error('Group containing the task not found');
         }
         group.tasks = group.tasks.filter((id) => id.toString() !== taskId);
         await group.save();
         await Task.findByIdAndDelete(taskId);
+        group = await Group.findById(group._id).populate({
+            path: 'tasks',
+            populate: {
+                path: 'assignedToId',
+                select: '_id email fullname',
+            },
+        });
         return {
             groupId: group._id,
             groupName: group.groupName,
@@ -659,15 +660,16 @@ async function removeSprintFromGroup(sprintId) {
         if (!sprint) {
             throw new Error('Sprint not found');
         }
-        const group = await Group.findOne({ sprints: sprintId }).populate({
-            path: 'sprints',
-        });
+        let group = await Group.findOne({ sprints: sprintId });
         if (!group) {
             throw new Error('Group containing the sprint not found');
         }
         group.sprints = group.sprints.filter((id) => id.toString() !== sprintId);
         await group.save();
         await Sprint.findByIdAndDelete(sprintId);
+        group = await Group.findById(group._id).populate({
+            path: 'sprints',
+        });
         return {
             groupId: group._id,
             groupName: group.groupName,
@@ -837,7 +839,14 @@ async function removeBugFromGroup(bugId) {
         if (!bug) {
             throw new Error('bug not found');
         }
-        const group = await Group.findOne({ bugs: bugId }).populate({
+        let group = await Group.findOne({ bugs: bugId });
+        if (!group) {
+            throw new Error('Group containing the bug not found');
+        }
+        group.bugs = group.bugs.filter((id) => id.toString() !== bugId);
+        await group.save();
+        await Bug.findByIdAndDelete(bugId);
+        group = await Group.findById(group._id).populate({
             path: 'bugs',
             populate: [
                 {
@@ -850,12 +859,6 @@ async function removeBugFromGroup(bugId) {
                 },
             ],
         });
-        if (!group) {
-            throw new Error('Group containing the bug not found');
-        }
-        group.bugs = group.bugs.filter((id) => id.toString() !== bugId);
-        await group.save();
-        await Bug.findByIdAndDelete(bugId);
         return {
             groupId: group._id,
             groupName: group.groupName,

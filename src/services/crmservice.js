@@ -168,13 +168,14 @@ async function removeLeadFromGroup(leadId) {
         if (!lead) {
             throw new Error('lead not found');
         }
-        const group = await Group.findOne({ leads: leadId }).populate('leads');
+        let group = await Group.findOne({ leads: leadId });
         if (!group) {
             throw new Error('Group containing the lead not found');
         }
         group.leads = group.leads.filter((id) => id.toString() !== leadId);
         await group.save();
         await Lead.findByIdAndDelete(leadId);
+        group = await Group.findById(group._id).populate('leads');
         return {
             groupId: group._id,
             groupName: group.groupName,

@@ -205,19 +205,20 @@ async function removeItemFromGroup(itemId) {
         if (!item) {
             throw new Error('Item not found');
         }
-        const group = await Group.findOne({ items: itemId }).populate({
-            path: 'items',
-            populate: {
-                path: 'assignedToId',
-                select: '_id email fullname',
-            },
-        });
+        let group = await Group.findOne({ items: itemId });
         if (!group) {
             throw new Error('Group containing the item not found');
         }
         group.items = group.items.filter((id) => id.toString() !== itemId);
         await group.save();
         await Item.findByIdAndDelete(itemId);
+        group = await Group.findById(group._id).populate({
+            path: 'items',
+            populate: {
+                path: 'assignedToId',
+                select: '_id email fullname',
+            },
+        });
         return {
             groupId: group._id,
             groupName: group.groupName,
