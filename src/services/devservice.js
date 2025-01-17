@@ -478,14 +478,39 @@ async function removeTaskFromGroup(taskId) {
         if (!task) {
             throw new Error('task not found');
         }
-        const group = await Group.findOne({ tasks: taskId });
+        const group = await Group.findOne({ tasks: taskId }).populate({
+            path: 'tasks',
+            populate: {
+                path: 'assignedToId',
+                select: '_id email fullname',
+            },
+        });
         if (!group) {
             throw new Error('Group containing the task not found');
         }
         group.tasks = group.tasks.filter((id) => id.toString() !== taskId);
         await group.save();
         await Task.findByIdAndDelete(taskId);
-        return group;
+        return {
+            groupId: group._id,
+            groupName: group.groupName,
+            items: group.tasks.map((task) => {
+                const transformedAssignedTo = Array.isArray(task.assignedToId)
+                    ? task.assignedToId.map((assigned) => ({
+                          userId: assigned._id,
+                          email: assigned.email,
+                          fullname: assigned.fullname,
+                      }))
+                    : null;
+                return {
+                    itemId: task._id,
+                    taskName: task.taskName,
+                    assignedToId: transformedAssignedTo,
+                    status: task.status || "",
+                    dueDate: task.dueDate || "",
+                };
+            }),
+        };
     } catch (err) {
         console.error('Error removing task from group:', err);
         throw { error: 'Failed to remove task from group', details: err.message };
@@ -634,14 +659,26 @@ async function removeSprintFromGroup(sprintId) {
         if (!sprint) {
             throw new Error('Sprint not found');
         }
-        const group = await Group.findOne({ sprints: sprintId });
+        const group = await Group.findOne({ sprints: sprintId }).populate({
+            path: 'sprints',
+        });
         if (!group) {
             throw new Error('Group containing the sprint not found');
         }
         group.sprints = group.sprints.filter((id) => id.toString() !== sprintId);
         await group.save();
         await Sprint.findByIdAndDelete(sprintId);
-        return group;
+        return {
+            groupId: group._id,
+            groupName: group.groupName,
+            items: group.sprints.map((sprint) => ({
+                itemId: sprint._id,
+                sprintName: sprint.sprintName,
+                sprintGoals: sprint.sprintGoals || "",
+                startDate: sprint.startDate || "",
+                endDate: sprint.endDate || "",
+            })),
+        };
     } catch (err) {
         console.error('Error removing sprint from group:', err);
         throw { error: 'Failed to remove sprint from group', details: err.message };
@@ -800,14 +837,45 @@ async function removeBugFromGroup(bugId) {
         if (!bug) {
             throw new Error('bug not found');
         }
-        const group = await Group.findOne({ bugs: bugId });
+        const group = await Group.findOne({ bugs: bugId }).populate({
+            path: 'bugs',
+            populate: [
+                {
+                    path: 'reporter',
+                    select: '_id email fullname',
+                },
+                {
+                    path: 'developer',
+                    select: '_id email fullname',
+                },
+            ],
+        });
         if (!group) {
             throw new Error('Group containing the bug not found');
         }
         group.bugs = group.bugs.filter((id) => id.toString() !== bugId);
         await group.save();
         await Bug.findByIdAndDelete(bugId);
-        return group;
+        return {
+            groupId: group._id,
+            groupName: group.groupName,
+            items: group.bugs.map((bug) => ({
+                itemId: bug._id,
+                bugName: bug.bugName,
+                reporter: bug.reporter.map((assigned) => ({
+                    userId: assigned._id,
+                    email: assigned.email,
+                    fullname: assigned.fullname,
+                })),
+                developer: bug.developer.map((assigned) => ({
+                    userId: assigned._id,
+                    email: assigned.email,
+                    fullname: assigned.fullname,
+                })),
+                priority: bug.priority || "",
+                status: bug.status || "",
+            })),
+        };
     } catch (err) {
         console.error('Error removing bug from group:', err);
         throw { error: 'Failed to remove bug from group', details: err.message };

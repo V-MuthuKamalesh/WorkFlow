@@ -216,14 +216,47 @@ async function removeTicketFromGroup(ticketId) {
         if (!ticket) {
             throw new Error('ticket not found');
         }
-        const group = await Group.findOne({ tickets: ticketId });
+        const group = await Group.findOne({ tickets: ticketId }).populate({
+            path: 'tickets',
+            populate: [
+                {
+                    path: 'employee',
+                    select: '_id email fullname',
+                },
+                {
+                    path: 'agent',
+                    select: '_id email fullname',
+                },
+            ],
+        });
         if (!group) {
             throw new Error('Group containing the ticket not found');
         }
         group.tickets = group.tickets.filter((id) => id.toString() !== ticketId);
         await group.save();
         await Ticket.findByIdAndDelete(ticketId);
-        return group;
+        return {
+            groupId: group._id,
+            groupName: group.groupName,
+            items: group.tickets.map((ticket) => ({
+                itemId: ticket._id,
+                ticketName: ticket.ticketName,
+                description: ticket.description || "",
+                employee: ticket.employee.map((assigned) => ({
+                    userId: assigned._id,
+                    email: assigned.email,
+                    fullname: assigned.fullname,
+                })),
+                agent: ticket.agent.map((assigned) => ({
+                    userId: assigned._id,
+                    email: assigned.email,
+                    fullname: assigned.fullname,
+                })),
+                priority: ticket.priority || "",
+                status: ticket.status || "",
+                requestType: ticket.requestType || "",
+            })),
+        };
     } catch (err) {
         console.error('Error removing ticket from group:', err);
         throw { error: 'Failed to remove ticket from group', details: err.message };

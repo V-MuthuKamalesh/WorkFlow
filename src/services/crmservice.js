@@ -168,14 +168,26 @@ async function removeLeadFromGroup(leadId) {
         if (!lead) {
             throw new Error('lead not found');
         }
-        const group = await Group.findOne({ leads: leadId });
+        const group = await Group.findOne({ leads: leadId }).populate('leads');
         if (!group) {
             throw new Error('Group containing the lead not found');
         }
         group.leads = group.leads.filter((id) => id.toString() !== leadId);
         await group.save();
         await Lead.findByIdAndDelete(leadId);
-        return group;
+        return {
+            groupId: group._id,
+            groupName: group.groupName,
+            items: group.leads.map((lead) => ({
+                itemId: lead._id,
+                leadName: lead.leadName,
+                status: lead.status || "",
+                company: lead.company || "",
+                title: lead.title || "",
+                email: lead.email || "",
+                lastInteraction: lead.lastInteraction || "",
+            })),
+        };
     } catch (err) {
         console.error('Error removing lead from group:', err);
         throw { error: 'Failed to remove lead from group', details: err.message };
