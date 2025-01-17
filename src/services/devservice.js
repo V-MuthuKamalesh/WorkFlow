@@ -8,21 +8,21 @@ async function getBugBoard(boardId) {
                 path: 'groups',
                 populate: {
                     path: 'bugs',
-                    populate: {
-                        path: 'reporter',
-                        select: '_id email fullname',
-                    },
-                    populate: {
-                        path: 'developer',
-                        select: '_id email fullname',
-                    },
+                    populate: [
+                        {
+                            path: 'reporter',
+                            select: '_id email fullname',
+                        },
+                        {
+                            path: 'developer',
+                            select: '_id email fullname',
+                        },
+                    ],
                 },
             });
         if (!board) {
             throw new Error('Board not found');
         }
-        console.log("populated board",board);
-        
         return {
             boardId: board._id,
             boardName: board.boardName,
@@ -31,30 +31,22 @@ async function getBugBoard(boardId) {
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,
-                items: group.bugs.map((bug) => {
-                    const transformedReporter = Array.isArray(bug.reporter)
-                    ? bug.reporter.map((assigned) => ({
-                          userId: assigned._id, 
-                          email: assigned.email,
-                          fullname: assigned.fullname,
-                      }))
-                    : [];
-                    const transformedDeveloper = Array.isArray(bug.developer)
-                    ? bug.developer.map((assigned) => ({
-                          userId: assigned._id, 
-                          email: assigned.email,
-                          fullname: assigned.fullname,
-                      }))
-                    : [];
-                    return {
-                        itemId: bug._id,
-                        bugName: bug.bugName,
-                        reporter: transformedReporter,
-                        developer: transformedDeveloper,
-                        priority: bug.priority || "",
-                        status: bug.status || "",
-                    };
-                }),
+                items: group.bugs.map((bug) => ({
+                    itemId: bug._id,
+                    bugName: bug.bugName,
+                    reporter: bug.reporter.map((assigned) => ({
+                        userId: assigned._id,
+                        email: assigned.email,
+                        fullname: assigned.fullname,
+                    })),
+                    developer: bug.developer.map((assigned) => ({
+                        userId: assigned._id,
+                        email: assigned.email,
+                        fullname: assigned.fullname,
+                    })),
+                    priority: bug.priority || "",
+                    status: bug.status || "",
+                })),
             })),
         };
     } catch (err) {
@@ -62,7 +54,6 @@ async function getBugBoard(boardId) {
         throw { error: 'Failed to fetch board', details: err.message };
     }
 }
-
 
 // Group Functions
 async function addBugGroup(boardId, groupData, itemId) {
