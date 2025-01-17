@@ -1,4 +1,4 @@
-const { User, Module, Workspace, Board, Group } = require('../models/schema'); 
+const { Favourite, Module, Workspace, Board, Group } = require('../models/schema'); 
 
 
 async function query(filterBy) {
@@ -130,10 +130,6 @@ async function remove(workspaceId, moduleId) {
         console.error('Error removing workspace:', err);
         throw err;
     }
-}
-
-async function findUser(userId){
-
 }
 
 async function addMember(workspaceId, userId, adminId, role = 'member') {
@@ -272,6 +268,73 @@ async function updateGroup(groupId, groupData) {
     }
 }
 
+async function addFavouriteWorkspace(workspaceId, favouriteId) {
+    try {
+      const updatedFavourite = await Favourite.findByIdAndUpdate(
+        favouriteId,
+        { $addToSet: { workspaces: workspaceId } },
+        { new: true } 
+      );
+      if (!updatedFavourite) {
+        throw new Error('Favourite not found');
+      }
+      return updatedFavourite;
+    } catch (error) {
+      console.error(`Error adding workspace to Favourite: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async function removeFavouriteWorkspace(workspaceId, favouriteId) {
+    try {
+      const updatedFavourite = await Favourite.findByIdAndUpdate(
+        favouriteId,
+        { $pull: { workspaces: workspaceId } },
+        { new: true }
+      );
+      if (!updatedFavourite) {
+        throw new Error('Favourite not found');
+      }
+      return updatedFavourite;
+    } catch (error) {
+      console.error(`Error removing workspace from Favourite: ${error.message}`);
+      throw error;
+    }
+  }
+  
+  async function addBoardToFavourite(boardId, favouriteId) {
+    try {
+      const updatedFavourite = await Favourite.findByIdAndUpdate(
+        favouriteId,
+        { $addToSet: { boards: boardId } },
+        { new: true } 
+      );
+      if (!updatedFavourite) {
+        throw new Error('Favourite not found');
+      }
+      return updatedFavourite;
+    } catch (error) {
+      console.error(`Error adding board to Favourite: ${error.message}`);
+      throw error;
+    }
+  }
+
+  async function removeBoardFromFavourite(boardId, favouriteId) {
+    try {
+      const updatedFavourite = await Favourite.findByIdAndUpdate(
+        favouriteId,
+        { $pull: { boards: boardId } }, 
+        { new: true } 
+      );
+      if (!updatedFavourite) {
+        throw new Error('Favourite not found');
+      }
+      return updatedFavourite;
+    } catch (error) {
+      console.error(`Error removing board from Favourite: ${error.message}`);
+      throw error;
+    }
+  }
 
 
 
@@ -288,5 +351,8 @@ module.exports = {
     removeBoard,
     updateBoard,
     updateGroup,
-    
+    addFavouriteWorkspace,
+    removeFavouriteWorkspace,
+    addBoardToFavourite,
+    removeBoardFromFavourite,
 };

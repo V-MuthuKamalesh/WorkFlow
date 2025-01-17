@@ -339,6 +339,24 @@ async function removeMembersFromItem(itemId, userId, type) {
     }
 }
 
+async function addFavouriteWorkspace(workspaceId, type) {
+    try {
+        let favouriteWorkspace;
+        if(type=="workmanagement"){
+            favouriteWorkspace = await workService.addFavouriteWorkspace(workspaceId, process.env.FAV_WORK);
+        }else if(type=="crm"){
+            favouriteWorkspace = await crmService.addFavouriteWorkspace(workspaceId, process.env.FAV_CRM);
+        }else if(type=="dev"){
+            favouriteWorkspace = await devService.addFavouriteWorkspace(workspaceId, process.env.FAV_DEV);
+        }else if(type=="service"){
+            favouriteWorkspace = await service.addFavouriteWorkspace(workspaceId, process.env.FAV_SERVICE);
+        }
+        return item;
+    } catch (err) {
+        console.log('Failed to remove members from item: ' + err.message);
+        throw err;
+    }
+}
 module.exports = {
     getWorkspaces,
     getWorkspaceById,
@@ -361,4 +379,5 @@ module.exports = {
     updateItemInGroup,
     addMembersToItem,
     removeMembersFromItem,
+    addFavouriteWorkspace,
 };

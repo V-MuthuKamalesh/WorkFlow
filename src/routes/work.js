@@ -118,8 +118,8 @@ module.exports = (io) => {
         });
 
         socket.on('removeItemFromGroup', async (data, callback) => {
-            const { itemId, group, type } = data;
-            const updatedGroup = await workspaceController.removeItemFromGroup(itemId, group, type);
+            const { itemId, type } = data;
+            const updatedGroup = await workspaceController.removeItemFromGroup(itemId, type);
             callback(updatedGroup);
         });
 
@@ -144,6 +144,46 @@ module.exports = (io) => {
                 callback({ error: err.message });
             }
         });        
+
+        socket.on('addFavouriteWorkspace', async (data, callback) => {
+            const { workspaceId, type } = data;
+            try {
+                const updatedFavourite = await workspaceController.addFavouriteWorkspace(workspaceId, type);
+                callback(updatedFavourite);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });  
+
+        socket.on('removeFavouriteWorkspace', async (data, callback) => {
+            const { workspaceId, type } = data;
+            try {
+                const updatedFavourite = await workspaceController.removeFavouriteWorkspace(workspaceId, type);
+                callback(updatedFavourite);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });  
+
+        socket.on('addBoardToFavourite', async (data, callback) => {
+            const { boardId, type } = data;
+            try {
+                const updatedFavourite = await workspaceController.addBoardToFavourite(boardId, type);
+                callback(updatedFavourite);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });  
+
+        socket.on('removeBoardFromFavourite', async (data, callback) => {
+            const { boardId, type } = data;
+            try {
+                const updatedFavourite = await workspaceController.removeBoardFromFavourite(boardId, type);
+                callback(updatedFavourite);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });  
 
         socket.on('disconnect', () => {
             console.log('A user disconnected');
