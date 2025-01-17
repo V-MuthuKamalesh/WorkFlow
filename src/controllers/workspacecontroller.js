@@ -343,20 +343,97 @@ async function addFavouriteWorkspace(workspaceId, type) {
     try {
         let favouriteWorkspace;
         if(type=="workmanagement"){
-            favouriteWorkspace = await workService.addFavouriteWorkspace(workspaceId, process.env.FAV_WORK);
+            favouriteWorkspace = await workspaceService.addFavouriteWorkspace(workspaceId, process.env.FAV_WORK);
         }else if(type=="crm"){
-            favouriteWorkspace = await crmService.addFavouriteWorkspace(workspaceId, process.env.FAV_CRM);
+            favouriteWorkspace = await workspaceService.addFavouriteWorkspace(workspaceId, process.env.FAV_CRM);
         }else if(type=="dev"){
-            favouriteWorkspace = await devService.addFavouriteWorkspace(workspaceId, process.env.FAV_DEV);
+            favouriteWorkspace = await workspaceService.addFavouriteWorkspace(workspaceId, process.env.FAV_DEV);
         }else if(type=="service"){
-            favouriteWorkspace = await service.addFavouriteWorkspace(workspaceId, process.env.FAV_SERVICE);
+            favouriteWorkspace = await workspaceService.addFavouriteWorkspace(workspaceId, process.env.FAV_SERVICE);
         }
-        return item;
+        return favouriteWorkspace;
     } catch (err) {
         console.log('Failed to remove members from item: ' + err.message);
         throw err;
     }
 }
+
+async function removeFavouriteWorkspace(workspaceId, type) {
+    try {
+        let favouriteWorkspace;
+        if(type=="workmanagement"){
+            favouriteWorkspace = await workspaceService.removeFavouriteWorkspace(workspaceId, process.env.FAV_WORK);
+        }else if(type=="crm"){
+            favouriteWorkspace = await workspaceService.removeFavouriteWorkspace(workspaceId, process.env.FAV_CRM);
+        }else if(type=="dev"){
+            favouriteWorkspace = await workspaceService.removeFavouriteWorkspace(workspaceId, process.env.FAV_DEV);
+        }else if(type=="service"){
+            favouriteWorkspace = await workspaceService.removeFavouriteWorkspace(workspaceId, process.env.FAV_SERVICE);
+        }
+        return favouriteWorkspace;
+    } catch (err) {
+        console.log('Failed to remove members from item: ' + err.message);
+        throw err;
+    }
+}
+
+async function addBoardToFavourite(boardId, type) {
+    try {
+        let favouriteWorkspace;
+        if(type=="workmanagement"){
+            favouriteWorkspace = await workspaceService.addBoardToFavourite(boardId, process.env.FAV_WORK);
+        }else if(type=="crm"){
+            favouriteWorkspace = await workspaceService.addBoardToFavourite(boardId, process.env.FAV_CRM);
+        }else if(type=="dev"){
+            favouriteWorkspace = await workspaceService.addBoardToFavourite(boardId, process.env.FAV_DEV);
+        }else if(type=="service"){
+            favouriteWorkspace = await workspaceService.addBoardToFavourite(boardId, process.env.FAV_SERVICE);
+        }
+        return favouriteWorkspace;
+    } catch (err) {
+        console.log('Failed to remove members from item: ' + err.message);
+        throw err;
+    }
+}
+
+async function removeBoardFromFavourite(boardId, type) {
+    try {
+        let favouriteWorkspace;
+        if(type=="workmanagement"){
+            favouriteWorkspace = await workspaceService.removeBoardFromFavourite(boardId, process.env.FAV_WORK);
+        }else if(type=="crm"){
+            favouriteWorkspace = await workspaceService.removeBoardFromFavourite(boardId, process.env.FAV_CRM);
+        }else if(type=="dev"){
+            favouriteWorkspace = await workspaceService.removeBoardFromFavourite(boardId, process.env.FAV_DEV);
+        }else if(type=="service"){
+            favouriteWorkspace = await workspaceService.removeBoardFromFavourite(boardId, process.env.FAV_SERVICE);
+        }
+        return favouriteWorkspace;
+    } catch (err) {
+        console.log('Failed to remove members from item: ' + err.message);
+        throw err;
+    }
+}
+
+async function getFavourite(type) {
+    try {
+        let favouriteWorkspace;
+        if(type=="workmanagement"){
+            favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_WORK);
+        }else if(type=="crm"){
+            favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_CRM);
+        }else if(type=="dev"){
+            favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_DEV);
+        }else if(type=="service"){
+            favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_SERVICE);
+        }
+        return favouriteWorkspace;
+    } catch (err) {
+        console.log('Failed to remove members from item: ' + err.message);
+        throw err;
+    }
+}
+
 module.exports = {
     getWorkspaces,
     getWorkspaceById,
@@ -380,4 +457,8 @@ module.exports = {
     addMembersToItem,
     removeMembersFromItem,
     addFavouriteWorkspace,
+    removeFavouriteWorkspace,
+    addBoardToFavourite,
+    removeBoardFromFavourite,
+    getFavourite,
 };

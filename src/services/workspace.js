@@ -200,7 +200,7 @@ async function addBoard(workspaceId, boardData) {
         const board = new Board(boardData);
         await board.save();
         workspace.boards.push(board._id);
-        const updatedWorkspace = await workspace.save();
+        await workspace.save();
         return {boardId:board.id, boardName: board.boardName};
     } catch (err) {
         console.error('Error adding board to workspace:', err);
@@ -336,6 +336,41 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
     }
   }
 
+  async function getFavourite(favouriteId) {
+    try {
+        const favourite = await Favourite.findById(favouriteId)
+            .populate({
+                path: 'workspaces',  
+            })
+            .populate({
+                path: 'boards',  
+            });
+        if (!favourite) {
+            throw new Error('Favourite not found');
+        }
+        const workspaceDetails = await Promise.all(
+            favourite.workspaces.map(async (workspaceId) => {
+                return await getWorkspaceDetailsById(workspaceId);
+            })
+        );
+        const boardDetails = favourite.boards.map(board => ({
+            boardId: board._id,
+            boardName: board.boardName,
+            workspaceName: board.workspaceName,
+            type: board.type,
+        }));
+        return {
+            favouriteId: favourite._id,
+            favouriteName: favourite.favouriteName,
+            description: favourite.description || '',
+            workspaces: workspaceDetails,
+            boards: boardDetails,
+        };
+    } catch (err) {
+        console.error('Error fetching favourite details:', err);
+        throw { error: 'Failed to fetch favourite details', details: err.message };
+    }
+}
 
 
 module.exports = {
@@ -355,4 +390,5 @@ module.exports = {
     removeFavouriteWorkspace,
     addBoardToFavourite,
     removeBoardFromFavourite,
+    getFavourite,
 };

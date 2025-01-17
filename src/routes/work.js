@@ -185,6 +185,16 @@ module.exports = (io) => {
             }
         });  
 
+        socket.on('getFavourite', async (data, callback) => {
+            const { type } = data;
+            try {
+                const favourite = await workspaceController.getFavourite(type);
+                callback(favourite);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });  
+
         socket.on('disconnect', () => {
             console.log('A user disconnected');
         });
