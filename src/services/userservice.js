@@ -86,6 +86,15 @@ exports.getAllUsers = async () => {
   }
 };
 
+exports.getUserDetails = async (userId) => {
+  try {
+    const user = await User.findById(userId); 
+    return {fullname: user.fullname, email: user.email};
+  } catch (error) {
+    throw new Error('Error fetching users');
+  }
+};
+
 exports.checkRole = async (workspaceId, userId) => {
   try {
       const workspace = await Workspace.findById(workspaceId).populate({

@@ -145,6 +145,17 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+exports.getUserDetails = async (req, res) => {
+  try {
+    const {userId}=req.body;
+    const users = await userService.getUserDetails(userId); 
+    res.status(200).json(users); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Something went wrong!' });
+  }
+};
+
 exports.checkRole = async (req, res) => {
   try {
     const { workspaceId, userId } = req.body;
