@@ -73,8 +73,8 @@ exports.logout = (req, res) => {
 
 exports.OAuth = async (req, res) => {
   try {
-    const { email,name} = req.body;
-    const password = name;
+    const { email,name, picture} = req.body;
+    const password = "bxhjvcjbkjhbgfncdxgcvhbjkn,mb vcdgfsxvcb";
     // console.log(email,name,password);
     let user = await userService.findUserByEmail(email);
     if (!user) {
@@ -83,6 +83,7 @@ exports.OAuth = async (req, res) => {
         email,
         password: hashedPassword,
         fullname:name,
+        imgUrl: picture ,
       });
     }
 
@@ -147,7 +148,7 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUserDetails = async (req, res) => {
   try {
-    const {userId}=req.body;
+    const {userId}=req.query;
     const users = await userService.getUserDetails(userId); 
     res.status(200).json(users); 
   } catch (error) {

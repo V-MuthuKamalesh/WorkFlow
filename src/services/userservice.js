@@ -89,7 +89,7 @@ exports.getAllUsers = async () => {
 exports.getUserDetails = async (userId) => {
   try {
     const user = await User.findById(userId); 
-    return {fullname: user.fullname, email: user.email};
+    return {fullname: user.fullname, email: user.email, picture: user.imgUrl};
   } catch (error) {
     throw new Error('Error fetching users');
   }
