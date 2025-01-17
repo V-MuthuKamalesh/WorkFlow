@@ -80,6 +80,8 @@ module.exports = (io) => {
         socket.on('getBoardById', async (data, callback) => {
             const { boardId} = data;
             const board = await workspaceController.getBoardById(boardId);
+            console.log("Board", board);
+            
             callback(board);
         });
 

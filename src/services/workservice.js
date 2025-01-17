@@ -17,6 +17,8 @@ async function getBoard(boardId) {
         if (!board) {
             throw new Error('Board not found');
         }
+        console.log("Populated board",board);
+        
         return {
             boardId: board._id,
             boardName: board.boardName,
@@ -32,7 +34,7 @@ async function getBoard(boardId) {
                               email: assigned.email,
                               fullname: assigned.fullname,
                           }))
-                        : null;
+                        : [];
                     return {
                         itemId: item._id,
                         itemName: item.itemName,
@@ -223,6 +225,10 @@ async function updateItemInGroup(itemData) {
         if (!item) {
             throw new Error('Item not found');
         }
+        itemData = {
+            ...itemData,
+            assignedToId: taskData.assignedToId.map(user => user.userId),
+        };
         const updatedItem = await Item.findByIdAndUpdate(
             itemData._id,
             { $set: itemData },

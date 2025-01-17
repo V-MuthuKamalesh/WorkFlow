@@ -21,6 +21,8 @@ async function getBugBoard(boardId) {
         if (!board) {
             throw new Error('Board not found');
         }
+        console.log("populated board",board);
+        
         return {
             boardId: board._id,
             boardName: board.boardName,
@@ -505,6 +507,10 @@ async function updateTaskInGroup(taskData) {
         if (!task) {
             throw new Error('task not found');
         }
+        taskData = {
+            ...taskData,
+            assignedToId: taskData.assignedToId.map(user => user.userId),
+        };
         const updatedTask = await task.findByIdAndUpdate(
             taskData._id,
             { $set: taskData },
@@ -819,10 +825,16 @@ async function removeBugFromGroup(bugId) {
 
 async function updateBugInGroup(bugData) {
     try {
+
         const bug = await Bug.findById(bugData._id);
         if (!bug) {
             throw new Error('Bug not found');
         }
+        bugData = {
+            ...bugData,
+            reporter: bugData.reporter.map(user => user.userId),
+            developer: bugData.developer.map(user => user.userId),
+        };
         const updatedBug = await Bug.findByIdAndUpdate(
             bugData._id,
             { $set: bugData },
