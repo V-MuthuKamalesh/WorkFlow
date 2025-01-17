@@ -205,6 +205,11 @@ async function updateTicketInGroup(ticketData) {
         if (!ticket) {
             throw new Error('ticket not found');
         }
+        ticketData = {
+            ...ticketData,
+            employee: ticketData.employee.map(user => user.userId),
+            agent: ticketData.agent.map(user => user.userId),
+        };
         const updatedTicket = await ticket.findByIdAndUpdate(
             ticketData._id,
             { $set: ticketData },
