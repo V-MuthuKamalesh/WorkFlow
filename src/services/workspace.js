@@ -201,6 +201,7 @@ async function addBoard(workspaceId, boardData) {
         await board.save();
         workspace.boards.push(board._id);
         await workspace.save();
+        let taskBoard =null;
         if (boardData.type === "Sprint") {
             const taskBoardData = {
                 boardName: boardData.boardName + "-Task",
@@ -230,6 +231,7 @@ async function removeBoard(boardId) {
         if (!workspace) {
             throw new Error('Workspace not found for the specified board');
         }
+        const response = [boardId];
         let taskBoardId = null;
         if (board.type === "Sprint") {
             const taskBoardName = board.boardName + "-Task";
@@ -237,16 +239,15 @@ async function removeBoard(boardId) {
             if (taskBoard) {
                 taskBoardId = await removeBoard(taskBoard._id);
             }
+            if (taskBoardId) {
+                response.push(taskBoardId);
+            }
         }
         workspace.boards = workspace.boards.filter(
             (id) => id.toString() !== boardId
         );
         await workspace.save();
         await Board.findByIdAndDelete(boardId);
-        const response = [boardId];
-        if (taskBoardId) {
-            response.push(taskBoardId);
-        }
         return response;
     } catch (err) {
         console.error('Error removing board:', err);
