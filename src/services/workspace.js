@@ -205,7 +205,7 @@ async function addBoard(workspaceId, boardData) {
             const taskBoardData = {
                 boardName: boardData.boardName + "-Task",
                 type: "Task",
-                createdBy: boardData.createdBy,
+                createdById: boardData.createdById,
             };
             await addBoard(workspaceId, taskBoardData);
         }
