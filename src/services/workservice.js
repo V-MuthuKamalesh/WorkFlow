@@ -17,7 +17,7 @@ async function getBoard(boardId) {
         if (!board) {
             throw new Error('Board not found');
         }
-        console.log("Populated board",board);
+        // console.log("Populated board",board);
         
         return {
             boardId: board._id,
