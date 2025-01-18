@@ -195,6 +195,16 @@ module.exports = (io) => {
             }
         });  
 
+        socket.on('isBoardInFavourite', async (data, callback) => {
+            const { boardId, type } = data;
+            try {
+                const updatedFavourite = await workspaceController.isBoardInFavourite(boardId, type);
+                callback(updatedFavourite);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });
+
         socket.on('disconnect', () => {
             console.log('A user disconnected');
         });

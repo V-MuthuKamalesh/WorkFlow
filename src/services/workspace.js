@@ -212,7 +212,7 @@ async function addBoard(workspaceId, boardData) {
         }
         const response = [
             { boardId: board.id, boardName: board.boardName },
-            taskBoard ? { boardId: taskBoard.boardId, boardName: taskBoard.boardName } : null
+            taskBoard ? taskBoard[0] : null
         ];
         return response.filter(board => board !== null);
     } catch (err) {
@@ -407,6 +407,19 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
     }
 }
 
+async function isBoardInFavourite(boardId, favouriteId) {
+    try {
+      const favourite = await Favourite.findOne({
+        _id: favouriteId,
+        boards: { $in: [boardId] }, 
+      });
+      return !!favourite;
+    } catch (error) {
+      console.error(`Error checking if board is in Favourite: ${error.message}`);
+      throw error;
+    }
+  }
+  
 
 module.exports = {
     query,
@@ -426,4 +439,5 @@ module.exports = {
     addBoardToFavourite,
     removeBoardFromFavourite,
     getFavourite,
+    isBoardInFavourite,
 };

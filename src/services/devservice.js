@@ -626,9 +626,9 @@ async function removeMembersFromTask(itemId, userId) {
 
 
 // Sprint Functions
-async function addSprintToGroup(groupId, sprintData) {
+async function addSprintToGroup(groupId, sprintData, boardId) {
     try {
-        const sprintBoard = await Board.findById(sprintData.boardId);
+        const sprintBoard = await Board.findById(boardId);
         const taskBoard = await Board.findOne({boardName:sprintBoard.boardName+"-Task"});
         const group = await Group.findById(groupId);
         if (!group) {
@@ -649,9 +649,9 @@ async function addSprintToGroup(groupId, sprintData) {
     }
 }
 
-async function addSprint(sprintData) {
+async function addSprint(sprintData, boardId) {
     try {
-        const sprintBoard = await Board.findById(sprintData.boardId);
+        const sprintBoard = await Board.findById(boardId);
         const taskBoard = await Board.findOne({boardName:sprintBoard.boardName+"-Task"});
         const groupData = {groupName: sprintData.sprintName};
         const taskData = {taskName: "New Task"};
@@ -712,9 +712,12 @@ async function removeSprintFromGroup(sprintId) {
     }
 }
 
-async function updateSprintInGroup(sprintData) {
+async function updateSprintInGroup(sprintData, boardId) {
     try {
+        console.log(sprintData);
         const sprint = await Sprint.findById(sprintData._id);
+        console.log(sprint);
+        
         if (!sprint) {
             console.log('Sprint not found');
         }
@@ -725,7 +728,7 @@ async function updateSprintInGroup(sprintData) {
             { new: true }
         );
         if (isSprintNameUpdated) {
-            const sprintBoard = await Board.findById(sprintData.boardId);
+            const sprintBoard = await Board.findById(boardId);
             if (!sprintBoard) {
                 console.log('Sprint board not found');
             }

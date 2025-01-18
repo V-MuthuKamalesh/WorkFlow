@@ -207,14 +207,13 @@ async function updateGroupInBoard(groupId, groupData) {
 
 async function addItemToGroup(groupId, itemData, type, boardId) {
     try {
-        itemData.boardId = boardId;
         let updatedGroup;
         if(type=="Bug"){
             updatedGroup = await devService.addBugToGroup(groupId,itemData);
         }else if(type=="Task"){
             updatedGroup = await devService.addTaskToGroup(groupId,itemData);
         }else if(type=="Sprint"){
-            updatedGroup = await devService.addSprintToGroup(groupId,itemData);
+            updatedGroup = await devService.addSprintToGroup(groupId,itemData, boardId);
         }else if(type=="Lead"){
             updatedGroup = await crmService.addLeadToGroup(groupId,itemData);
         }else if(type=="Ticket"){
@@ -230,14 +229,13 @@ async function addItemToGroup(groupId, itemData, type, boardId) {
 
 async function addItem(itemData, type, boardId) {
     try {
-        itemData.boardId = boardId;
         let item;
         if(type=="Bug"){
             item = await devService.addBug(itemData);
         }else if(type=="Task"){
             item = await devService.addTask(itemData);
         }else if(type=="Sprint"){
-            item = await devService.addSprint(itemData);
+            item = await devService.addSprint(itemData, boardId);
         }else if(type=="Lead"){
             item = await crmService.addLead(itemData);
         }else if(type=="Ticket"){
@@ -275,7 +273,6 @@ async function removeItemFromGroup(itemId, type) {
 
 async function updateItemInGroup(itemId, itemData, type, boardId) {
     try {
-        itemData.boardId = boardId;
         itemData._id=itemId;
         let item;
         if(type=="Bug"){
@@ -283,7 +280,7 @@ async function updateItemInGroup(itemId, itemData, type, boardId) {
         }else if(type=="Task"){
             item = await devService.updateTaskInGroup(itemData);
         }else if(type=="Sprint"){
-            item = await devService.updateSprintInGroup(itemData);
+            item = await devService.updateSprintInGroup(itemData, boardId);
         }else if(type=="Lead"){
             item = await crmService.updateLeadInGroup(itemData);
         }else if(type=="Ticket"){
@@ -437,6 +434,25 @@ async function getFavourite(type) {
     }
 }
 
+async function isBoardInFavourite(boardId, type) {
+    try {
+        let favouriteWorkspace;
+        if(type=="work-management"){
+            favouriteWorkspace = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_WORK);
+        }else if(type=="crm"){
+            favouriteWorkspace = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_CRM);
+        }else if(type=="dev"){
+            favouriteWorkspace = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_DEV);
+        }else if(type=="service"){
+            favouriteWorkspace = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_SERVICE);
+        }
+        return favouriteWorkspace;
+    } catch (err) {
+        console.log('Failed to remove members from item: ' + err.message);
+        throw err;
+    }
+}
+
 module.exports = {
     getWorkspaces,
     getWorkspaceById,
@@ -464,4 +480,5 @@ module.exports = {
     addBoardToFavourite,
     removeBoardFromFavourite,
     getFavourite,
+    isBoardInFavourite,
 };
