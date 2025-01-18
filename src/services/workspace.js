@@ -240,7 +240,7 @@ async function removeBoard(boardId) {
                 taskBoardId = await removeBoard(taskBoard._id);
             }
             if (taskBoardId) {
-                response.push(taskBoardId);
+                response.push(taskBoardId[0]);
             }
         }
         workspace.boards = workspace.boards.filter(
