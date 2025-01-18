@@ -328,7 +328,7 @@ async function getTaskBoard(boardId) {
                         taskName: task.taskName,
                         assignedToId: transformedAssignedTo, 
                         status: task.status || "",
-                        dueDate: task.dueDate || "",
+                        priority: task.priority || "",
                     };
                 }),
             })),
@@ -377,7 +377,7 @@ async function addTaskGroup(boardId, groupData, itemId) {
                     taskName: task.taskName,
                     assignedToId: task.assignedToId,
                     status: task.status || "",
-                    dueDate: task.dueDate || "",
+                    priority: task.priority || "",
                 })),
             })),
         };
@@ -426,7 +426,7 @@ async function removeTaskGroup(groupId) {
                     taskName: task.taskName,
                     assignedToId: task.assignedToId,
                     status: task.status || "",
-                    dueDate: task.dueDate || "",
+                    priority: task.priority || "",
                 })),
             })),
         };
@@ -635,7 +635,7 @@ async function addSprintToGroup(groupId, sprintData, boardId) {
             console.log('Group not found');
         }
         const groupData = {groupName: sprintData.sprintName};
-        const taskData = {taskName: "New Task"};
+        const taskData = {taskName: sprintData.sprintName+" Task"};
         const { itemId } = await addTask(taskData);
         await addTaskGroup(taskBoard._id, groupData, itemId);
         const sprint = new Sprint(sprintData);
