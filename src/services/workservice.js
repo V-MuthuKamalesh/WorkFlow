@@ -1,4 +1,4 @@
-const {  Board, Group, Item, User } = require('../models/schema'); 
+const {  Module, Board, Group, Item, User } = require('../models/schema'); 
 const { sendSlackNotification } = require('../utils/slack');
 
 async function getBoard(boardId) {
@@ -357,6 +357,65 @@ async function removeMembersFromItem(itemId, userId) {
     }
 }
 
+async function getWorkspacesWithItemCounts(moduleId, userId) {
+    try {
+        const module = await Module.findById(moduleId).populate({
+            path: 'workspaces',
+            populate: {
+                path: 'boards',
+                populate: {
+                    path: 'groups',
+                    populate: {
+                        path: 'items',
+                        populate: {
+                            path: 'assignedToId',
+                            select: '_id',
+                        },
+                    },
+                },
+            },
+        });
+        if (!module) {
+            throw new Error('Module not found');
+        }
+        const result = module.workspaces.map((workspace) => {
+            let totalAssignedItems = 0;
+            const statusCounts = {
+                "Ready to start": 0,
+                "In Progress": 0,
+                "Waiting for review": 0,
+                "Pending Deploy": 0,
+                "Done": 0,
+                "Stuck": 0,
+            };
+            workspace.boards.forEach((board) => {
+                board.groups.forEach((group) => {
+                    group.items.forEach((item) => {
+                        if (
+                            Array.isArray(item.assignedToId) &&
+                            item.assignedToId.some((assigned) => assigned._id.toString() === userId)
+                        ) {
+                            totalAssignedItems++;
+                        }
+                        if (statusCounts.hasOwnProperty(item.status)) {
+                            statusCounts[item.status]++;
+                        }
+                    });
+                });
+            });
+            return {
+                workspaceName: workspace.workspaceName,
+                totalAssignedItems,
+                statusCounts,
+            };
+        });
+        return result;
+    } catch (err) {
+        console.error('Error fetching workspaces with item counts:', err);
+        throw { error: 'Failed to fetch workspaces with item counts', details: err.message };
+    }
+}
+
 
 module.exports = {
     getBoard,
@@ -369,4 +428,5 @@ module.exports = {
     updateItemInGroup,
     addMembersToItem,
     removeMembersFromItem,
+    getWorkspacesWithItemCounts,
 };

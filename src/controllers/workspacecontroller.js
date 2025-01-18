@@ -7,6 +7,24 @@ const crmService = require('../services/crmservice');
 
 const { Module } = require('../models/schema');
 
+async function getWorkspacesWithItemCounts(userId, moduleId) {
+    try {
+        let workspaces;
+        if(moduleId==process.env.WORK){
+            workspaces = await workService.getWorkspacesWithItemCounts(moduleId, userId);
+        }else if(moduleId==process.env.CRM){
+            workspaces = await crmService.getWorkspacesWithLeadCounts(moduleId, userId);
+        }else if(moduleId==process.env.DEV){
+            workspaces = await devService.getWorkspacesWithTaskCounts(moduleId, userId);
+        }else if(moduleId==process.env.SERVICE){
+            workspaces = await service.getWorkspacesWithTicketCounts(moduleId, userId);
+        }
+        return workspaces;
+    } catch (err) {
+        console.log('Failed to get workspaces: ' + err.message);
+    }
+}
+
 async function getWorkspaces(token, moduleId) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -501,4 +519,5 @@ module.exports = {
     getFavourite,
     isBoardInFavourite,
     isWorkspaceInFavourite,
+    getWorkspacesWithItemCounts,
 };

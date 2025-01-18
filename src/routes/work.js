@@ -14,6 +14,12 @@ module.exports = (io) => {
             callback(workspaces);
         });
 
+        socket.on('getWorkspacesWithItemCounts', async (data, callback) => {
+            const {moduleId, userId} = data;
+            const workspaces = await workspaceController.getWorkspacesWithItemCounts(userId, moduleId);
+            callback(workspaces);
+        });
+
         socket.on('getBoardsByWorkspaceById', async (data, callback) => {
             const {id}=data;
             const workspace = await workspaceController.getWorkspaceById(id);

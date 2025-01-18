@@ -1,4 +1,4 @@
-const { Board, Group, Lead } = require('../models/schema'); 
+const { Module, Board, Group, Lead } = require('../models/schema'); 
 
 async function getLeadBoard(boardId) {
     try {
@@ -213,6 +213,53 @@ async function updateLeadInGroup(leadData) {
     }
 }
 
+async function getWorkspacesWithLeadCounts(moduleId, userId) {
+    try {
+        const module = await Module.findById(moduleId).populate({
+            path: 'workspaces',
+            populate: {
+                path: 'boards',
+                populate: {
+                    path: 'groups',
+                    populate: {
+                        path: 'leads',
+                    },
+                },
+            },
+        });
+        if (!module) {
+            throw new Error('Module not found');
+        }
+        const filteredWorkspaces = module.workspaces.filter((workspace) =>
+            workspace.members.some((member) => member.userId.toString() === userId)
+        );
+        const workspaceData = filteredWorkspaces.map((workspace) => {
+            const leadStatusCounts = {};
+            let totalLeads = 0;
+            workspace.boards.forEach((board) => {
+                board.groups.forEach((group) => {
+                    group.leads.forEach((lead) => {
+                        const status = lead.status || 'Unknown';
+                        leadStatusCounts[status] = (leadStatusCounts[status] || 0) + 1;
+                        totalLeads++;
+                    });
+                });
+            });
+            return {
+                workspaceId: workspace._id,
+                workspaceName: workspace.workspaceName,
+                totalLeads,
+                statusCounts: leadStatusCounts,
+            };
+        });
+        return workspaceData;
+    } catch (err) {
+        console.error('Error fetching workspaces with lead counts:', err);
+        throw { error: 'Failed to fetch workspaces with lead counts', details: err.message };
+    }
+}
+
+
 
 module.exports = {
     getLeadBoard,
@@ -222,4 +269,5 @@ module.exports = {
     addLead,
     removeLeadFromGroup,
     updateLeadInGroup,
+    getWorkspacesWithLeadCounts,
 };
