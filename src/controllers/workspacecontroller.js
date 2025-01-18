@@ -321,7 +321,7 @@ async function removeMembersFromItem(itemId, userId, type) {
         let item;
         if(type=="reporter"){
             item = await devService.removeMembersFromReporter(itemId, userId);
-        }else if(type=="task"){
+        }else if(type=="person"){
             item = await devService.removeMembersFromTask(itemId, userId);
         }else if(type=="developer"){
             item = await devService.removeMembersFromDeveloper(itemId, userId);
