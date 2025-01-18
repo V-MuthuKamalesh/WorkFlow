@@ -21,7 +21,7 @@ async function getBugBoard(boardId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: board._id,
@@ -60,7 +60,7 @@ async function addBugGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         groupData.bugs=[itemId];
         groupData.boardId = boardId;
@@ -112,11 +112,11 @@ async function removeBugGroup(groupId) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const board = await Board.findOne({ groups: groupId });
         if (!board) {
-            throw new Error('Board containing the group not found');
+            console.log('Board containing the group not found');
         }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
@@ -137,7 +137,7 @@ async function removeBugGroup(groupId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: newboard._id,
@@ -173,7 +173,7 @@ async function getSprintBoard(boardId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: board._id,
@@ -206,7 +206,7 @@ async function addSprintGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         groupData.sprints=[itemId];
         groupData.boardId = boardId;
@@ -249,11 +249,11 @@ async function removeSprintGroup(groupId) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const board = await Board.findOne({ groups: groupId });
         if (!board) {
-            throw new Error('Board containing the group not found');
+            console.log('Board containing the group not found');
         }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
@@ -266,7 +266,7 @@ async function removeSprintGroup(groupId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: newboard._id,
@@ -305,7 +305,7 @@ async function getTaskBoard(boardId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: board._id,
@@ -345,7 +345,7 @@ async function addTaskGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         groupData.tasks=[itemId];
         groupData.boardId = boardId;
@@ -391,11 +391,11 @@ async function removeTaskGroup(groupId) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const board = await Board.findOne({ groups: groupId });
         if (!board) {
-            throw new Error('Board containing the group not found');
+            console.log('Board containing the group not found');
         }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
@@ -412,7 +412,7 @@ async function removeTaskGroup(groupId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: newboard._id,
@@ -441,7 +441,7 @@ async function addTaskToGroup(groupId, taskData) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const task = new Task(taskData);
         await task.save();
@@ -476,11 +476,11 @@ async function removeTaskFromGroup(taskId) {
     try {
         const task = await Task.findById(taskId);
         if (!task) {
-            throw new Error('task not found');
+            console.log('task not found');
         }
         let group = await Group.findOne({ tasks: taskId });
         if (!group) {
-            throw new Error('Group containing the task not found');
+            console.log('Group containing the task not found');
         }
         group.tasks = group.tasks.filter((id) => id.toString() !== taskId);
         await group.save();
@@ -522,7 +522,7 @@ async function updateTaskInGroup(taskData) {
     try {
         const task = await Task.findById(taskData._id);
         if (!task) {
-            throw new Error('task not found');
+            console.log('task not found');
         }
         taskData = {
             ...taskData,
@@ -544,19 +544,19 @@ async function addMembersToTask(itemId, userId) {
     try {
         const task = await Task.findById(itemId);
         if (!task) {
-            throw new Error('Task not found');
+            console.log('Task not found');
         }
         const userAlreadyAssigned = task.assignedToId.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
-            throw new Error('User is already assigned to this task');
+            console.log('User is already assigned to this task');
         }
         task.assignedToId.push(userId);
         await task.save();
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the task "${task.taskName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
@@ -582,13 +582,13 @@ async function removeMembersFromTask(itemId, userId) {
     try {
         const task = await Task.findById(itemId);
         if (!task) {
-            throw new Error('Task not found');
+            console.log('Task not found');
         }
 
         let user = await User.findById(userId);
 
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
 
         const userIndex = task.assignedToId.findIndex(
@@ -628,10 +628,16 @@ async function removeMembersFromTask(itemId, userId) {
 // Sprint Functions
 async function addSprintToGroup(groupId, sprintData) {
     try {
+        const sprintBoard = await Board.findById(sprintData.boardId);
+        const taskBoard = await Board.findOne({boardName:sprintBoard.boardName+"-Task"});
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
+        const groupData = {groupName: sprintData.sprintName};
+        const taskData = {taskName: "New Task"};
+        const { itemId } = await addTask(taskData);
+        await addTaskGroup(taskBoard._id, groupData, itemId);
         const sprint = new Sprint(sprintData);
         await sprint.save();
         group.sprints.push(sprint._id);
@@ -645,6 +651,12 @@ async function addSprintToGroup(groupId, sprintData) {
 
 async function addSprint(sprintData) {
     try {
+        const sprintBoard = await Board.findById(sprintData.boardId);
+        const taskBoard = await Board.findOne({boardName:sprintBoard.boardName+"-Task"});
+        const groupData = {groupName: sprintData.sprintName};
+        const taskData = {taskName: "New Task"};
+        const { itemId } = await addTask(taskData);
+        await addTaskGroup(taskBoard._id, groupData, itemId);
         const sprint = new Sprint(sprintData);
         await sprint.save();
         return {itemId:sprint._id};
@@ -658,12 +670,25 @@ async function removeSprintFromGroup(sprintId) {
     try {
         const sprint = await Sprint.findById(sprintId);
         if (!sprint) {
-            throw new Error('Sprint not found');
+            console.log('Sprint not found');
         }
         let group = await Group.findOne({ sprints: sprintId });
         if (!group) {
-            throw new Error('Group containing the sprint not found');
+            console.log('Group containing the sprint not found');
         }
+        const sprintBoard = await Board.findOne({ groups: group._id });
+        if (!sprintBoard) {
+            console.log('Sprint board not found');
+        }
+        const taskBoard = await Board.findOne({ boardName: sprintBoard.boardName + "-Task" });
+        if (!taskBoard) {
+            console.log('Task board containing the sprint group not found');
+        }
+        const taskGroup = await Group.findOne({ groupName: sprint.sprintName, boardId: taskBoard._id });
+        if (!taskGroup) {
+            console.log('Task group associated with sprint not found');
+        }
+        await removeTaskGroup(taskGroup._id);
         group.sprints = group.sprints.filter((id) => id.toString() !== sprintId);
         await group.save();
         await Sprint.findByIdAndDelete(sprintId);
@@ -691,13 +716,31 @@ async function updateSprintInGroup(sprintData) {
     try {
         const sprint = await Sprint.findById(sprintData._id);
         if (!sprint) {
-            throw new Error('Sprint not found');
+            console.log('Sprint not found');
         }
+        const isSprintNameUpdated = sprintData.sprintName && sprintData.sprintName !== sprint.sprintName;
         const updatedSprint = await Sprint.findByIdAndUpdate(
             sprintData._id,
             { $set: sprintData },
             { new: true }
         );
+        if (isSprintNameUpdated) {
+            const sprintBoard = await Board.findById(sprintData.boardId);
+            if (!sprintBoard) {
+                console.log('Sprint board not found');
+            }
+            const taskBoard = await Board.findOne({ boardName: sprintBoard.boardName + "-Task" });
+            if (!taskBoard) {
+                console.log('Task board not found');
+            }
+            const taskGroup = await Group.findOne({ groupName: sprint.sprintName, boardId: taskBoard._id });
+            if (taskGroup) {
+                taskGroup.groupName = sprintData.sprintName;
+                await taskGroup.save();
+            } else {
+                console.warn('Task group matching old sprintName not found');
+            }
+        }
         return updatedSprint;
     } catch (err) {
         console.error('Error updating sprint in group:', err);
@@ -709,19 +752,19 @@ async function addMembersToDeveloper(itemId, userId) {
     try {
         const bug = await Bug.findById(itemId);
         if (!bug) {
-            throw new Error('Bug not found');
+            console.log('Bug not found');
         }
         const userAlreadyAssigned = bug.developer.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
-            throw new Error('User is already assigned to this bug');
+            console.log('User is already assigned to this bug');
         }
         bug.developer.push(userId);
         await bug.save();
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned as a Developer to the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
@@ -747,13 +790,13 @@ async function removeMembersFromDeveloper(itemId, userId) {
     try {
         const bug = await Bug.findById(itemId);
         if (!bug) {
-            throw new Error('Bug not found');
+            console.log('Bug not found');
         }
 
         let user = await User.findById(userId);
 
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
 
         const userIndex = bug.developer.findIndex(
@@ -795,7 +838,7 @@ async function addBugToGroup(groupId, bugData) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const bug = new Bug(bugData);
         await bug.save();
@@ -837,11 +880,11 @@ async function removeBugFromGroup(bugId) {
     try {
         const bug = await Bug.findById(bugId);
         if (!bug) {
-            throw new Error('bug not found');
+            console.log('bug not found');
         }
         let group = await Group.findOne({ bugs: bugId });
         if (!group) {
-            throw new Error('Group containing the bug not found');
+            console.log('Group containing the bug not found');
         }
         group.bugs = group.bugs.filter((id) => id.toString() !== bugId);
         await group.save();
@@ -890,7 +933,7 @@ async function updateBugInGroup(bugData) {
 
         const bug = await Bug.findById(bugData._id);
         if (!bug) {
-            throw new Error('Bug not found');
+            console.log('Bug not found');
         }
         bugData = {
             ...bugData,
@@ -913,19 +956,19 @@ async function addMembersToReporter(itemId, userId) {
     try {
         const bug = await Bug.findById(itemId);
         if (!bug) {
-            throw new Error('Bug not found');
+            console.log('Bug not found');
         }
         const userAlreadyAssigned = bug.reporter.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
-            throw new Error('User is already assigned to this bug');
+            console.log('User is already assigned to this bug');
         }
         bug.reporter.push(userId);
         await bug.save();
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned as Reporterto the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
@@ -951,13 +994,13 @@ async function removeMembersFromReporter(itemId, userId) {
     try {
         const bug = await Bug.findById(itemId);
         if (!bug) {
-            throw new Error('Bug not found');
+            console.log('Bug not found');
         }
 
         let user = await User.findById(userId);
 
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
 
         const userIndex = bug.reporter.findIndex(

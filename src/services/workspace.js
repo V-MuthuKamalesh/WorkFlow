@@ -201,6 +201,14 @@ async function addBoard(workspaceId, boardData) {
         await board.save();
         workspace.boards.push(board._id);
         await workspace.save();
+        if (boardData.type === "Sprint") {
+            const taskBoardData = {
+                boardName: boardData.boardName + "-Task",
+                type: "Task",
+                createdBy: boardData.createdBy,
+            };
+            await addBoard(workspaceId, taskBoardData);
+        }
         return {boardId:board.id, boardName: board.boardName};
     } catch (err) {
         console.error('Error adding board to workspace:', err);
@@ -218,7 +226,13 @@ async function removeBoard(boardId) {
         if (!workspace) {
             throw new Error('Workspace not found for the specified board');
         }
-        const workspaceId = workspace._id;
+        if (board.type === "Sprint") {
+            const taskBoardName = board.boardName + "-Task";
+            const taskBoard = await Board.findOne({ boardName: taskBoardName });
+            if (taskBoard) {
+                await removeBoard(taskBoard._id);
+            }
+        }
         workspace.boards = workspace.boards.filter(
             (id) => id.toString() !== boardId
         );
@@ -237,6 +251,17 @@ async function updateBoard(boardId, boardData) {
         const board = await Board.findById(boardId);
         if (!board) {
             throw new Error('Board not found');
+        }
+        const isBoardNameUpdated = boardData.boardName && boardData.boardName !== board.boardName;
+        if (board.type === "Sprint" && isBoardNameUpdated) {
+            const taskBoardName = board.boardName + "-Task";
+            const taskBoard = await Board.findOne({ boardName: taskBoardName });
+            if (taskBoard) {
+                taskData={
+                    boardName: boardData.boardName+"-Task",
+                }
+                await updateBoard(taskBoard._id,taskData);
+            }
         }
         const updatedBoard = await Board.findByIdAndUpdate(
             boardId,
