@@ -106,14 +106,14 @@ module.exports = (io) => {
 
         // Item events
         socket.on('addItemToGroup', async (data, callback) => {
-            const { groupId, item, type } = data;
-            const updatedGroup = await workspaceController.addItemToGroup(groupId, item, type);
+            const { groupId, item, type, boardId } = data;
+            const updatedGroup = await workspaceController.addItemToGroup(groupId, item, type, boardId);
             callback(updatedGroup);
         });
 
         socket.on('createItem', async (data, callback) => {
-            const { item, type } = data;
-            const itemData = await workspaceController.addItem(item, type);
+            const { item, type, boardId } = data;
+            const itemData = await workspaceController.addItem(item, type, boardId);
             callback(itemData);
         });
 
@@ -124,8 +124,8 @@ module.exports = (io) => {
         });
 
         socket.on('updateItemInGroup', async (data, callback) => {
-            const { itemId, updateData, type } = data;
-            const updatedItem = await workspaceController.updateItemInGroup(itemId, updateData, type);
+            const { itemId, updateData, type, boardId } = data;
+            const updatedItem = await workspaceController.updateItemInGroup(itemId, updateData, type, boardId);
             callback(updatedItem);
         });
 

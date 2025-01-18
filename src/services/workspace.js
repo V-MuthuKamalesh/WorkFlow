@@ -207,9 +207,13 @@ async function addBoard(workspaceId, boardData) {
                 type: "Task",
                 createdById: boardData.createdById,
             };
-            await addBoard(workspaceId, taskBoardData);
+            taskBoard = await addBoard(workspaceId, taskBoardData);
         }
-        return {boardId:board.id, boardName: board.boardName};
+        const response = [
+            { boardId: board.id, boardName: board.boardName },
+            taskBoard ? { boardId: taskBoard.boardId, boardName: taskBoard.boardName } : null
+        ];
+        return response.filter(board => board !== null);
     } catch (err) {
         console.error('Error adding board to workspace:', err);
         throw err;
@@ -226,11 +230,12 @@ async function removeBoard(boardId) {
         if (!workspace) {
             throw new Error('Workspace not found for the specified board');
         }
+        let taskBoardId = null;
         if (board.type === "Sprint") {
             const taskBoardName = board.boardName + "-Task";
             const taskBoard = await Board.findOne({ boardName: taskBoardName });
             if (taskBoard) {
-                await removeBoard(taskBoard._id);
+                taskBoardId = await removeBoard(taskBoard._id);
             }
         }
         workspace.boards = workspace.boards.filter(
@@ -238,7 +243,11 @@ async function removeBoard(boardId) {
         );
         await workspace.save();
         await Board.findByIdAndDelete(boardId);
-        return await boardId;
+        const response = [boardId];
+        if (taskBoardId) {
+            response.push(taskBoardId);
+        }
+        return response;
     } catch (err) {
         console.error('Error removing board:', err);
         throw err;

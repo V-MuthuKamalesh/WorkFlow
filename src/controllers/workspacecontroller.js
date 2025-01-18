@@ -205,8 +205,9 @@ async function updateGroupInBoard(groupId, groupData) {
     }
 }
 
-async function addItemToGroup(groupId, itemData, type) {
+async function addItemToGroup(groupId, itemData, type, boardId) {
     try {
+        itemData.boardId = boardId;
         let updatedGroup;
         if(type=="Bug"){
             updatedGroup = await devService.addBugToGroup(groupId,itemData);
@@ -227,8 +228,9 @@ async function addItemToGroup(groupId, itemData, type) {
     }
 }
 
-async function addItem(itemData, type) {
+async function addItem(itemData, type, boardId) {
     try {
+        itemData.boardId = boardId;
         let item;
         if(type=="Bug"){
             item = await devService.addBug(itemData);
@@ -271,8 +273,9 @@ async function removeItemFromGroup(itemId, type) {
     }
 }
 
-async function updateItemInGroup(itemId, itemData, type) {
+async function updateItemInGroup(itemId, itemData, type, boardId) {
     try {
+        itemData.boardId = boardId;
         itemData._id=itemId;
         let item;
         if(type=="Bug"){
@@ -342,7 +345,7 @@ async function removeMembersFromItem(itemId, userId, type) {
 async function addFavouriteWorkspace(workspaceId, type) {
     try {
         let favouriteWorkspace;
-        if(type=="workmanagement"){
+        if(type=="work-management"){
             favouriteWorkspace = await workspaceService.addFavouriteWorkspace(workspaceId, process.env.FAV_WORK);
         }else if(type=="crm"){
             favouriteWorkspace = await workspaceService.addFavouriteWorkspace(workspaceId, process.env.FAV_CRM);
@@ -361,7 +364,7 @@ async function addFavouriteWorkspace(workspaceId, type) {
 async function removeFavouriteWorkspace(workspaceId, type) {
     try {
         let favouriteWorkspace;
-        if(type=="workmanagement"){
+        if(type=="work-management"){
             favouriteWorkspace = await workspaceService.removeFavouriteWorkspace(workspaceId, process.env.FAV_WORK);
         }else if(type=="crm"){
             favouriteWorkspace = await workspaceService.removeFavouriteWorkspace(workspaceId, process.env.FAV_CRM);
@@ -380,7 +383,7 @@ async function removeFavouriteWorkspace(workspaceId, type) {
 async function addBoardToFavourite(boardId, type) {
     try {
         let favouriteWorkspace;
-        if(type=="workmanagement"){
+        if(type=="work-management"){
             favouriteWorkspace = await workspaceService.addBoardToFavourite(boardId, process.env.FAV_WORK);
         }else if(type=="crm"){
             favouriteWorkspace = await workspaceService.addBoardToFavourite(boardId, process.env.FAV_CRM);
@@ -399,7 +402,7 @@ async function addBoardToFavourite(boardId, type) {
 async function removeBoardFromFavourite(boardId, type) {
     try {
         let favouriteWorkspace;
-        if(type=="workmanagement"){
+        if(type=="work-management"){
             favouriteWorkspace = await workspaceService.removeBoardFromFavourite(boardId, process.env.FAV_WORK);
         }else if(type=="crm"){
             favouriteWorkspace = await workspaceService.removeBoardFromFavourite(boardId, process.env.FAV_CRM);
@@ -418,7 +421,7 @@ async function removeBoardFromFavourite(boardId, type) {
 async function getFavourite(type) {
     try {
         let favouriteWorkspace;
-        if(type=="workmanagement"){
+        if(type=="work-management"){
             favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_WORK);
         }else if(type=="crm"){
             favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_CRM);
