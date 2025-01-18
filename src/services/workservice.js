@@ -253,7 +253,7 @@ async function updateItemInGroup(itemData) {
         }
         itemData = {
             ...itemData,
-            assignedToId: taskData.assignedToId.map(user => user.userId),
+            assignedToId: itemData.assignedToId.map(user => user.userId),
         };
         const updatedItem = await Item.findByIdAndUpdate(
             itemData._id,
