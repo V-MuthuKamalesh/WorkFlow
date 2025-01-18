@@ -299,7 +299,7 @@ async function getTaskBoard(boardId) {
                 populate: {
                     path: 'tasks',
                     populate: {
-                        path: 'assignedToId',
+                        path: 'person',
                         select: '_id email fullname',
                     },
                 },
@@ -316,8 +316,8 @@ async function getTaskBoard(boardId) {
                 groupId: group._id,
                 groupName: group.groupName,
                 items: group.tasks.map((task) => {
-                    const transformedAssignedTo = Array.isArray(task.assignedToId)
-                        ? task.assignedToId.map((assigned) => ({
+                    const transformedAssignedTo = Array.isArray(task.person)
+                        ? task.person.map((assigned) => ({
                               userId: assigned._id, 
                               email: assigned.email,
                               fullname: assigned.fullname,
@@ -326,7 +326,7 @@ async function getTaskBoard(boardId) {
                     return {
                         itemId: task._id,
                         taskName: task.taskName,
-                        assignedToId: transformedAssignedTo, 
+                        person: transformedAssignedTo, 
                         status: task.status || "",
                         priority: task.priority || "",
                     };
@@ -359,7 +359,7 @@ async function addTaskGroup(boardId, groupData, itemId) {
                 populate: {
                     path: 'tasks',
                     populate: {
-                        path: 'assignedToId',
+                        path: 'person',
                         select: '_id email fullname',
                     },
                 },
@@ -375,7 +375,7 @@ async function addTaskGroup(boardId, groupData, itemId) {
                 items: group.tasks.map((task) => ({
                     itemId: task._id,
                     taskName: task.taskName,
-                    assignedToId: task.assignedToId,
+                    person: task.person,
                     status: task.status || "",
                     priority: task.priority || "",
                 })),
@@ -406,7 +406,7 @@ async function removeTaskGroup(groupId) {
                 populate: {
                     path: 'tasks',
                     populate: {
-                        path: 'assignedToId',
+                        path: 'person',
                         select: '_id email fullname',
                     },
                 },
@@ -424,7 +424,7 @@ async function removeTaskGroup(groupId) {
                 items: group.tasks.map((task) => ({
                     itemId: task._id,
                     taskName: task.taskName,
-                    assignedToId: task.assignedToId,
+                    person: task.person,
                     status: task.status || "",
                     priority: task.priority || "",
                 })),
@@ -488,7 +488,7 @@ async function removeTaskFromGroup(taskId) {
         group = await Group.findById(group._id).populate({
             path: 'tasks',
             populate: {
-                path: 'assignedToId',
+                path: 'person',
                 select: '_id email fullname',
             },
         });
@@ -496,8 +496,8 @@ async function removeTaskFromGroup(taskId) {
             groupId: group._id,
             groupName: group.groupName,
             items: group.tasks.map((task) => {
-                const transformedAssignedTo = Array.isArray(task.assignedToId)
-                    ? task.assignedToId.map((assigned) => ({
+                const transformedAssignedTo = Array.isArray(task.person)
+                    ? task.person.map((assigned) => ({
                           userId: assigned._id,
                           email: assigned.email,
                           fullname: assigned.fullname,
@@ -506,7 +506,7 @@ async function removeTaskFromGroup(taskId) {
                 return {
                     itemId: task._id,
                     taskName: task.taskName,
-                    assignedToId: transformedAssignedTo,
+                    person: transformedAssignedTo,
                     status: task.status || "",
                     dueDate: task.dueDate || "",
                 };
@@ -526,7 +526,7 @@ async function updateTaskInGroup(taskData) {
         }
         taskData = {
             ...taskData,
-            assignedToId: taskData.assignedToId.map(user => user.userId),
+            person: taskData.person.map(user => user.userId),
         };
         const updatedTask = await Task.findByIdAndUpdate(
             taskData._id,
@@ -546,13 +546,13 @@ async function addMembersToTask(itemId, userId) {
         if (!task) {
             console.log('Task not found');
         }
-        const userAlreadyAssigned = task.assignedToId.some(
+        const userAlreadyAssigned = task.person.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this task');
         }
-        task.assignedToId.push(userId);
+        task.person.push(userId);
         await task.save();
         const user = await User.findById(userId);
         if (!user) {
@@ -561,11 +561,11 @@ async function addMembersToTask(itemId, userId) {
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the task "${task.taskName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
         await task.populate({
-            path: 'assignedToId',
+            path: 'person',
             select: '_id email fullname',
         });
 
-        const transformedAssignedTo = task.assignedToId.map((assignedUser) => ({
+        const transformedAssignedTo = task.person.map((assignedUser) => ({
             userId: assignedUser._id,
             email: assignedUser.email,
             fullname: assignedUser.fullname,
@@ -591,7 +591,7 @@ async function removeMembersFromTask(itemId, userId) {
             console.log('User not found');
         }
 
-        const userIndex = task.assignedToId.findIndex(
+        const userIndex = task.person.findIndex(
             (id) => id.toString() === user._id.toString()
         );
 
@@ -599,7 +599,7 @@ async function removeMembersFromTask(itemId, userId) {
             return 'User is not assigned to this task';
         }
 
-        task.assignedToId.splice(userIndex, 1);
+        task.person.splice(userIndex, 1);
 
         await task.save();
 
@@ -607,11 +607,11 @@ async function removeMembersFromTask(itemId, userId) {
         await sendSlackNotification(user.email, message);
 
         await task.populate({
-            path: 'assignedToId',
+            path: 'person',
             select: '_id email fullname',
         });
 
-        const transformedAssignedTo = task.assignedToId.map((assignedUser) => ({
+        const transformedAssignedTo = task.person.map((assignedUser) => ({
             userId: assignedUser._id,
             email: assignedUser.email,
             fullname: assignedUser.fullname,

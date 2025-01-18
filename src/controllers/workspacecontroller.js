@@ -299,7 +299,7 @@ async function addMembersToItem(itemId, userId, type) {
         let item;
         if(type=="reporter"){
             item = await devService.addMembersToReporter(itemId, userId);
-        }else if(type=="task"){
+        }else if(type=="person"){
             item = await devService.addMembersToTask(itemId, userId);
         }else if(type=="developer"){
             item = await devService.addMembersToDeveloper(itemId, userId);

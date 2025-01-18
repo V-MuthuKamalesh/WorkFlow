@@ -103,7 +103,7 @@ const leadSchema = new Schema({
 
 const taskSchema = new Schema({
   taskName: { type: String, required: true },
-  assignedToId:[{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}], 
+  person:[{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}], 
   status: { type: String },
   priority: { type: String },
   createdAt: { type: Date, default: Date.now },
