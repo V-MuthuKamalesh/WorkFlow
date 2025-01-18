@@ -413,7 +413,7 @@ async function isBoardInFavourite(boardId, favouriteId) {
         _id: favouriteId,
         boards: { $in: [boardId] }, 
       });
-      return !!favourite;
+      return {isFavourite: !!favourite};
     } catch (error) {
       console.error(`Error checking if board is in Favourite: ${error.message}`);
       throw error;
@@ -426,7 +426,7 @@ async function isBoardInFavourite(boardId, favouriteId) {
         _id: favouriteId,
         workspaces: { $in: [workspaceId] },
       });
-      return !!favourite;
+      return {isFavourite : !!favourite};
     } catch (error) {
       console.error(`Error checking if workspace is in Favourite: ${error.message}`);
       throw error;
