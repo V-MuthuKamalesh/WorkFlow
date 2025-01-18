@@ -204,7 +204,16 @@ module.exports = (io) => {
                 callback({ error: err.message });
             }
         });
-
+        
+        socket.on('isWorkspaceInFavourite', async (data, callback) => {
+            const { workspaceId, type } = data;
+            try {
+                const updatedFavourite = await workspaceController.isWorkspaceInFavourite(workspaceId, type);
+                callback(updatedFavourite);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });
         socket.on('disconnect', () => {
             console.log('A user disconnected');
         });

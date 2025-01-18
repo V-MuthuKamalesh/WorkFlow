@@ -436,15 +436,34 @@ async function getFavourite(type) {
 
 async function isBoardInFavourite(boardId, type) {
     try {
+        let favouriteBoard;
+        if(type=="work-management"){
+            favouriteBoard = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_WORK);
+        }else if(type=="crm"){
+            favouriteBoard = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_CRM);
+        }else if(type=="dev"){
+            favouriteBoard = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_DEV);
+        }else if(type=="service"){
+            favouriteBoard = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_SERVICE);
+        }
+        return favouriteBoard;
+    } catch (err) {
+        console.log('Failed to remove members from item: ' + err.message);
+        throw err;
+    }
+}
+
+async function isWorkspaceInFavourite(workspaceId, type) {
+    try {
         let favouriteWorkspace;
         if(type=="work-management"){
-            favouriteWorkspace = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_WORK);
+            favouriteWorkspace = await workspaceService.isWorkspaceInFavourite(workspaceId, process.env.FAV_WORK);
         }else if(type=="crm"){
-            favouriteWorkspace = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_CRM);
+            favouriteWorkspace = await workspaceService.isWorkspaceInFavourite(workspaceId, process.env.FAV_CRM);
         }else if(type=="dev"){
-            favouriteWorkspace = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_DEV);
+            favouriteWorkspace = await workspaceService.isWorkspaceInFavourite(workspaceId, process.env.FAV_DEV);
         }else if(type=="service"){
-            favouriteWorkspace = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_SERVICE);
+            favouriteWorkspace = await workspaceService.isWorkspaceInFavourite(workspaceId, process.env.FAV_SERVICE);
         }
         return favouriteWorkspace;
     } catch (err) {
@@ -481,4 +500,5 @@ module.exports = {
     removeBoardFromFavourite,
     getFavourite,
     isBoardInFavourite,
+    isWorkspaceInFavourite,
 };

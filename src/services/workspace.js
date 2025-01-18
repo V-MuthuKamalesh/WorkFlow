@@ -420,6 +420,19 @@ async function isBoardInFavourite(boardId, favouriteId) {
     }
   }
   
+  async function isWorkspaceInFavourite(workspaceId, favouriteId) {
+    try {
+      const favourite = await Favourite.findOne({
+        _id: favouriteId,
+        workspaces: { $in: [workspaceId] },
+      });
+      return !!favourite;
+    } catch (error) {
+      console.error(`Error checking if workspace is in Favourite: ${error.message}`);
+      throw error;
+    }
+  }
+  
 
 module.exports = {
     query,
@@ -440,4 +453,5 @@ module.exports = {
     removeBoardFromFavourite,
     getFavourite,
     isBoardInFavourite,
+    isWorkspaceInFavourite,
 };
