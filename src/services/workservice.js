@@ -123,7 +123,7 @@ async function removeGroup(groupId) {
         if (!board) {
             throw new Error('Board containing the group not found');
         }
-        for (const item of group.bugs) {
+        for (const item of group.items) {
             await removeItemFromGroup(item._id);
         }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
@@ -222,6 +222,7 @@ async function removeItemFromGroup(itemId) {
                 select: '_id email fullname',
             },
         });
+        console.log("Item deleted");
         return {
             groupId: group._id,
             groupName: group.groupName,

@@ -206,7 +206,7 @@ async function removeGroupFromBoard(groupId,type) {
         }else{
             boardData = await workService.removeGroup(groupId);
         }
-        
+        console.log("Group Removed");
         return boardData;
     } catch (err) {
         console.log('Failed to remove group from board'+ err.message );
@@ -282,6 +282,7 @@ async function removeItemFromGroup(itemId, type) {
         }else{
             updatedGroup = await workService.removeItemFromGroup(itemId);
         }
+        console.log("Item removed");
         return updatedGroup;
     } catch (err) {
         console.log('Failed to remove item from group' + err.message );

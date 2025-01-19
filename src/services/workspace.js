@@ -1,5 +1,8 @@
 const { Favourite, Module, Workspace, Board, Group } = require('../models/schema'); 
-const workspaceController = require('../controllers/workspacecontroller');
+const workService = require('../services/workservice');
+const devService = require('../services/devservice');
+const service = require('../services/service');
+const crmService = require('../services/crmservice');
 
 async function query(filterBy) {
     try {
@@ -120,13 +123,15 @@ async function remove(workspaceId, moduleId) {
         if (!moduleUpdate) {
             throw new Error('Module not found');
         }
+        const workspace = await Workspace.findById(workspaceId);
+        for (const boardId of workspace.boards) {
+            await removeBoard(boardId);
+        }
         const workspaceDelete = await Workspace.findByIdAndDelete(workspaceId);
         if (!workspaceDelete) {
             throw new Error('Workspace not found');
         }
-        for (const boardId of workspaceDelete.boards) {
-            await removeBoard(boardId);
-        }
+        
         await Favourite.updateMany(
             { workspaces: workspaceId },
             { $pull: { workspaces: workspaceId } }
@@ -234,12 +239,23 @@ async function removeBoard(boardId) {
         if (!board) {
             throw new Error('Board not found');
         }
-        console.log(board);
         for (const groupId of board.groups) { 
-            console.log(1.5, groupId, board.type);
-            await workspaceController.removeGroupFromBoard(groupId, board.type);
+            type=board.type;
+            if(type=="Bug"){
+                boardData = await devService.removeBugGroup(groupId);
+            }else if(type=="Task"){
+                boardData = await devService.removeTaskGroup(groupId);
+            }else if(type=="Sprint"){
+                boardData = await devService.removeSprintGroup(groupId);
+            }else if(type=="Lead"){
+                boardData = await crmService.removeLeadGroup(groupId);
+            }else if(type=="Ticket"){
+                boardData = await service.removeTicketGroup(groupId);
+            }else{
+                boardData = await workService.removeGroup(groupId);
+            }
+            console.log("Group Removed");
         }
-        console.log(2);
         const workspace = await Workspace.findOne({ boards: boardId });
         if (!workspace) {
             throw new Error('Workspace not found for the specified board');
@@ -265,6 +281,7 @@ async function removeBoard(boardId) {
             { $pull: { boards: boardId } }
         );
         await Board.findByIdAndDelete(boardId);
+        console.log("Board Removed");
         return response;
     } catch (err) {
         console.error('Error removing board:', err);
