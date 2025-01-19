@@ -51,7 +51,6 @@ async function getBugBoard(boardId) {
         };
     } catch (err) {
         console.error('Error fetching board:', err);
-        throw { error: 'Failed to fetch board', details: err.message };
     }
 }
 
@@ -104,7 +103,6 @@ async function addBugGroup(boardId, groupData, itemId) {
         };
     } catch (err) {
         console.error('Error adding group to board:', err);
-        throw { error: 'Failed to add group to board', details: err.message };
     }
 }
 
@@ -162,7 +160,6 @@ async function removeBugGroup(groupId) {
         };
     } catch (err) {
         console.error('Error removing group from board:', err);
-        throw { error: 'Failed to remove group', details: err.message };
     }
 }
 
@@ -199,7 +196,6 @@ async function getSprintBoard(boardId) {
         };
     } catch (err) {
         console.error('Error fetching board:', err);
-        throw { error: 'Failed to fetch board', details: err.message };
     }
 }
 
@@ -244,7 +240,6 @@ async function addSprintGroup(boardId, groupData, itemId) {
         };
     } catch (err) {
         console.error('Error adding group to board:', err);
-        throw { error: 'Failed to add group to board', details: err.message };
     }
 }
 
@@ -293,7 +288,6 @@ async function removeSprintGroup(groupId) {
         };
     } catch (err) {
         console.error('Error removing group from board:', err);
-        throw { error: 'Failed to remove group', details: err.message };
     }
 }
 
@@ -341,7 +335,6 @@ async function getTaskBoard(boardId) {
         };
     } catch (err) {
         console.error('Error fetching board:', err);
-        throw { error: 'Failed to fetch board', details: err.message };
     }
 }
 
@@ -393,7 +386,6 @@ async function addTaskGroup(boardId, groupData, itemId, sprintId) {
         };
     } catch (err) {
         console.error('Error adding group to board:', err);
-        throw { error: 'Failed to add group to board', details: err.message };
     }
 }
 
@@ -445,7 +437,6 @@ async function removeTaskGroup(groupId) {
         };
     } catch (err) {
         console.error('Error removing group from task board:', err);
-        throw { error: 'Failed to remove group', details: err.message };
     }
 }
 
@@ -470,7 +461,6 @@ async function addTaskToGroup(groupId, taskData) {
         return {itemId:task._id, taskName: task.taskName, assignedToId: transformedAssignedTo, status: task.status || "", priority: task.priority || "",};
     } catch (err) {
         console.error('Error adding task to group:', err);
-        throw { error: 'Failed to add task to group', details: err.message };
     }
 }
 
@@ -481,7 +471,6 @@ async function addTask(taskData) {
         return {itemId:task._id};
     } catch (err) {
         console.error('Error creating task:', err);
-        throw { error: 'Failed to create task ', details: err.message };
     }
 }
 
@@ -527,7 +516,6 @@ async function removeTaskFromGroup(taskId) {
         };
     } catch (err) {
         console.error('Error removing task from group:', err);
-        throw { error: 'Failed to remove task from group', details: err.message };
     }
 }
 
@@ -549,7 +537,6 @@ async function updateTaskInGroup(taskData) {
         return updatedTask;
     } catch (err) {
         console.error('Error updating task in group:', err);
-        throw { error: 'Failed to update task in group', details: err.message };
     }
 }
 
@@ -587,7 +574,6 @@ async function addMembersToTask(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error adding members to task:', err);
-        throw err;
     }
 }
 
@@ -633,7 +619,6 @@ async function removeMembersFromTask(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error removing members from task:', err);
-        throw err;
     }
 }
 
@@ -658,7 +643,6 @@ async function addSprintToGroup(groupId, sprintData, boardId) {
         return {itemId:sprint._id, sprintName: sprint.sprintName, sprintGoals: sprint.sprintGoals || "", startDate: sprint.startDate || "", endDate: sprint.endDate || "",};
     } catch (err) {
         console.error('Error adding sprint to group:', err);
-        throw { error: 'Failed to add sprint to group', details: err.message };
     }
 }
 
@@ -675,7 +659,6 @@ async function addSprint(sprintData, boardId) {
         return {itemId:sprint._id};
     } catch (err) {
         console.error('Error creating sprint:', err);
-        throw { error: 'Failed to create sprint ', details: err.message };
     }
 }
 
@@ -709,7 +692,6 @@ async function removeSprintFromGroup(sprintId) {
         };
     } catch (err) {
         console.error('Error removing sprint from group:', err);
-        throw { error: 'Failed to remove sprint from group', details: err.message };
     }
 }
 
@@ -738,7 +720,6 @@ async function updateSprintInGroup(sprintData) {
         return updatedSprint;
     } catch (err) {
         console.error('Error updating sprint in group:', err);
-        throw { error: 'Failed to update sprint in group', details: err.message };
     }
 }
 
@@ -776,7 +757,6 @@ async function addMembersToDeveloper(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error adding members to bug:', err);
-        throw err;
     }
 }
 
@@ -822,7 +802,6 @@ async function removeMembersFromDeveloper(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error removing members from bug:', err);
-        throw err;
     }
 }
 
@@ -855,7 +834,6 @@ async function addBugToGroup(groupId, bugData) {
         return {itemId:bug._id, bugName: bug.bugName, reporter: transformedReporter, developer: transformedDeveloper, priority: bug.priority || "",status: bug.status || "",};
     } catch (err) {
         console.error('Error adding bug to group:', err);
-        throw { error: 'Failed to add bug to group', details: err.message };
     }
 }
 
@@ -866,7 +844,6 @@ async function addBug(bugData) {
         return {itemId:bug._id};
     } catch (err) {
         console.error('Error creating item:', err);
-        throw { error: 'Failed to create item ', details: err.message };
     }
 }
 
@@ -918,7 +895,6 @@ async function removeBugFromGroup(bugId) {
         };
     } catch (err) {
         console.error('Error removing bug from group:', err);
-        throw { error: 'Failed to remove bug from group', details: err.message };
     }
 }
 
@@ -942,7 +918,6 @@ async function updateBugInGroup(bugData) {
         return updatedBug;
     } catch (err) {
         console.error('Error updating bug in group:', err);
-        throw { error: 'Failed to update bug in group', details: err.message };
     }
 }
 
@@ -980,7 +955,6 @@ async function addMembersToReporter(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error adding members to bug:', err);
-        throw err;
     }
 }
 
@@ -1026,7 +1000,6 @@ async function removeMembersFromReporter(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error removing members from bug:', err);
-        throw err;
     }
 }
 
@@ -1055,7 +1028,7 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
             ],
         });
         if (!module) {
-            throw new Error('Module not found');
+            console.log('Module not found');
         }
         const filteredWorkspaces = module.workspaces.filter((workspace) =>
             workspace.members.some(member => member.userId.toString() === userId)
@@ -1091,7 +1064,6 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
         return workspaceData;
     } catch (err) {
         console.error('Error fetching workspaces with task counts:', err);
-        throw { error: 'Failed to fetch workspaces with task counts', details: err.message };
     }
 }
 

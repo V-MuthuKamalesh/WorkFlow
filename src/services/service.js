@@ -21,7 +21,7 @@ async function getTicketBoard(boardId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: board._id,
@@ -53,7 +53,6 @@ async function getTicketBoard(boardId) {
         };
     } catch (err) {
         console.error('Error fetching board:', err);
-        throw { error: 'Failed to fetch board', details: err.message };
     }
 }
 
@@ -62,7 +61,7 @@ async function addTicketGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         groupData.tickets = [itemId];
         groupData.boardId = boardId;
@@ -108,7 +107,6 @@ async function addTicketGroup(boardId, groupData, itemId) {
         };
     } catch (err) {
         console.error('Error adding group to board:', err);
-        throw { error: 'Failed to add group to board', details: err.message };
     }
 }
 
@@ -116,11 +114,11 @@ async function removeTicketGroup(groupId) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const board = await Board.findOne(group.boardId);
         if (!board) {
-            throw new Error('Board containing the group not found');
+            console.log('Board containing the group not found');
         }
         for (const ticket of group.tickets) {
             await removeTicketFromGroup(ticket._id);
@@ -144,7 +142,7 @@ async function removeTicketGroup(groupId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: newboard._id,
@@ -166,7 +164,6 @@ async function removeTicketGroup(groupId) {
         };
     } catch (err) {
         console.error('Error removing group from board:', err);
-        throw { error: 'Failed to remove group', details: err.message };
     }
 }
 
@@ -175,7 +172,7 @@ async function addTicketToGroup(groupId, ticketData) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const ticket = new Ticket(ticketData);
         await ticket.save();
@@ -198,7 +195,6 @@ async function addTicketToGroup(groupId, ticketData) {
         return {itemId:ticket._id, ticketName: ticket.ticketName, description: ticket.description || "", status: ticket.status || "", priority: ticket.priority || "",requestType: ticket.requestType || "", employee: transformedEmployee, agent: transformedAgent,};
     } catch (err) {
         console.error('Error adding ticket to group:', err);
-        throw { error: 'Failed to add ticket to group', details: err.message };
     }
 }
 
@@ -209,7 +205,6 @@ async function addTicket(ticketData) {
         return {itemId:ticket._id};
     } catch (err) {
         console.error('Error creating ticket:', err);
-        throw { error: 'Failed to create ticket ', details: err.message };
     }
 }
 
@@ -217,11 +212,11 @@ async function removeTicketFromGroup(ticketId) {
     try {
         const ticket = await Ticket.findById(ticketId);
         if (!ticket) {
-            throw new Error('ticket not found');
+            console.log('ticket not found');
         }
         let group = await Group.findOne({ tickets: ticketId });
         if (!group) {
-            throw new Error('Group containing the ticket not found');
+            console.log('Group containing the ticket not found');
         }
         group.tickets = group.tickets.filter((id) => id.toString() !== ticketId);
         await group.save();
@@ -263,7 +258,6 @@ async function removeTicketFromGroup(ticketId) {
         };
     } catch (err) {
         console.error('Error removing ticket from group:', err);
-        throw { error: 'Failed to remove ticket from group', details: err.message };
     }
 }
 
@@ -271,7 +265,7 @@ async function updateTicketInGroup(ticketData) {
     try {
         const ticket = await Ticket.findById(ticketData._id);
         if (!ticket) {
-            throw new Error('ticket not found');
+            console.log('ticket not found');
         }
         ticketData = {
             ...ticketData,
@@ -286,7 +280,6 @@ async function updateTicketInGroup(ticketData) {
         return updatedTicket;
     } catch (err) {
         console.error('Error updating ticket in group:', err);
-        throw { error: 'Failed to update ticket in group', details: err.message };
     }
 }
 
@@ -294,19 +287,19 @@ async function addMembersToAgent(itemId, userId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
-            throw new Error('Ticket not found');
+            console.log('Ticket not found');
         }
         const userAlreadyAssigned = ticket.agent.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
-            throw new Error('User is already assigned to this ticket');
+            console.log('User is already assigned to this ticket');
         }
         ticket.agent.push(userId);
         await ticket.save();
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
@@ -324,7 +317,6 @@ async function addMembersToAgent(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error adding members to ticket:', err);
-        throw err;
     }
 }
 
@@ -332,13 +324,13 @@ async function removeMembersFromAgent(itemId, userId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
-            throw new Error('Ticket not found');
+            console.log('Ticket not found');
         }
 
         let user = await User.findById(userId);
 
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
 
         const userIndex = ticket.agent.findIndex(
@@ -370,7 +362,6 @@ async function removeMembersFromAgent(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error removing members from ticket:', err);
-        throw err;
     }
 }
 
@@ -378,19 +369,19 @@ async function addMembersToEmployee(itemId, userId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
-            throw new Error('Ticket not found');
+            console.log('Ticket not found');
         }
         const userAlreadyAssigned = ticket.employee.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
-            throw new Error('User is already assigned to this ticket');
+            console.log('User is already assigned to this ticket');
         }
         ticket.employee.push(userId);
         await ticket.save();
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
@@ -408,7 +399,6 @@ async function addMembersToEmployee(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error adding members to ticket:', err);
-        throw err;
     }
 }
 
@@ -416,13 +406,13 @@ async function removeMembersFromEmployee(itemId, userId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
-            throw new Error('Ticket not found');
+            console.log('Ticket not found');
         }
 
         let user = await User.findById(userId);
 
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
 
         const userIndex = ticket.employee.findIndex(
@@ -454,7 +444,6 @@ async function removeMembersFromEmployee(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error removing members from ticket:', err);
-        throw err;
     }
 }
 
@@ -483,7 +472,7 @@ async function getWorkspacesWithTicketCounts(moduleId, userId) {
             },
         });
         if (!module) {
-            throw new Error('Module not found');
+            console.log('Module not found');
         }
         const filteredWorkspaces = module.workspaces.filter((workspace) =>
             workspace.members.some((member) => member.userId.toString() === userId)
@@ -524,7 +513,6 @@ async function getWorkspacesWithTicketCounts(moduleId, userId) {
         return workspaceData;
     } catch (err) {
         console.error('Error fetching workspaces with ticket counts:', err);
-        throw { error: 'Failed to fetch workspaces with ticket counts', details: err.message };
     }
 }
 

@@ -15,7 +15,7 @@ async function getBoard(boardId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         // console.log("Populated board",board);
         
@@ -47,7 +47,6 @@ async function getBoard(boardId) {
         };
     } catch (err) {
         console.error('Error fetching board:', err);
-        throw { error: 'Failed to fetch board', details: err.message };
     }
 }
 
@@ -55,12 +54,11 @@ async function getType(boardId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return board.type || "";
     } catch (err) {
         console.error('Error fetching board:', err);
-        throw { error: 'Failed to fetch board', details: err.message };
     }
 }
 
@@ -70,7 +68,7 @@ async function addGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         groupData.items = [itemId];
         groupData.boardId = boardId;
@@ -109,7 +107,6 @@ async function addGroup(boardId, groupData, itemId) {
         };
     } catch (err) {
         console.error('Error adding group to board:', err);
-        throw { error: 'Failed to add group to board', details: err.message };
     }
 }
 
@@ -117,11 +114,11 @@ async function removeGroup(groupId) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const board = await Board.findOne({ groups: groupId });
         if (!board) {
-            throw new Error('Board containing the group not found');
+            console.log('Board containing the group not found');
         }
         for (const item of group.items) {
             await removeItemFromGroup(item._id);
@@ -141,7 +138,7 @@ async function removeGroup(groupId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: newboard._id,
@@ -162,7 +159,6 @@ async function removeGroup(groupId) {
         };
     } catch (err) {
         console.error('Error removing group from board:', err);
-        throw { error: 'Failed to remove group', details: err.message };
     }
 }
 
@@ -171,7 +167,7 @@ async function addItemToGroup(groupId, itemData) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const item = new Item(itemData);
         await item.save();
@@ -187,7 +183,6 @@ async function addItemToGroup(groupId, itemData) {
         return {itemId:item._id, itemName: item.itemName, assignedToId: transformedAssignedTo, status: item.status || "", dueDate: item.dueDate || "",};
     } catch (err) {
         console.error('Error adding item to group:', err);
-        throw { error: 'Failed to add item to group', details: err.message };
     }
 }
 
@@ -198,7 +193,6 @@ async function addItem(itemData) {
         return {itemId:item._id};
     } catch (err) {
         console.error('Error creating item:', err);
-        throw { error: 'Failed to create item ', details: err.message };
     }
 }
 
@@ -206,11 +200,11 @@ async function removeItemFromGroup(itemId) {
     try {
         const item = await Item.findById(itemId);
         if (!item) {
-            throw new Error('Item not found');
+            console.log('Item not found');
         }
         let group = await Group.findOne({ items: itemId });
         if (!group) {
-            throw new Error('Group containing the item not found');
+            console.log('Group containing the item not found');
         }
         group.items = group.items.filter((id) => id.toString() !== itemId);
         await group.save();
@@ -245,7 +239,6 @@ async function removeItemFromGroup(itemId) {
         };
     } catch (err) {
         console.error('Error removing item from group:', err);
-        throw { error: 'Failed to remove item from group', details: err.message };
     }
 }
 
@@ -253,7 +246,7 @@ async function updateItemInGroup(itemData) {
     try {
         const item = await Item.findById(itemData._id);
         if (!item) {
-            throw new Error('Item not found');
+            console.log('Item not found');
         }
         itemData = {
             ...itemData,
@@ -273,7 +266,6 @@ async function updateItemInGroup(itemData) {
         return updatedItem;
     } catch (err) {
         console.error('Error updating item in group:', err);
-        throw { error: 'Failed to update item in group', details: err.message };
     }
 }
 
@@ -281,19 +273,19 @@ async function addMembersToItem(itemId, userId) {
     try {
         const item = await Item.findById(itemId);
         if (!item) {
-            throw new Error('Item not found');
+            console.log('Item not found');
         }
         const userAlreadyAssigned = item.assignedToId.some(
             (id) => id.toString() === userId
         );
         if (userAlreadyAssigned) {
-            throw new Error('User is already assigned to this item');
+            console.log('User is already assigned to this item');
         }
         item.assignedToId.push(userId);
         await item.save();
         const user = await User.findById(userId);
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the item "${item.itemName}". Please check the details and take necessary actions.\n\nThank you!`;
         await sendSlackNotification(user.email, message);
@@ -311,7 +303,6 @@ async function addMembersToItem(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error adding members to item:', err);
-        throw err;
     }
 }
 
@@ -319,13 +310,13 @@ async function removeMembersFromItem(itemId, userId) {
     try {
         const item = await Item.findById(itemId);
         if (!item) {
-            throw new Error('Item not found');
+            console.log('Item not found');
         }
 
         let user = await User.findById(userId);
 
         if (!user) {
-            throw new Error('User not found');
+            console.log('User not found');
         }
 
         const userIndex = item.assignedToId.findIndex(
@@ -357,7 +348,6 @@ async function removeMembersFromItem(itemId, userId) {
         return { assignedToId: transformedAssignedTo };
     } catch (err) {
         console.error('Error removing members from item:', err);
-        throw err;
     }
 }
 
@@ -386,7 +376,7 @@ async function getWorkspacesWithItemCounts(moduleId, userId) {
             ],
         });
         if (!module) {
-            throw new Error('Module not found');
+            console.log('Module not found');
         }
         const filteredWorkspaces = module.workspaces.filter((workspace) =>
             workspace.members.some(member => member.userId.toString() === userId)
@@ -422,7 +412,6 @@ async function getWorkspacesWithItemCounts(moduleId, userId) {
         return workspaceData;
     } catch (err) {
         console.error('Error fetching workspaces with item counts:', err);
-        throw { error: 'Failed to fetch workspaces with item counts', details: err.message };
     }
 }
 

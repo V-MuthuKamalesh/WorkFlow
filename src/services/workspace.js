@@ -12,7 +12,7 @@ async function query(filterBy) {
             select: 'workspaceName createdBy members',
         });
         if (!module) {
-            throw new Error('Module not found');
+            console.log('Module not found');
         }
         // console.log(module);
         
@@ -28,7 +28,6 @@ async function query(filterBy) {
         return transformedWorkspaces;
     } catch (err) {
         console.error('Error fetching workspaces:', err);
-        throw err;
     }
 }
 
@@ -44,7 +43,7 @@ async function getById(workspaceId) {
                 select: 'email fullname _id', 
             });
         if (!detailedWorkspace) {
-            throw new Error('Workspace not found');
+            console.log('Workspace not found');
         }
         const transformedBoards = detailedWorkspace.boards.map(board => {
             const { _id, boardName } = board.toObject();
@@ -62,7 +61,6 @@ async function getById(workspaceId) {
         return {workspaceId:workspaceId, workspaceName: detailedWorkspace.workspaceName, boards: transformedBoards, members: transformedMembers, }; 
     } catch (err) {
         console.error('Error fetching workspace by ID:', err);
-        throw err;
     }
 }
 
@@ -73,7 +71,7 @@ async function getWorkspaceDetailsById(workspaceId) {
                 path: 'boards', 
             });
         if (!detailedWorkspace) {
-            throw new Error('Workspace not found');
+            console.log('Workspace not found');
         }
         return {
             workspaceId: detailedWorkspace._id,
@@ -84,7 +82,6 @@ async function getWorkspaceDetailsById(workspaceId) {
         };
     } catch (err) {
         console.error('Error fetching workspace by ID:', err);
-        throw err;
     }
 }
 
@@ -96,7 +93,6 @@ async function add(workspaceData) {
         await workspace.save();
         return {workspaceName:workspace.workspaceName, workspaceId: workspace._id};
     } catch (err) {
-        throw err;
     }
 }
 
@@ -109,7 +105,6 @@ async function update(id, workspaceData) {
         );
         return updatedWorkspace;
     } catch (err) {
-        throw err;
     }
 }
 
@@ -121,7 +116,7 @@ async function remove(workspaceId, moduleId) {
             { new: true } 
         );
         if (!moduleUpdate) {
-            throw new Error('Module not found');
+            console.log('Module not found');
         }
         const workspace = await Workspace.findById(workspaceId);
         for (const boardId of workspace.boards) {
@@ -129,7 +124,7 @@ async function remove(workspaceId, moduleId) {
         }
         const workspaceDelete = await Workspace.findByIdAndDelete(workspaceId);
         if (!workspaceDelete) {
-            throw new Error('Workspace not found');
+            console.log('Workspace not found');
         }
         
         await Favourite.updateMany(
@@ -140,7 +135,6 @@ async function remove(workspaceId, moduleId) {
         return workspaceId;
     } catch (err) {
         console.error('Error removing workspace:', err);
-        throw err;
     }
 }
 
@@ -148,7 +142,7 @@ async function addMember(workspaceId, userId, adminId, role = 'member') {
     try {
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) {
-            throw new Error('Workspace not found');
+            console.log('Workspace not found');
         }
         if (workspace.createdBy.toString() !== adminId) {
             return 'You do not have permission to add a user to this workspace';
@@ -164,7 +158,6 @@ async function addMember(workspaceId, userId, adminId, role = 'member') {
         return 'User added to Workspace successfully';
     } catch (err) {
         console.error('Error adding member to workspace:', err);
-        throw err;
     }
 }
 
@@ -172,7 +165,7 @@ async function removeMember(workspaceId, userId, adminId) {
     try {
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) {
-            throw new Error('Workspace not found');
+            console.log('Workspace not found');
         }
         
         if (workspace.createdBy.toString() !== adminId) {
@@ -196,7 +189,6 @@ async function removeMember(workspaceId, userId, adminId) {
         return 'User removed from workspace successfully';
     } catch (err) {
         console.error('Error removing member from workspace:', err);
-        throw err;
     }
 }
 
@@ -206,7 +198,7 @@ async function addBoard(workspaceId, boardData) {
     try {
         const workspace = await Workspace.findById(workspaceId);
         if (!workspace) {
-            throw new Error('Workspace not found');
+            console.log('Workspace not found');
         }
         boardData.workspaceName = workspace.workspaceName;
         const board = new Board(boardData);
@@ -229,7 +221,6 @@ async function addBoard(workspaceId, boardData) {
         return response.filter(board => board !== null);
     } catch (err) {
         console.error('Error adding board to workspace:', err);
-        throw err;
     }
 }
 
@@ -237,7 +228,7 @@ async function removeBoard(boardId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         for (const groupId of board.groups) { 
             type=board.type;
@@ -258,7 +249,7 @@ async function removeBoard(boardId) {
         }
         const workspace = await Workspace.findOne({ boards: boardId });
         if (!workspace) {
-            throw new Error('Workspace not found for the specified board');
+            console.log('Workspace not found for the specified board');
         }
         const response = [boardId];
         let taskBoardId = null;
@@ -285,7 +276,6 @@ async function removeBoard(boardId) {
         return response;
     } catch (err) {
         console.error('Error removing board:', err);
-        throw err;
     }
 }
 
@@ -294,7 +284,7 @@ async function updateBoard(boardId, boardData) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         const isBoardNameUpdated = boardData.boardName && boardData.boardName !== board.boardName;
         if (board.type === "Sprint" && isBoardNameUpdated) {
@@ -315,7 +305,6 @@ async function updateBoard(boardId, boardData) {
         return updatedBoard;
     } catch (err) {
         console.error('Error updating board:', err);
-        throw { error: 'Failed to update board', details: err.message };
     }
 }
 
@@ -323,7 +312,7 @@ async function updateGroup(groupId, groupData) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const updatedGroup = await Group.findByIdAndUpdate(
             groupId,
@@ -333,7 +322,6 @@ async function updateGroup(groupId, groupData) {
         return updatedGroup;
     } catch (err) {
         console.error('Error updating group:', err);
-        throw { error: 'Failed to update group', details: err.message };
     }
 }
 
@@ -345,12 +333,11 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
         { new: true } 
       );
       if (!updatedFavourite) {
-        throw new Error('Favourite not found');
+        console.log('Favourite not found');
       }
       return updatedFavourite;
     } catch (error) {
       console.error(`Error adding workspace to Favourite: ${error.message}`);
-      throw error;
     }
   }
 
@@ -362,12 +349,11 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
         { new: true }
       );
       if (!updatedFavourite) {
-        throw new Error('Favourite not found');
+        console.log('Favourite not found');
       }
       return updatedFavourite;
     } catch (error) {
       console.error(`Error removing workspace from Favourite: ${error.message}`);
-      throw error;
     }
   }
   
@@ -379,12 +365,11 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
         { new: true } 
       );
       if (!updatedFavourite) {
-        throw new Error('Favourite not found');
+        console.log('Favourite not found');
       }
       return updatedFavourite;
     } catch (error) {
       console.error(`Error adding board to Favourite: ${error.message}`);
-      throw error;
     }
   }
 
@@ -396,12 +381,11 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
         { new: true } 
       );
       if (!updatedFavourite) {
-        throw new Error('Favourite not found');
+        console.log('Favourite not found');
       }
       return updatedFavourite;
     } catch (error) {
       console.error(`Error removing board from Favourite: ${error.message}`);
-      throw error;
     }
   }
 
@@ -415,7 +399,7 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
                 path: 'boards',  
             });
         if (!favourite) {
-            throw new Error('Favourite not found');
+            console.log('Favourite not found');
         }
         const workspaceDetails = await Promise.all(
             favourite.workspaces.map(async (workspace) => {
@@ -453,7 +437,6 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
         };
     } catch (err) {
         console.error('Error fetching favourite details:', err);
-        throw { error: 'Failed to fetch favourite details', details: err.message };
     }
 }
 
@@ -466,7 +449,6 @@ async function isBoardInFavourite(boardId, favouriteId) {
       return {isFavourite: !!favourite};
     } catch (error) {
       console.error(`Error checking if board is in Favourite: ${error.message}`);
-      throw error;
     }
   }
   
@@ -479,7 +461,6 @@ async function isBoardInFavourite(boardId, favouriteId) {
       return {isFavourite : !!favourite};
     } catch (error) {
       console.error(`Error checking if workspace is in Favourite: ${error.message}`);
-      throw error;
     }
   }
   

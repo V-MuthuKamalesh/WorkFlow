@@ -353,7 +353,6 @@ async function removeMembersFromItem(itemId, userId, type) {
         return item;
     } catch (err) {
         console.log('Failed to remove members from item: ' + err.message);
-        throw err;
     }
 }
 
@@ -372,7 +371,6 @@ async function addFavouriteWorkspace(workspaceId, type) {
         return favouriteWorkspace;
     } catch (err) {
         console.log('Failed to remove members from item: ' + err.message);
-        throw err;
     }
 }
 
@@ -391,7 +389,6 @@ async function removeFavouriteWorkspace(workspaceId, type) {
         return favouriteWorkspace;
     } catch (err) {
         console.log('Failed to remove members from item: ' + err.message);
-        throw err;
     }
 }
 
@@ -410,7 +407,6 @@ async function addBoardToFavourite(boardId, type) {
         return favouriteWorkspace;
     } catch (err) {
         console.log('Failed to remove members from item: ' + err.message);
-        throw err;
     }
 }
 
@@ -429,7 +425,6 @@ async function removeBoardFromFavourite(boardId, type) {
         return favouriteWorkspace;
     } catch (err) {
         console.log('Failed to remove members from item: ' + err.message);
-        throw err;
     }
 }
 
@@ -448,7 +443,6 @@ async function getFavourite(userId, type) {
         return favouriteWorkspace;
     } catch (err) {
         console.log('Failed to remove members from item: ' + err.message);
-        throw err;
     }
 }
 
@@ -467,7 +461,6 @@ async function isBoardInFavourite(boardId, type) {
         return favouriteBoard;
     } catch (err) {
         console.log('Failed to remove members from item: ' + err.message);
-        throw err;
     }
 }
 
@@ -486,7 +479,6 @@ async function isWorkspaceInFavourite(workspaceId, type) {
         return favouriteWorkspace;
     } catch (err) {
         console.log('Failed to remove members from item: ' + err.message);
-        throw err;
     }
 }
 

@@ -10,7 +10,7 @@ async function getLeadBoard(boardId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: board._id,
@@ -35,7 +35,6 @@ async function getLeadBoard(boardId) {
         };
     } catch (err) {
         console.error('Error fetching board:', err);
-        throw { error: 'Failed to fetch board', details: err.message };
     }
 }
 
@@ -44,7 +43,7 @@ async function addLeadGroup(boardId, groupData, itemId) {
     try {
         const board = await Board.findById(boardId);
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         groupData.leads = [itemId];
         groupData.boardId = boardId;
@@ -81,7 +80,6 @@ async function addLeadGroup(boardId, groupData, itemId) {
         };
     } catch (err) {
         console.error('Error adding group to board:', err);
-        throw { error: 'Failed to add group to board', details: err.message };
     }
 }
 
@@ -89,11 +87,11 @@ async function removeLeadGroup(groupId) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const board = await Board.findOne({ groups: groupId });
         if (!board) {
-            throw new Error('Board containing the group not found');
+            console.log('Board containing the group not found');
         }
         for (const lead of group.leads) {
             await removeLeadFromGroup(lead._id);
@@ -109,7 +107,7 @@ async function removeLeadGroup(groupId) {
                 },
             });
         if (!board) {
-            throw new Error('Board not found');
+            console.log('Board not found');
         }
         return {
             boardId: newboard._id,
@@ -132,7 +130,6 @@ async function removeLeadGroup(groupId) {
         };
     } catch (err) {
         console.error('Error removing group from board:', err);
-        throw { error: 'Failed to remove group', details: err.message };
     }
 }
 
@@ -141,7 +138,7 @@ async function addLeadToGroup(groupId, leadData) {
     try {
         const group = await Group.findById(groupId);
         if (!group) {
-            throw new Error('Group not found');
+            console.log('Group not found');
         }
         const lead = new Lead(leadData);
         await lead.save();
@@ -150,7 +147,6 @@ async function addLeadToGroup(groupId, leadData) {
         return {itemId:lead._id, leadName: lead.leadName, status: lead.status || "", company: lead.company || "", title: lead.title || "",email: lead.email || "", lastInteraction: lead.lastInteraction || "",};
     } catch (err) {
         console.error('Error adding lead to group:', err);
-        throw { error: 'Failed to add lead to group', details: err.message };
     }
 }
 
@@ -161,7 +157,6 @@ async function addLead(leadData) {
         return {itemId:lead._id};
     } catch (err) {
         console.error('Error creating lead:', err);
-        throw { error: 'Failed to create lead ', details: err.message };
     }
 }
 
@@ -169,11 +164,11 @@ async function removeLeadFromGroup(leadId) {
     try {
         const lead = await Lead.findById(leadId);
         if (!lead) {
-            throw new Error('lead not found');
+            console.log('lead not found');
         }
         let group = await Group.findOne({ leads: leadId });
         if (!group) {
-            throw new Error('Group containing the lead not found');
+            console.log('Group containing the lead not found');
         }
         group.leads = group.leads.filter((id) => id.toString() !== leadId);
         await group.save();
@@ -194,7 +189,6 @@ async function removeLeadFromGroup(leadId) {
         };
     } catch (err) {
         console.error('Error removing lead from group:', err);
-        throw { error: 'Failed to remove lead from group', details: err.message };
     }
 }
 
@@ -202,7 +196,7 @@ async function updateLeadInGroup(leadData) {
     try {
         const lead = await Lead.findById(leadData._id);
         if (!lead) {
-            throw new Error('lead not found');
+            console.log('lead not found');
         }
         const updatedLead = await Lead.findByIdAndUpdate(
             leadData._id,
@@ -212,7 +206,6 @@ async function updateLeadInGroup(leadData) {
         return updatedLead;
     } catch (err) {
         console.error('Error updating lead in group:', err);
-        throw { error: 'Failed to update lead in group', details: err.message };
     }
 }
 
@@ -237,7 +230,7 @@ async function getWorkspacesWithLeadCounts(moduleId, userId) {
             ],
         });
         if (!module) {
-            throw new Error('Module not found');
+            console.log('Module not found');
         }
         const filteredWorkspaces = module.workspaces.filter((workspace) =>
             workspace.members.some((member) => member.userId.toString() === userId)
@@ -272,7 +265,6 @@ async function getWorkspacesWithLeadCounts(moduleId, userId) {
         return workspaceData;
     } catch (err) {
         console.error('Error fetching workspaces with lead counts:', err);
-        throw { error: 'Failed to fetch workspaces with lead counts', details: err.message };
     }
 }
 

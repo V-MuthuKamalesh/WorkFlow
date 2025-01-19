@@ -6,7 +6,7 @@ exports.findUserByEmail = async (email) => {
   try {
     return await User.findOne({ email });
   } catch (error) {
-    throw new Error('Error finding user');
+    console.log('Error finding user');
   }  
 };
 
@@ -14,7 +14,7 @@ exports.findUserByUserName = async (username) => {
   try {
     return await User.findOne({ username });
   } catch (error) {
-    throw new Error('Error finding user');
+    console.log('Error finding user');
   }  
 };
 
@@ -24,7 +24,7 @@ exports.createUser = async (userData) => {
     await newUser.save();
     return newUser;
   } catch (error) {
-    throw new Error('Error creating user');
+    console.log('Error creating user');
   }
 };
 
@@ -33,7 +33,6 @@ exports.sendPasswordResetEmail = async (email) => {
   if (!user) {
     const error = new Error('User not found');
     error.status = 404;
-    throw error;
   }
 
   const resetToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
@@ -66,7 +65,6 @@ exports.sendInviteMemberRequestEmail = async (email, role) => {
   if (!user) {
     const error = new Error('User not found');
     error.status = 404;
-    throw error;
   }
 
   const resetToken = jwt.sign({ id: user._id, email: user.email, role }, JWT_SECRET, { expiresIn: '1h' });
@@ -99,7 +97,6 @@ exports.isUserWithEmailExists = async (email) => {
   if (!user) {
     const error = new Error('User not found');
     error.status = 404;
-    throw error;
   }
 };
 
@@ -109,7 +106,7 @@ exports.resetPassword = async (token, newPassword) => {
     decoded = jwt.verify(token, JWT_SECRET);
   } catch (error) {
     error.status = 401;
-    throw new Error('Invalid or expired token');
+    console.log('Invalid or expired token');
   }
 
   const hashedPassword = await bcrypt.hash(newPassword, Number(SALT_ROUNDS));
@@ -124,7 +121,7 @@ exports.getAllUsers = async () => {
   try {
     return await User.find(); 
   } catch (error) {
-    throw new Error('Error fetching users');
+    console.log('Error fetching users');
   }
 };
 
@@ -133,7 +130,7 @@ exports.getUserDetails = async (userId) => {
     const user = await User.findById(userId); 
     return {fullname: user.fullname, email: user.email, picture: user.imgUrl};
   } catch (error) {
-    throw new Error('Error fetching users');
+    console.log('Error fetching users');
   }
 };
 
@@ -144,13 +141,13 @@ exports.checkRole = async (workspaceId, userId) => {
           select: 'email fullname',
       });
       if (!workspace) {
-          throw new Error('Workspace not found');
+          console.log('Workspace not found');
       }
       const member = workspace.members.find(
           (member) => member.userId && member.userId._id.toString() === userId
       );
       if (!member) {
-          throw new Error('User not found in this workspace');
+          console.log('User not found in this workspace');
       }
       return { role: member.role };
   } catch (error) {
