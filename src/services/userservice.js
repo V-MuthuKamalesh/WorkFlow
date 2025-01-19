@@ -61,6 +61,48 @@ exports.sendPasswordResetEmail = async (email) => {
   });
 };
 
+exports.sendInviteMemberRequestEmail = async (email, role) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    const error = new Error('User not found');
+    error.status = 404;
+    throw error;
+  }
+
+  const resetToken = jwt.sign({ id: user._id, email: user.email, role }, JWT_SECRET, { expiresIn: '1h' });
+  const resetLink = `http://localhost:3000/invite-user?token=${resetToken}`;
+  
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: 'Workspace Member Adding Request',
+    html: `
+      <div style="font-family: Arial, sans-serif; text-align: center; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">
+        <h2>Password Reset</h2>
+        <p>Click <a href="${resetLink}" style="color: #007bff;">here</a> to add as a memeber to workspace in Work Flow. This link will expire in 1 hour.</p>
+        <small>If you are not willing to add as a member, you can safely ignore it.</small>
+      </div>
+    `,
+  });
+};
+
+exports.isUserWithEmailExists = async (email) => {
+  const user = await User.findOne({ email });
+  if (!user) {
+    const error = new Error('User not found');
+    error.status = 404;
+    throw error;
+  }
+};
+
 exports.resetPassword = async (token, newPassword) => {
   let decoded;
   try {

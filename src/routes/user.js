@@ -11,6 +11,7 @@ router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.post('/tokenexpired',userController.verifyToken);
 router.post('/sendemail',userController.sendPasswordResetEmail);
+router.post('/sendinvite',userController.isUserWithEmailExists);
 router.post('/reset',userController.resetPassword);
 router.get('/allusers',userController.getAllUsers);
 router.get('/getuserdetails',userController.getUserDetails);

@@ -125,6 +125,18 @@ exports.sendPasswordResetEmail = async (req, res) => {
   }
 };
 
+exports.isUserWithEmailExists = async (req, res) => {
+  try {
+    const { email, role } = req.body;
+    await userService.isUserWithEmailExists(email);
+    await userService.sendInviteMemberRequestEmail(email, role);
+    res.status(200).json({ message: 'Invite email sent' });
+  } catch (error) {
+    console.error(error);
+    res.status(error.status || 500).json({ message:'User with given Email is not a user of Work Flow' });
+  }
+};
+
 exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;

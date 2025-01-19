@@ -89,11 +89,11 @@ async function deleteWorkspace(id, moduleId) {
     }
 }
 
-async function addMemberToWorkspace(id, userId, token) {
+async function addMemberToWorkspace(id, adminId, token) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const adminId = decoded._id;
-        const response = await workspaceService.addMember(id, userId, adminId);
+        const userId = decoded.id, role = decoded.role;
+        const response = await workspaceService.addMember(id, userId, adminId, role);
         return response;
     } catch (err) {
         console.log('Failed to add member to workspace: ' + err.message);
