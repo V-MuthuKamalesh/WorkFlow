@@ -122,6 +122,9 @@ async function removeTicketGroup(groupId) {
         if (!board) {
             throw new Error('Board containing the group not found');
         }
+        for (const ticket of group.tickets) {
+            await removeTicketFromGroup(ticket._id);
+        }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
         await Group.findByIdAndDelete(groupId);

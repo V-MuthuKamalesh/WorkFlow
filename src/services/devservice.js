@@ -118,6 +118,9 @@ async function removeBugGroup(groupId) {
         if (!board) {
             console.log('Board containing the group not found');
         }
+        for (const bug of group.bugs) {
+            await removeBugFromGroup(bug._id);
+        }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
         await Group.findByIdAndDelete(groupId);
@@ -254,6 +257,9 @@ async function removeSprintGroup(groupId) {
         const board = await Board.findOne({ groups: groupId });
         if (!board) {
             console.log('Board containing the group not found');
+        }
+        for (const sprint of group.sprints) {
+            await removeSprintFromGroup(sprint._id);
         }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
@@ -396,6 +402,9 @@ async function removeTaskGroup(groupId) {
         const board = await Board.findOne({ groups: groupId });
         if (!board) {
             console.log('Board containing the group not found');
+        }
+        for (const task of group.tasks) {
+            await removeTaskFromGroup(task._id);
         }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();

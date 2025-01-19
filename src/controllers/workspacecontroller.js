@@ -29,10 +29,8 @@ async function getWorkspaces(token, moduleId) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decoded.userId;
-        // console.log(userId);
         const filterBy = { moduleId, userId };
         const workspaces = await workspaceService.query(filterBy);
-        // console.log("Workspaces",workspaces);
         return workspaces;
     } catch (err) {
         console.log('Failed to get workspaces: ' + err.message);
@@ -66,7 +64,7 @@ async function getWorkspaceDetailsById(id) {
 async function createWorkspace(data) {
     try {
         const newWorkspace = await workspaceService.add(data);
-        await Module.findByIdAndUpdate(data.moduleId, { $push: { workspaces: newWorkspace._id } });
+        await Module.findByIdAndUpdate(data.moduleId, { $push: { workspaces: newWorkspace.workspaceId } });
         return newWorkspace;
     } catch (err) {
         console.log('Failed to create workspace: ' + err.message);
@@ -433,17 +431,17 @@ async function removeBoardFromFavourite(boardId, type) {
     }
 }
 
-async function getFavourite(type) {
+async function getFavourite(userId, type) {
     try {
         let favouriteWorkspace;
         if(type=="work-management"){
-            favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_WORK);
+            favouriteWorkspace = await workspaceService.getFavourite(userId, process.env.FAV_WORK);
         }else if(type=="crm"){
-            favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_CRM);
+            favouriteWorkspace = await workspaceService.getFavourite(userId, process.env.FAV_CRM);
         }else if(type=="dev"){
-            favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_DEV);
+            favouriteWorkspace = await workspaceService.getFavourite(userId, process.env.FAV_DEV);
         }else if(type=="service"){
-            favouriteWorkspace = await workspaceService.getFavourite(process.env.FAV_SERVICE);
+            favouriteWorkspace = await workspaceService.getFavourite(userId, process.env.FAV_SERVICE);
         }
         return favouriteWorkspace;
     } catch (err) {

@@ -123,6 +123,9 @@ async function removeGroup(groupId) {
         if (!board) {
             throw new Error('Board containing the group not found');
         }
+        for (const item of group.bugs) {
+            await removeItemFromGroup(item._id);
+        }
         board.groups = board.groups.filter(group => group.toString() !== groupId);
         await board.save();
         await Group.findByIdAndDelete(groupId);

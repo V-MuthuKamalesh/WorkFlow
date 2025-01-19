@@ -124,6 +124,13 @@ async function remove(workspaceId, moduleId) {
         if (!workspaceDelete) {
             throw new Error('Workspace not found');
         }
+        for (const boardId of workspaceDelete.boards) {
+            await removeBoard(boardId);
+        }
+        await Favourite.updateMany(
+            { workspaces: workspaceId },
+            { $pull: { workspaces: workspaceId } }
+        );
         console.log(`Workspace with ID ${workspaceId} successfully removed from Module and deleted.`);
         return workspaceId;
     } catch (err) {
@@ -227,6 +234,9 @@ async function removeBoard(boardId) {
         if (!board) {
             throw new Error('Board not found');
         }
+        for (const groupId of board.groups) {
+            await removeGroupFromBoard(groupId, board.type);
+        }
         const workspace = await Workspace.findOne({ boards: boardId });
         if (!workspace) {
             throw new Error('Workspace not found for the specified board');
@@ -247,6 +257,10 @@ async function removeBoard(boardId) {
             (id) => id.toString() !== boardId
         );
         await workspace.save();
+        await Favourite.updateMany(
+            { boards: boardId },
+            { $pull: { boards: boardId } }
+        );
         await Board.findByIdAndDelete(boardId);
         return response;
     } catch (err) {
@@ -371,7 +385,7 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
     }
   }
 
-  async function getFavourite(favouriteId) {
+  async function getFavourite(userId, favouriteId) {
     try {
         const favourite = await Favourite.findById(favouriteId)
             .populate({
@@ -384,22 +398,38 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
             throw new Error('Favourite not found');
         }
         const workspaceDetails = await Promise.all(
-            favourite.workspaces.map(async (workspaceId) => {
-                return await getWorkspaceDetailsById(workspaceId);
+            favourite.workspaces.map(async (workspace) => {
+                const isMember = workspace.members && workspace.members.includes(userId);
+                if (isMember) {
+                    return await getWorkspaceDetailsById(workspace._id);
+                }
+                return null;
             })
         );
-        const boardDetails = favourite.boards.map(board => ({
-            boardId: board._id,
-            boardName: board.boardName,
-            workspaceName: board.workspaceName,
-            type: board.type,
-        }));
+        const boardDetails = await Promise.all(
+            favourite.boards.map(async (board) => {
+                const workspace = await Workspace.findOne({ boards: board._id });
+                if (!workspace) return null;
+                const isMember = workspace.members && workspace.members.includes(userId);
+                if (isMember) {
+                    return {
+                        boardId: board._id,
+                        boardName: board.boardName,
+                        workspaceName: board.workspaceName,
+                        type: board.type,
+                    };
+                }
+                return null;
+            })
+        );
+        const filteredWorkspaceDetails = workspaceDetails.filter((workspace) => workspace !== null);
+        const filteredBoardDetails = boardDetails.filter((board) => board !== null);
         return {
             favouriteId: favourite._id,
             favouriteName: favourite.favouriteName,
             description: favourite.description || '',
-            workspaces: workspaceDetails,
-            boards: boardDetails,
+            workspaces: filteredWorkspaceDetails,
+            boards: filteredBoardDetails,
         };
     } catch (err) {
         console.error('Error fetching favourite details:', err);

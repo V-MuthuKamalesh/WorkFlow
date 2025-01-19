@@ -192,9 +192,9 @@ module.exports = (io) => {
         });  
 
         socket.on('getFavourite', async (data, callback) => {
-            const { type } = data;
+            const { userId,type } = data;
             try {
-                const favourite = await workspaceController.getFavourite(type);
+                const favourite = await workspaceController.getFavourite(userId, type);
                 callback(favourite);
             } catch (err) {
                 callback({ error: err.message });
