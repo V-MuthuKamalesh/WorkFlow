@@ -217,15 +217,21 @@ async function getWorkspacesWithLeadCounts(moduleId, userId) {
     try {
         const module = await Module.findById(moduleId).populate({
             path: 'workspaces',
-            populate: {
-                path: 'boards',
-                populate: {
-                    path: 'groups',
+            populate: [
+                {
+                    path: 'members',
+                    select: '_id',
+                },
+                {
+                    path: 'boards',
                     populate: {
-                        path: 'leads',
+                        path: 'groups',
+                        populate: {
+                            path: 'leads',
+                        },
                     },
                 },
-            },
+            ],
         });
         if (!module) {
             throw new Error('Module not found');
@@ -234,22 +240,30 @@ async function getWorkspacesWithLeadCounts(moduleId, userId) {
             workspace.members.some((member) => member.userId.toString() === userId)
         );
         const workspaceData = filteredWorkspaces.map((workspace) => {
-            const leadStatusCounts = {};
             let totalLeads = 0;
+            let completedLeads = 0; 
+            let inProgressLeads = 0; 
+            let pendingLeads = 0; 
             workspace.boards.forEach((board) => {
                 board.groups.forEach((group) => {
                     group.leads.forEach((lead) => {
-                        const status = lead.status || 'Unknown';
-                        leadStatusCounts[status] = (leadStatusCounts[status] || 0) + 1;
                         totalLeads++;
+                        if (lead.status === 'Qualified') {
+                            completedLeads++;
+                        } else if (lead.status === 'Attempted to Contact') {
+                            inProgressLeads++;
+                        } else {
+                            pendingLeads++;
+                        }
                     });
                 });
             });
             return {
-                workspaceId: workspace._id,
                 workspaceName: workspace.workspaceName,
                 totalLeads,
-                statusCounts: leadStatusCounts,
+                completedLeads,
+                inProgressLeads,
+                pendingLeads,
             };
         });
         return workspaceData;
@@ -258,6 +272,7 @@ async function getWorkspacesWithLeadCounts(moduleId, userId) {
         throw { error: 'Failed to fetch workspaces with lead counts', details: err.message };
     }
 }
+
 
 
 

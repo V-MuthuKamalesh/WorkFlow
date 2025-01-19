@@ -91,7 +91,7 @@ async function add(workspaceData) {
         workspaceData.members = [{ userId :workspaceData.createdBy , role:"admin"}];
         const workspace = new Workspace(workspaceData);
         await workspace.save();
-        return workspace;
+        return {workspaceName:workspace.workspaceName, workspaceId: workspace._id};
     } catch (err) {
         throw err;
     }

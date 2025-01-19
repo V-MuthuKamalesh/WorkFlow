@@ -486,8 +486,10 @@ async function getWorkspacesWithTicketCounts(moduleId, userId) {
             workspace.members.some((member) => member.userId.toString() === userId)
         );
         const workspaceData = filteredWorkspaces.map((workspace) => {
-            const ticketStatusCounts = {};
             let totalTickets = 0;
+            let completedTickets = 0; 
+            let inProgressTickets = 0; 
+            let pendingTickets = 0; 
             workspace.boards.forEach((board) => {
                 board.groups.forEach((group) => {
                     group.tickets.forEach((ticket) => {
@@ -495,9 +497,14 @@ async function getWorkspacesWithTicketCounts(moduleId, userId) {
                             (assignedAgent) => assignedAgent._id.toString() === userId
                         );
                         if (isAgentMatch) {
-                            const status = ticket.status || 'Unknown';
-                            ticketStatusCounts[status] = (ticketStatusCounts[status] || 0) + 1;
                             totalTickets++;
+                            if (ticket.status === 'Resolved') {
+                                completedTickets++;
+                            } else if (ticket.status === 'Awaiting Customer') {
+                                inProgressTickets++;
+                            } else {
+                                pendingTickets++;
+                            }
                         }
                     });
                 });
@@ -506,7 +513,9 @@ async function getWorkspacesWithTicketCounts(moduleId, userId) {
                 workspaceId: workspace._id,
                 workspaceName: workspace.workspaceName,
                 totalTickets,
-                statusCounts: ticketStatusCounts,
+                completedTickets,
+                inProgressTickets,
+                pendingTickets,
             };
         });
         return workspaceData;

@@ -1043,65 +1043,61 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
     try {
         const module = await Module.findById(moduleId).populate({
             path: 'workspaces',
-            populate: {
-                path: 'boards',
-                populate: {
-                    path: 'groups',
+            populate: [
+                {
+                    path: 'members',
+                    select: '_id',
+                },
+                {
+                    path: 'boards',
                     populate: {
-                        path: 'tasks',
+                        path: 'groups',
                         populate: {
-                            path: 'person',
-                            select: '_id',
+                            path: 'tasks',
+                            populate: {
+                                path: 'person',
+                                select: '_id',
+                            },
                         },
                     },
                 },
-            },
+            ],
         });
         if (!module) {
             throw new Error('Module not found');
         }
-        const result = module.workspaces.map((workspace) => {
-            let totalAssignedTasks = 0;
-            const statusCounts = {
-                "Ready to start": 0,
-                "In Progress": 0,
-                "Waiting for review": 0,
-                "Pending Deploy": 0,
-                "Done": 0,
-                "Stuck": 0,
-            };
-            const priorityCounts = {
-                Low: 0,
-                Medium: 0,
-                High: 0,
-                Critical: 0,
-            };
+        const filteredWorkspaces = module.workspaces.filter((workspace) =>
+            workspace.members.some(member => member.userId.toString() === userId)
+        );
+        console.log(filteredWorkspaces);
+        const workspaceData = filteredWorkspaces.map((workspace) => {
+            let totalTasks = 0;
+            let completedTasks = 0;
+            let inProgressTasks = 0;
+            let pendingTasks = 0;
             workspace.boards.forEach((board) => {
                 board.groups.forEach((group) => {
                     group.tasks.forEach((task) => {
-                        if (
-                            Array.isArray(task.person) &&
-                            task.person.some((assigned) => assigned._id.toString() === userId)
-                        ) {
-                            totalAssignedTasks++;
-                        }
-                        if (statusCounts.hasOwnProperty(task.status)) {
-                            statusCounts[task.status]++;
-                        }
-                        if (priorityCounts.hasOwnProperty(task.priority)) {
-                            priorityCounts[task.priority]++;
+                        totalTasks++;
+                        if (task.status === 'Done') {
+                            completedTasks++;
+                        } else if (task.status === 'In Progress') {
+                            inProgressTasks++;
+                        } else {
+                            pendingTasks++;
                         }
                     });
                 });
             });
             return {
                 workspaceName: workspace.workspaceName,
-                totalAssignedTasks,
-                statusCounts,
-                priorityCounts,
+                totalTasks,
+                completedTasks,
+                pendingTasks,
+                inProgressTasks,
             };
         });
-        return result;
+        return workspaceData;
     } catch (err) {
         console.error('Error fetching workspaces with task counts:', err);
         throw { error: 'Failed to fetch workspaces with task counts', details: err.message };
