@@ -54,7 +54,7 @@ const workspaceSchema = new Schema({
 const boardSchema = new Schema({
   boardName: { type: String, required: true },
   workspaceName: { type: String }, 
-  type: { type: String},
+  type: { type: String, default: 'Item'},
   description: { type: String },
   createdById: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   groups: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Group' }],

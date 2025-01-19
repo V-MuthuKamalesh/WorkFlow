@@ -191,6 +191,7 @@ async function addGroupToBoard(boardId, groupData, itemId) {
 
 async function removeGroupFromBoard(groupId,type) {
     try {
+        console.log(groupId, type);
         let boardData;
         if(type=="Bug"){
             boardData = await devService.removeBugGroup(groupId);

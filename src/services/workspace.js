@@ -1,5 +1,5 @@
 const { Favourite, Module, Workspace, Board, Group } = require('../models/schema'); 
-
+const workspaceController = require('../controllers/workspacecontroller');
 
 async function query(filterBy) {
     try {
@@ -234,9 +234,12 @@ async function removeBoard(boardId) {
         if (!board) {
             throw new Error('Board not found');
         }
-        for (const groupId of board.groups) {
-            await removeGroupFromBoard(groupId, board.type);
+        console.log(board);
+        for (const groupId of board.groups) { 
+            console.log(1.5, groupId, board.type);
+            await workspaceController.removeGroupFromBoard(groupId, board.type);
         }
+        console.log(2);
         const workspace = await Workspace.findOne({ boards: boardId });
         if (!workspace) {
             throw new Error('Workspace not found for the specified board');
@@ -399,7 +402,7 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
         }
         const workspaceDetails = await Promise.all(
             favourite.workspaces.map(async (workspace) => {
-                const isMember = workspace.members && workspace.members.includes(userId);
+                const isMember = workspace.members && workspace.members.some(member => member.userId.toString() === userId);
                 if (isMember) {
                     return await getWorkspaceDetailsById(workspace._id);
                 }
@@ -410,7 +413,7 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
             favourite.boards.map(async (board) => {
                 const workspace = await Workspace.findOne({ boards: board._id });
                 if (!workspace) return null;
-                const isMember = workspace.members && workspace.members.includes(userId);
+                const isMember = workspace.members && workspace.members.some(member => member.userId.toString() === userId);
                 if (isMember) {
                     return {
                         boardId: board._id,
