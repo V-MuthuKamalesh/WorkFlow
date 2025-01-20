@@ -176,6 +176,5 @@ exports.checkRole = async (workspaceId, userId) => {
       return { role: member.role };
   } catch (error) {
       console.error('Error checking role:', error);
-      throw { error: 'Failed to check role', details: error.message };
   }
 };
