@@ -1,5 +1,22 @@
 const {  Module, Board, Group, Item, User } = require('../models/schema'); 
 const { sendSlackNotification } = require('../utils/slack');
+const { sendEmail } = require('../utils/email');
+
+async function sendNotification(user, message) {
+    try {
+        await sendSlackNotification(user.email, message);
+    } catch (slackError) {
+        const emailSubject = `Ticket Notification: ${message}`;
+        const emailBody = `
+            <div>
+                <p>Hello ${user.fullname},</p>
+                <p>${message}</p>
+                <p>Thank you!</p>
+            </div>
+        `;
+        await sendEmail(user.email, emailSubject, emailBody);
+    }
+}
 
 async function getBoard(boardId) {
     try {
@@ -258,9 +275,9 @@ async function updateItemInGroup(itemData) {
             { new: true }
         );
         const users = await User.find({ _id: { $in: item.assignedToId } });
-        const notificationPromises = users.map((user) => {
-            const message = `Hello ${user.fullname},\n\nThe item "${item.itemName}" has been updated.\nPlease check the details and take necessary actions.\n\nThank you!`;
-            return sendSlackNotification(user.email, message);
+        const notificationPromises = users.map(async (user) => {
+            const message = `\n\nThe item "${item.itemName}" has been updated.\nPlease check the details and take necessary actions.\n\nThank you!`;
+            await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
         return updatedItem;
@@ -287,8 +304,8 @@ async function addMembersToItem(itemId, userId) {
         if (!user) {
             console.log('User not found');
         }
-        const message = `Hello ${user.fullname},\n\nYou have been assigned to the item "${item.itemName}". Please check the details and take necessary actions.\n\nThank you!`;
-        await sendSlackNotification(user.email, message);
+        const message = `\n\nYou have been assigned to the item "${item.itemName}". Please check the details and take necessary actions.\n\nThank you!`;
+        await sendNotification(user, message);
         await item.populate({
             path: 'assignedToId',
             select: '_id email fullname',
@@ -331,8 +348,8 @@ async function removeMembersFromItem(itemId, userId) {
 
         await item.save();
 
-        const message = `Hello ${user.fullname},\n\nYou have been removed from the item "${item.itemName}".\n\nThank you!`;
-        await sendSlackNotification(user.email, message);
+        const message = `\n\nYou have been removed from the item "${item.itemName}".\n\nThank you!`;
+        await sendNotification(user, message);
 
         await item.populate({
             path: 'assignedToId',

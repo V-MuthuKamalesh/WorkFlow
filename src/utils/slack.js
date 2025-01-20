@@ -16,6 +16,7 @@ async function sendSlackNotification(email, message) {
         console.log(`Notification sent to ${email}`);
     } catch (error) {
         console.error('Error sending Slack notification:', error.message);
+        throw error;
     }
 }
 

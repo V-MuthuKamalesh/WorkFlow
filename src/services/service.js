@@ -1,5 +1,22 @@
 const { User, Module, Board, Group, Ticket } = require('../models/schema'); 
 const { sendSlackNotification } = require('../utils/slack');
+const { sendEmail } = require('../utils/email');
+
+async function sendNotification(user, message) {
+    try {
+        await sendSlackNotification(user.email, message);
+    } catch (slackError) {
+        const emailSubject = `Ticket Notification: ${message}`;
+        const emailBody = `
+            <div>
+                <p>Hello ${user.fullname},</p>
+                <p>${message}</p>
+                <p>Thank you!</p>
+            </div>
+        `;
+        await sendEmail(user.email, emailSubject, emailBody);
+    }
+}
 
 async function getTicketBoard(boardId) {
     try {
@@ -302,7 +319,7 @@ async function addMembersToAgent(itemId, userId) {
             console.log('User not found');
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
-        await sendSlackNotification(user.email, message);
+        await sendNotification(user, message);
         await ticket.populate({
             path: 'agent',
             select: '_id email fullname',
@@ -346,7 +363,7 @@ async function removeMembersFromAgent(itemId, userId) {
         await ticket.save();
 
         const message = `Hello ${user.fullname},\n\nYou have been removed from the ticket "${ticket.ticketName}".\n\nThank you!`;
-        await sendSlackNotification(user.email, message);
+        await sendNotification(user, message);
 
         await ticket.populate({
             path: 'agent',
@@ -384,7 +401,7 @@ async function addMembersToEmployee(itemId, userId) {
             console.log('User not found');
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
-        await sendSlackNotification(user.email, message);
+        await sendNotification(user, message);
         await ticket.populate({
             path: 'employee',
             select: '_id email fullname',
@@ -428,7 +445,7 @@ async function removeMembersFromEmployee(itemId, userId) {
         await ticket.save();
 
         const message = `Hello ${user.fullname},\n\nYou have been removed from the ticket "${ticket.ticketName}".\n\nThank you!`;
-        await sendSlackNotification(user.email, message);
+        await sendNotification(user, message);
 
         await ticket.populate({
             path: 'employee',
