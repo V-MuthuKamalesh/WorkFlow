@@ -100,8 +100,14 @@ exports.addMemberToWorkspace = async (workspaceId, userId, adminId, role) => {
     if (!workspace) {
         console.log('Workspace not found');
     }
-    if (workspace.createdBy.toString() !== adminId) {
-        return 'You do not have permission to add a user to this workspace';
+    const isAuthorized =
+      workspace.createdBy.toString() === adminId ||
+      workspace.members.some(
+        (member) => member.userId.toString() === adminId && member.role === 'admin'
+      );
+
+    if (!isAuthorized) {
+      return 'You do not have permission to add a user to this workspace';
     }
     const isAlreadyMember = workspace.members.some(
         member => member.userId.toString() === userId
