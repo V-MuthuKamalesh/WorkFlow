@@ -129,6 +129,17 @@ exports.isUserWithEmailExists = async (req, res) => {
   }
 };
 
+exports.sendMessage = async (req, res) => {
+  try {
+    const { userId, message } = req.body;
+    await userService.sendMessage(userId, message);
+    res.status(200).json({ message: 'Message Sent' });
+  } catch (error) {
+    console.error(error);
+    res.status(error.status || 500).json({ message:'User with given Email is not a user of Work Flow' });
+  }
+};
+
 exports.addMemberToWorkspace = async (req, res) => {
   try {
     const { token } = req.body;
