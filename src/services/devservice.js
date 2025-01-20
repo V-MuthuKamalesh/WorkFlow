@@ -1042,13 +1042,18 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
             workspace.boards.forEach((board) => {
                 board.groups.forEach((group) => {
                     group.tasks.forEach((task) => {
-                        totalTasks++;
-                        if (task.status === 'Done') {
-                            completedTasks++;
-                        } else if (task.status === 'In Progress') {
-                            inProgressTasks++;
-                        } else {
-                            pendingTasks++;
+                        const isPersonMatch = task.person.some(
+                            (assigned) => assigned._id.toString() === userId
+                        );
+                        if (isPersonMatch) {
+                            totalTasks++;
+                            if (task.status === 'Done') {
+                                completedTasks++;
+                            } else if (task.status === 'In Progress') {
+                                inProgressTasks++;
+                            } else {
+                                pendingTasks++;
+                            }
                         }
                     });
                 });

@@ -390,13 +390,18 @@ async function getWorkspacesWithItemCounts(moduleId, userId) {
             workspace.boards.forEach((board) => {
                 board.groups.forEach((group) => {
                     group.items.forEach((item) => {
-                        totalTasks++;
-                        if (item.status === 'Done') {
-                            completedTasks++;
-                        } else if (item.status === 'In Progress') {
-                            inProgressTasks++;
-                        } else {
-                            pendingTasks++;
+                        const isAssignedToMatch = item.assignedToId.some(
+                            (assigned) => assigned._id.toString() === userId
+                        );
+                        if (isAssignedToMatch) {
+                            totalTasks++;
+                            if (item.status === 'Done') {
+                                completedTasks++;
+                            } else if (item.status === 'In Progress') {
+                                inProgressTasks++;
+                            } else {
+                                pendingTasks++;
+                            }
                         }
                     });
                 });
