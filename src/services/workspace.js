@@ -138,29 +138,6 @@ async function remove(workspaceId, moduleId) {
     }
 }
 
-async function addMember(workspaceId, userId, adminId, role = 'member') {
-    try {
-        const workspace = await Workspace.findById(workspaceId);
-        if (!workspace) {
-            console.log('Workspace not found');
-        }
-        if (workspace.createdBy.toString() !== adminId) {
-            return 'You do not have permission to add a user to this workspace';
-        }
-        const isAlreadyMember = workspace.members.some(
-            member => member.userId.toString() === userId
-        );
-        if (isAlreadyMember) {
-            return 'User is already a member of this workspace';
-        }
-        workspace.members.push({ userId, role });
-        const updatedWorkspace = await workspace.save();
-        return 'User added to Workspace successfully';
-    } catch (err) {
-        console.error('Error adding member to workspace:', err);
-    }
-}
-
 async function removeMember(workspaceId, userId, adminId) {
     try {
         const workspace = await Workspace.findById(workspaceId);
@@ -472,7 +449,6 @@ module.exports = {
     add,
     update,
     remove,
-    addMember,
     removeMember,
     addBoard,
     removeBoard,

@@ -89,17 +89,6 @@ async function deleteWorkspace(id, moduleId) {
     }
 }
 
-async function addMemberToWorkspace(id, adminId, token) {
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.id, role = decoded.role;
-        const response = await workspaceService.addMember(id, userId, adminId, role);
-        return response;
-    } catch (err) {
-        console.log('Failed to add member to workspace: ' + err.message);
-    }
-}
-
 async function removeMemberToWorkspace(id, userId, token) {
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -488,7 +477,6 @@ module.exports = {
     getWorkspaceDetailsById,
     createWorkspace,
     updateWorkspace,
-    addMemberToWorkspace,
     removeMemberToWorkspace,
     deleteWorkspace,
     addBoardToWorkspace,

@@ -60,15 +60,16 @@ exports.sendPasswordResetEmail = async (email) => {
   });
 };
 
-exports.sendInviteMemberRequestEmail = async (email, role) => {
+exports.sendInviteMemberRequestEmail = async (email, role, workspaceId, adminId) => {
   const user = await User.findOne({ email });
   if (!user) {
     const error = new Error('User not found');
     error.status = 404;
   }
-
-  const resetToken = jwt.sign({ id: user._id, email: user.email, role }, JWT_SECRET, { expiresIn: '1h' });
-  const resetLink = `http://localhost:3000/invite-user?token=${resetToken}`;
+  const workspace = Workspace.findById(workspaceId);
+  const adminUser = User.findById(adminId);
+  const resetToken = jwt.sign({ userId: user._id, email: user.email, role,adminId, workspaceId }, JWT_SECRET, { expiresIn: '1h' });
+  const resetLink = `http://localhost:3000/invite-user?token=${resetToken}&name=${adminUser.fullname}&workspaceName=${workspace.workspaceName}`;
   
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -90,6 +91,29 @@ exports.sendInviteMemberRequestEmail = async (email, role) => {
       </div>
     `,
   });
+};
+
+exports.addMemberToWorkspace = async (workspaceId, userId, adminId, role) => {
+  try {
+    const workspace = await Workspace.findById(workspaceId);
+    if (!workspace) {
+        console.log('Workspace not found');
+    }
+    if (workspace.createdBy.toString() !== adminId) {
+        return 'You do not have permission to add a user to this workspace';
+    }
+    const isAlreadyMember = workspace.members.some(
+        member => member.userId.toString() === userId
+    );
+    if (isAlreadyMember) {
+        return 'User is already a member of this workspace';
+    }
+    workspace.members.push({ userId, role });
+    const updatedWorkspace = await workspace.save();
+    return 'User added to Workspace successfully';
+  } catch (error) {
+    console.error('Error adding member to workspace:', err);
+  }  
 };
 
 exports.isUserWithEmailExists = async (email) => {
