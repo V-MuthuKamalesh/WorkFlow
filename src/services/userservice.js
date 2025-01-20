@@ -1,5 +1,6 @@
 const { User, Workspace } = require('../models/schema'); 
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const { JWT_SECRET, SALT_ROUNDS } = process.env;
 exports.findUserByEmail = async (email) => {
