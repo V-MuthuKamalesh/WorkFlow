@@ -1034,7 +1034,71 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
             workspace.members.some(member => member.userId.toString() === userId)
         );
         console.log(filteredWorkspaces);
-        const workspaceData = filteredWorkspaces.map((workspace) => {
+        const reporterData = filteredWorkspaces.map((workspace) => {
+            let totalBugs = 0;
+            let fixedBugs = 0;
+            let inProgressBugs = 0;
+            let pendingBugs = 0;
+            workspace.boards.forEach((board) => {
+                board.groups.forEach((group) => {
+                    group.bugs.forEach((bug) => {
+                        const isPersonMatch = bug.reporter.some(
+                            (assigned) => assigned._id.toString() === userId
+                        );
+                        if (isPersonMatch) {
+                            totalBugs++;
+                            if (bug.status === 'Done') {
+                                fixedBugs++;
+                            } else if (bug.status === 'In Progress') {
+                                inProgressBugs++;
+                            } else {
+                                pendingBugs++;
+                            }
+                        }
+                    });
+                });
+            });
+            return {
+                workspaceName: workspace.workspaceName,
+                totalBugs,
+                fixedBugs,
+                pendingBugs,
+                inProgressBugs,
+            };
+        });
+        const developerData = filteredWorkspaces.map((workspace) => {
+            let totalBugs = 0;
+            let fixedBugs = 0;
+            let inProgressBugs = 0;
+            let pendingBugs = 0;
+            workspace.boards.forEach((board) => {
+                board.groups.forEach((group) => {
+                    group.bugs.forEach((bug) => {
+                        const isPersonMatch = bug.developer.some(
+                            (assigned) => assigned._id.toString() === userId
+                        );
+                        if (isPersonMatch) {
+                            totalBugs++;
+                            if (bug.status === 'Done') {
+                                fixedBugs++;
+                            } else if (bug.status === 'In Progress') {
+                                inProgressBugs++;
+                            } else {
+                                pendingBugs++;
+                            }
+                        }
+                    });
+                });
+            });
+            return {
+                workspaceName: workspace.workspaceName,
+                totalBugs,
+                fixedBugs,
+                pendingBugs,
+                inProgressBugs,
+            };
+        });
+        const taskData = filteredWorkspaces.map((workspace) => {
             let totalTasks = 0;
             let completedTasks = 0;
             let inProgressTasks = 0;
@@ -1066,7 +1130,11 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
                 inProgressTasks,
             };
         });
-        return workspaceData;
+        return {
+            taskStats: taskData,
+            reporterStats: reporterData,
+            developerStats: developerData
+        };
     } catch (err) {
         console.error('Error fetching workspaces with task counts:', err);
     }
