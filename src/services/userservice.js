@@ -155,6 +155,7 @@ exports.getUserDetails = async (userId) => {
     return {fullname: user.fullname, email: user.email, picture: user.imgUrl};
   } catch (error) {
     console.log('Error fetching users');
+    throw error;
   }
 };
 

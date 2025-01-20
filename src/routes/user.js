@@ -8,7 +8,6 @@ router.post('/signup', validationMiddleware(validateUser), userController.signup
 router.post('/email',userController.email);
 router.post('/oauth', userController.OAuth);
 router.post('/login', userController.login);
-router.post('/logout', userController.logout);
 router.post('/tokenexpired',userController.verifyToken);
 router.post('/resetemail',userController.sendPasswordResetEmail);
 router.post('/sendinvite',userController.isUserWithEmailExists);
