@@ -84,7 +84,7 @@ exports.sendInviteMemberRequestEmail = async (email, role) => {
     subject: 'Workspace Member Adding Request',
     html: `
       <div style="font-family: Arial, sans-serif; text-align: center; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9;">
-        <h2>Password Reset</h2>
+        <h2>User Invite</h2>
         <p>Click <a href="${resetLink}" style="color: #007bff;">here</a> to add as a memeber to workspace in Work Flow. This link will expire in 1 hour.</p>
         <small>If you are not willing to add as a member, you can safely ignore it.</small>
       </div>
