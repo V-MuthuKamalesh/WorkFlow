@@ -66,8 +66,8 @@ exports.sendInviteMemberRequestEmail = async (email, role, workspaceId, adminId)
     const error = new Error('User not found');
     error.status = 404;
   }
-  const workspace = Workspace.findById(workspaceId);
-  const adminUser = User.findById(adminId);
+  const workspace = await Workspace.findById(workspaceId);
+  const adminUser = await User.findById(adminId);
   const resetToken = jwt.sign({ userId: user._id, email: user.email, role,adminId, workspaceId }, JWT_SECRET, { expiresIn: '1h' });
   const resetLink = `http://localhost:3000/invite-user?token=${resetToken}&name=${adminUser.fullname}&workspaceName=${workspace.workspaceName}`;
   
