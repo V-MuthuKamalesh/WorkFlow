@@ -28,6 +28,7 @@ async function getTicketBoard(boardId) {
             boardName: board.boardName,
             type: board.type || "",
             workspaceName: board.workspaceName,
+            workspaceId: board.workspaceId,
             groups: board.groups.map((group) => ({
                 groupId: group._id,
                 groupName: group.groupName,

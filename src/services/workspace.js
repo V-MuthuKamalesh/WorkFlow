@@ -178,6 +178,7 @@ async function addBoard(workspaceId, boardData) {
             console.log('Workspace not found');
         }
         boardData.workspaceName = workspace.workspaceName;
+        boardData.workspaceId = workspaceId;
         const board = new Board(boardData);
         await board.save();
         workspace.boards.push(board._id);
@@ -397,6 +398,7 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
                         boardId: board._id,
                         boardName: board.boardName,
                         workspaceName: board.workspaceName,
+                        workspaceId: board.workspaceId,
                         type: board.type,
                     };
                 }
