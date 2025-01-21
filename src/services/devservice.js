@@ -551,6 +551,12 @@ async function updateTaskInGroup(taskData) {
             { $set: taskData },
             { new: true }
         );
+        const users = await User.find({ _id: { $in: taskData.person } });
+        const notificationPromises = users.map(async (user) => {
+            const message = `The task "${task.taskName}" has been updated. Please review the details.`;
+            await sendNotification(user, message);
+        });
+        await Promise.all(notificationPromises);
         return updatedTask;
     } catch (err) {
         console.error('Error updating task in group:', err);
@@ -932,6 +938,12 @@ async function updateBugInGroup(bugData) {
             { $set: bugData },
             { new: true }
         );
+        const users = await User.find({ _id: { $in: [...bugData.reporter, ...bugData.developer] } });
+        const notificationPromises = users.map(async (user) => {
+            const message = `The bug "${bug.bugName}" has been updated. Please review the changes.`;
+            await sendNotification(user, message);
+        });
+        await Promise.all(notificationPromises);
         return updatedBug;
     } catch (err) {
         console.error('Error updating bug in group:', err);

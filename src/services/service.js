@@ -294,6 +294,12 @@ async function updateTicketInGroup(ticketData) {
             { $set: ticketData },
             { new: true }
         );
+        const users = await User.find({ _id: { $in: [...ticketData.employee, ...ticketData.agent] } });
+        const notificationPromises = users.map(async (user) => {
+            const message = `The ticket "${ticket.ticketName}" has been updated. Please review the updates.`;
+            await sendNotification(user, message);
+        });
+        await Promise.all(notificationPromises);
         return updatedTicket;
     } catch (err) {
         console.error('Error updating ticket in group:', err);
