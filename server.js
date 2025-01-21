@@ -4,10 +4,10 @@ const cors= require('cors');
 require('dotenv').config();
 const http = require('http');
 const { Server } = require('socket.io');
+const cronSchedule = require('./src/utils/cron');
 
 const userRoutes = require('./src/routes/user');
 const workRoutes = require('./src/routes/work');
-// const devRoutes = require('./src/routes/dev');
 
 const app = express();
 const server = http.createServer(app); 
