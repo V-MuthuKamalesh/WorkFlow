@@ -6,7 +6,7 @@ async function sendNotification(user, message) {
     try {
         await sendSlackNotification(user.email, message);
     } catch (slackError) {
-        const emailSubject = `Ticket Notification: ${message}`;
+        const emailSubject = `Notification`;
         const emailBody = `
             <div>
                 <p>Hello ${user.fullname},</p>
