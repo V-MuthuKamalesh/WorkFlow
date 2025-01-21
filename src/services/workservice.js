@@ -398,7 +398,7 @@ async function getWorkspacesWithItemCounts(moduleId, userId) {
         const filteredWorkspaces = module.workspaces.filter((workspace) =>
             workspace.members.some(member => member.userId.toString() === userId)
         );
-        console.log(filteredWorkspaces);
+        // console.log(filteredWorkspaces);
         const workspaceData = filteredWorkspaces.map((workspace) => {
             let totalTasks = 0;
             let completedTasks = 0;

@@ -20,7 +20,7 @@ mongoose.connect(process.env.DATABASE_URL)
   .catch(err => console.log('Error connecting to MongoDB', err));
 
 app.use('/api/users', userRoutes); 
-app.use('/api/work', workRoutes(io)); 
+app.use('/api/', workRoutes(io)); 
 // app.use('/api/dev', devRoutes(io)); 
 
 const PORT = process.env.PORT;

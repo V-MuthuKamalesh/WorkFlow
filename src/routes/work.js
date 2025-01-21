@@ -5,7 +5,7 @@ const router = express.Router();
 module.exports = (io) => {
 
     io.on('connection', (socket) => {
-        console.log('A user connected in Workmanagement');
+        console.log('A user connected');
 
         // Work-related events
         socket.on('getWorkspaces', async (data, callback) => {

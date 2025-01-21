@@ -66,7 +66,7 @@ exports.sendPasswordResetEmail = async (email) => {
   }
 
   const resetToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
-  const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
   
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
@@ -99,7 +99,7 @@ exports.sendInviteMemberRequestEmail = async (email, role, workspaceId, adminId)
   const workspace = await Workspace.findById(workspaceId);
   const adminUser = await User.findById(adminId);
   const resetToken = jwt.sign({ userId: user._id, email: user.email, role,adminId, workspaceId }, JWT_SECRET, { expiresIn: '1h' });
-  const resetLink = `http://localhost:3000/invite-user?token=${resetToken}&name=${adminUser.fullname}&workspaceName=${workspace.workspaceName}`;
+  const resetLink = `${process.env.FRONTEND_URL}/invite-user?token=${resetToken}&name=${adminUser.fullname}&workspaceName=${workspace.workspaceName}`;
   
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
