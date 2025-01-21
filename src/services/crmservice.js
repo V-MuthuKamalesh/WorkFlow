@@ -263,7 +263,7 @@ async function getWorkspacesWithLeadCounts(moduleId, userId) {
                 pendingLeads,
             };
         });
-        return workspaceData;
+        return {type:"crm",leadStats:workspaceData};
     } catch (err) {
         console.error('Error fetching workspaces with lead counts:', err);
     }

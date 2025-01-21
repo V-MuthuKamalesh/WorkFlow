@@ -415,7 +415,7 @@ async function getWorkspacesWithItemCounts(moduleId, userId) {
                 inProgressTasks,
             };
         });
-        return workspaceData;
+        return {type:"work-management",itemStats:workspaceData};
     } catch (err) {
         console.error('Error fetching workspaces with item counts:', err);
     }

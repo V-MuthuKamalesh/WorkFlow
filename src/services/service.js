@@ -517,7 +517,7 @@ async function getWorkspacesWithTicketCounts(moduleId, userId) {
                 pendingTickets,
             };
         });
-        return workspaceData;
+        return {type:"service",ticketStats:workspaceData};
     } catch (err) {
         console.error('Error fetching workspaces with ticket counts:', err);
     }

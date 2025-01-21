@@ -1144,6 +1144,7 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
             };
         });
         return {
+            type:"dev",
             taskStats: taskData,
             reporterStats: reporterData,
             developerStats: developerData
