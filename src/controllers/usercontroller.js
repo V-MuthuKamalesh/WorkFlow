@@ -185,6 +185,17 @@ exports.getUserDetails = async (req, res) => {
   }
 };
 
+exports.updateUser = async (req, res) => {
+  try {
+    const {userId, userData}=req.body;
+    const users = await userService.updateUser(userId, userData); 
+    res.status(200).json(users); 
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Something went wrong!' });
+  }
+};
+
 exports.checkRole = async (req, res) => {
   try {
     const { workspaceId, userId } = req.body;

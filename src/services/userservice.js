@@ -195,6 +195,19 @@ exports.getUserDetails = async (userId) => {
   }
 };
 
+exports.updateUser = async (id, userData) => {
+  try {
+      const updatedUser = await User.findByIdAndUpdate(
+          id,
+          { $set: userData },
+          { new: true }
+      );
+      return updatedUser;
+  } catch (err) {
+  }
+}
+
+
 exports.checkRole = async (workspaceId, userId) => {
   try {
       const workspace = await Workspace.findById(workspaceId).populate({

@@ -6,7 +6,8 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   fullname: { type: String, required: true },
   imgUrl: { type: String },
-  notification: { type: String },
+  phonenumber: { type: String },
+  country: { type: String},
   createdAt: { type: Date, default: Date.now }
 });
 

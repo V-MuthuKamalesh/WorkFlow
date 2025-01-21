@@ -16,4 +16,5 @@ router.post('/sendMessage',userController.sendMessage);
 router.post('/resetpassword',userController.resetPassword);
 router.get('/allusers',userController.getAllUsers);
 router.get('/getuserdetails',userController.getUserDetails);
+router.put('/updateUser',userController.updateUser);
 module.exports = router;
