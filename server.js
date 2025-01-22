@@ -21,7 +21,6 @@ mongoose.connect(process.env.DATABASE_URL)
 
 app.use('/api/users', userRoutes); 
 app.use('/api', workRoutes(io)); 
-// app.use('/api/dev', devRoutes(io)); 
 
 const PORT = process.env.PORT;
 server.listen(PORT, () => {
