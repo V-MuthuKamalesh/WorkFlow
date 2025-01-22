@@ -138,38 +138,6 @@ async function remove(workspaceId, moduleId) {
     }
 }
 
-async function removeMember(workspaceId, userId, adminId) {
-    try {
-        const workspace = await Workspace.findById(workspaceId);
-        if (!workspace) {
-            console.log('Workspace not found');
-        }
-        
-        if (workspace.createdBy.toString() !== adminId) {
-            return 'You do not have permission to remove a user from this workspace';
-        }
-        
-        const isMember = workspace.members.some(
-            member => member.userId.toString() === userId
-        );
-        
-        if (!isMember) {
-            return 'User is not a member of this workspace';
-        }
-        
-        workspace.members = workspace.members.filter(
-            member => member.userId.toString() !== userId
-        );
-        
-        await workspace.save();
-        
-        return 'User removed from workspace successfully';
-    } catch (err) {
-        console.error('Error removing member from workspace:', err);
-    }
-}
-
-
 // Board Functions
 async function addBoard(workspaceId, boardData) {
     try {
@@ -451,7 +419,6 @@ module.exports = {
     add,
     update,
     remove,
-    removeMember,
     addBoard,
     removeBoard,
     updateBoard,

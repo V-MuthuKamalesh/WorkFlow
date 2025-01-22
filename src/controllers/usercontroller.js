@@ -153,6 +153,17 @@ exports.addMemberToWorkspace = async (req, res) => {
   }
 };
 
+exports.removeMemberToWorkspace = async (id, userId, token) => {
+  try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const adminId = decoded._id;
+      const response = await workspaceService.removeMember(id, userId, adminId);
+      return response;
+  } catch (err) {
+      console.log('Failed to add member to workspace: ' + err.message);
+  }
+}
+
 exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;

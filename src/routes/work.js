@@ -50,12 +50,6 @@ module.exports = (io) => {
             const result = await workspaceController.deleteWorkspace(id, moduleId);
             callback(result);
         });
-        
-        socket.on('removeMemberToWorkspace', async (data, callback) => {
-            const { id, members, token } = data;
-            const response = await workspaceController.removeMemberToWorkspace(id, members, token);
-            callback(response);
-        });
 
         // Board events
         socket.on('addBoardToWorkspace', async (data, callback) => {
