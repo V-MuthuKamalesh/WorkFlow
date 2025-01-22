@@ -517,7 +517,40 @@ async function getWorkspacesWithTicketCounts(moduleId, userId) {
                 pendingTickets,
             };
         });
-        return {type:"service",ticketStats:workspaceData};
+        const employeeData = filteredWorkspaces.map((workspace) => {
+            let totalTickets = 0;
+            let completedTickets = 0; 
+            let inProgressTickets = 0; 
+            let pendingTickets = 0; 
+            workspace.boards.forEach((board) => {
+                board.groups.forEach((group) => {
+                    group.tickets.forEach((ticket) => {
+                        const isAgentMatch = ticket.employee.some(
+                            (assignedAgent) => assignedAgent._id.toString() === userId
+                        );
+                        if (isAgentMatch) {
+                            totalTickets++;
+                            if (ticket.status === 'Resolved') {
+                                completedTickets++;
+                            } else if (ticket.status === 'Awaiting Customer') {
+                                inProgressTickets++;
+                            } else {
+                                pendingTickets++;
+                            }
+                        }
+                    });
+                });
+            });
+            return {
+                workspaceId: workspace._id,
+                workspaceName: workspace.workspaceName,
+                totalTickets,
+                completedTickets,
+                inProgressTickets,
+                pendingTickets,
+            };
+        });
+        return {type:"service",agentStats:workspaceData, employeeStats:employeeData};
     } catch (err) {
         console.error('Error fetching workspaces with ticket counts:', err);
     }

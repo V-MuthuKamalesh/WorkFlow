@@ -1029,24 +1029,40 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
                     path: 'boards',
                     populate: {
                         path: 'groups',
-                        populate: {
-                            path: 'tasks',
-                            populate: {
-                                path: 'person',
-                                select: '_id',
+                        populate: [
+                            {
+                                path: 'tasks',
+                                populate: {
+                                    path: 'person',
+                                    select: '_id email fullname',
+                                },
                             },
-                        },
+                            {
+                                path: 'bugs',
+                                populate: [
+                                    {
+                                        path: 'reporter',
+                                        select: '_id email fullname',
+                                    },
+                                    {
+                                        path: 'developer',
+                                        select: '_id email fullname',
+                                    },
+                                ],
+                            },
+                        ],
                     },
                 },
             ],
         });
+        
         if (!module) {
             console.log('Module not found');
         }
         const filteredWorkspaces = module.workspaces.filter((workspace) =>
             workspace.members.some(member => member.userId.toString() === userId)
         );
-        console.log(filteredWorkspaces);
+        // console.log(filteredWorkspaces);
         const reporterData = filteredWorkspaces.map((workspace) => {
             let totalBugs = 0;
             let fixedBugs = 0;
@@ -1055,9 +1071,11 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
             workspace.boards.forEach((board) => {
                 board.groups.forEach((group) => {
                     group.bugs.forEach((bug) => {
+                        console.log(bug.reporter);
                         const isPersonMatch = bug.reporter.some(
                             (assigned) => assigned._id.toString() === userId
                         );
+                        console.log("1");
                         if (isPersonMatch) {
                             totalBugs++;
                             if (bug.status === 'Done') {
@@ -1090,6 +1108,7 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
                         const isPersonMatch = bug.developer.some(
                             (assigned) => assigned._id.toString() === userId
                         );
+                        console.log("2");
                         if (isPersonMatch) {
                             totalBugs++;
                             if (bug.status === 'Done') {
@@ -1122,6 +1141,7 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
                         const isPersonMatch = task.person.some(
                             (assigned) => assigned._id.toString() === userId
                         );
+                        console.log("3");
                         if (isPersonMatch) {
                             totalTasks++;
                             if (task.status === 'Done') {
