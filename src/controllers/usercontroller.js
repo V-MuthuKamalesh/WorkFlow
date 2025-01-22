@@ -167,11 +167,11 @@ exports.removeMemberToWorkspace = async (req, res) => {
 
 exports.promote = async (req, res) => {
   try {
-      const { id, userId } = req.body ;
-      const response = await userService.promote(id, userId, adminId);
+      const { workspaceId, userId } = req.body ;
+      const response = await userService.promote(workspaceId, userId);
       res.status(200).json({message:response});
   } catch (err) {
-      console.log('Failed to remove member to workspace: ' + err.message);
+      console.log('Failed to promote member to workspace: ' + err.message);
   }
 }
 
