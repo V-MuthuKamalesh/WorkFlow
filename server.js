@@ -10,7 +10,7 @@ const userRoutes = require('./src/routes/user');
 const workRoutes = require('./src/routes/work');
 
 const app = express();
-const server = http.createServer(app); 
+const server = http.createServer(app);  
 const io = new Server(server); 
 app.use(express.json({limit:'50mb'}));
 app.use(cors());
