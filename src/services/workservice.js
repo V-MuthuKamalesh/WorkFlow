@@ -281,15 +281,16 @@ async function addMembersToItem(itemId, userId) {
         );
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this item');
+        }else{
+            item.assignedToId.push(userId);
+            await item.save();
+            const user = await User.findById(userId);
+            if (!user) {
+                console.log('User not found');
+            }
+            const message = `\n\nYou have been assigned to the item "${item.itemName}". Please check the details and take necessary actions.\n\nThank you!`;
+            await sendNotification(user, message);
         }
-        item.assignedToId.push(userId);
-        await item.save();
-        const user = await User.findById(userId);
-        if (!user) {
-            console.log('User not found');
-        }
-        const message = `\n\nYou have been assigned to the item "${item.itemName}". Please check the details and take necessary actions.\n\nThank you!`;
-        await sendNotification(user, message);
         await item.populate({
             path: 'assignedToId',
             select: '_id email fullname',
@@ -352,7 +353,7 @@ async function removeMembersFromItem(itemId, userId) {
     }
 }
 
-async function getWorkspacesWithItemCounts(moduleId, userId) {
+async function getWorkspacesWithItemCounts(moduleId, userId, workspaceId) {
     try {
         const module = await Module.findById(moduleId).populate({
             path: 'workspaces',
@@ -383,7 +384,11 @@ async function getWorkspacesWithItemCounts(moduleId, userId) {
             workspace.members.some(member => member.userId.toString() === userId)
         );
         // console.log(filteredWorkspaces);
-        const workspaceData = filteredWorkspaces.map((workspace) => {
+        const relevantWorkspaces = workspaceId
+            ? filteredWorkspaces.filter(workspace => workspace._id.toString() === workspaceId)
+            : filteredWorkspaces;
+
+        const workspaceData = relevantWorkspaces.map((workspace) => {
             let totalTasks = 0;
             let completedTasks = 0;
             let inProgressTasks = 0;

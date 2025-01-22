@@ -741,15 +741,16 @@ async function addMembersToDeveloper(itemId, userId) {
         );
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this bug');
+        }else{
+            bug.developer.push(userId);
+            await bug.save();
+            const user = await User.findById(userId);
+            if (!user) {
+                console.log('User not found');
+            }
+            const message = `Hello ${user.fullname},\n\nYou have been assigned as a Developer to the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
+            await sendNotification(user, message);
         }
-        bug.developer.push(userId);
-        await bug.save();
-        const user = await User.findById(userId);
-        if (!user) {
-            console.log('User not found');
-        }
-        const message = `Hello ${user.fullname},\n\nYou have been assigned as a Developer to the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
-        await sendNotification(user, message);
         await bug.populate({
             path: 'developer',
             select: '_id email fullname',
@@ -945,15 +946,16 @@ async function addMembersToReporter(itemId, userId) {
         );
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this bug');
-        }
-        bug.reporter.push(userId);
-        await bug.save();
-        const user = await User.findById(userId);
-        if (!user) {
-            console.log('User not found');
-        }
-        const message = `Hello ${user.fullname},\n\nYou have been assigned as Reporterto the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
-        await sendNotification(user, message);
+        }else{
+            bug.reporter.push(userId);
+            await bug.save();
+            const user = await User.findById(userId);
+            if (!user) {
+                console.log('User not found');
+            }
+            const message = `Hello ${user.fullname},\n\nYou have been assigned as Reporterto the bug "${bug.bugName}". Please check the details and take necessary actions.\n\nThank you!`;
+            await sendNotification(user, message);
+        }        
         await bug.populate({
             path: 'reporter',
             select: '_id email fullname',
@@ -1063,7 +1065,11 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
             workspace.members.some(member => member.userId.toString() === userId)
         );
         // console.log(filteredWorkspaces);
-        const reporterData = filteredWorkspaces.map((workspace) => {
+        const relevantWorkspaces = workspaceId
+            ? filteredWorkspaces.filter(workspace => workspace._id.toString() === workspaceId)
+            : filteredWorkspaces;
+
+        const reporterData = relevantWorkspaces.map((workspace) => {
             let totalBugs = 0;
             let fixedBugs = 0;
             let inProgressBugs = 0;
@@ -1095,7 +1101,7 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
                 inProgressBugs,
             };
         });
-        const developerData = filteredWorkspaces.map((workspace) => {
+        const developerData = relevantWorkspaces.map((workspace) => {
             let totalBugs = 0;
             let fixedBugs = 0;
             let inProgressBugs = 0;
@@ -1127,7 +1133,7 @@ async function getWorkspacesWithTaskCounts(moduleId, userId) {
                 inProgressBugs,
             };
         });
-        const taskData = filteredWorkspaces.map((workspace) => {
+        const taskData = relevantWorkspaces.map((workspace) => {
             let totalTasks = 0;
             let completedTasks = 0;
             let inProgressTasks = 0;

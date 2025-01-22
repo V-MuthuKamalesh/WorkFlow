@@ -7,17 +7,17 @@ const crmService = require('../services/crmservice');
 
 const { Module } = require('../models/schema');
 
-async function getWorkspacesWithItemCounts(userId, moduleId) {
+async function getWorkspacesWithItemCounts(userId, moduleId, workspaceId) {
     try {
         let workspaces;
         if(moduleId==process.env.WORK){
-            workspaces = await workService.getWorkspacesWithItemCounts(moduleId, userId);
+            workspaces = await workService.getWorkspacesWithItemCounts(moduleId, userId, workspaceId);
         }else if(moduleId==process.env.CRM){
-            workspaces = await crmService.getWorkspacesWithLeadCounts(moduleId, userId);
+            workspaces = await crmService.getWorkspacesWithLeadCounts(moduleId, userId, workspaceId);
         }else if(moduleId==process.env.DEV){
-            workspaces = await devService.getWorkspacesWithTaskCounts(moduleId, userId);
+            workspaces = await devService.getWorkspacesWithTaskCounts(moduleId, userId, workspaceId);
         }else if(moduleId==process.env.SERVICE){
-            workspaces = await service.getWorkspacesWithTicketCounts(moduleId, userId);
+            workspaces = await service.getWorkspacesWithTicketCounts(moduleId, userId, workspaceId);
         }
         return workspaces;
     } catch (err) {

@@ -301,15 +301,16 @@ async function addMembersToAgent(itemId, userId) {
         );
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this ticket');
+        }else{
+            ticket.agent.push(userId);
+            await ticket.save();
+            const user = await User.findById(userId);
+            if (!user) {
+                console.log('User not found');
+            }
+            const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
+            await sendNotification(user, message);
         }
-        ticket.agent.push(userId);
-        await ticket.save();
-        const user = await User.findById(userId);
-        if (!user) {
-            console.log('User not found');
-        }
-        const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
-        await sendNotification(user, message);
         await ticket.populate({
             path: 'agent',
             select: '_id email fullname',
@@ -383,15 +384,16 @@ async function addMembersToEmployee(itemId, userId) {
         );
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this ticket');
+        }else{
+            ticket.employee.push(userId);
+            await ticket.save();
+            const user = await User.findById(userId);
+            if (!user) {
+                console.log('User not found');
+            }
+            const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
+            await sendNotification(user, message);
         }
-        ticket.employee.push(userId);
-        await ticket.save();
-        const user = await User.findById(userId);
-        if (!user) {
-            console.log('User not found');
-        }
-        const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
-        await sendNotification(user, message);
         await ticket.populate({
             path: 'employee',
             select: '_id email fullname',
@@ -484,7 +486,11 @@ async function getWorkspacesWithTicketCounts(moduleId, userId) {
         const filteredWorkspaces = module.workspaces.filter((workspace) =>
             workspace.members.some((member) => member.userId.toString() === userId)
         );
-        const workspaceData = filteredWorkspaces.map((workspace) => {
+        const relevantWorkspaces = workspaceId
+            ? filteredWorkspaces.filter(workspace => workspace._id.toString() === workspaceId)
+            : filteredWorkspaces;
+
+        const workspaceData = relevantWorkspaces.map((workspace) => {
             let totalTickets = 0;
             let completedTickets = 0; 
             let inProgressTickets = 0; 
@@ -517,7 +523,7 @@ async function getWorkspacesWithTicketCounts(moduleId, userId) {
                 pendingTickets,
             };
         });
-        const employeeData = filteredWorkspaces.map((workspace) => {
+        const employeeData = relevantWorkspaces.map((workspace) => {
             let totalTickets = 0;
             let completedTickets = 0; 
             let inProgressTickets = 0; 
