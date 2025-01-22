@@ -152,36 +152,28 @@ exports.addMemberToWorkspace = async (workspaceId, userId, adminId, role) => {
   }  
 };
 
-exports.removeMember = async (workspaceId, userId, adminId) => {
+exports.promote = async (workspaceId, userId) => {
   try {
       const workspace = await Workspace.findById(workspaceId);
       if (!workspace) {
           console.log('Workspace not found');
+          return 'Workspace not found';
       }
-      
-      if (workspace.createdBy.toString() !== adminId) {
-          return 'You do not have permission to remove a user from this workspace';
-      }
-      
-      const isMember = workspace.members.some(
-          member => member.userId.toString() === userId
+      const memberIndex = workspace.members.findIndex(
+          (member) => member.userId.toString() === userId
       );
-      
-      if (!isMember) {
+      if (memberIndex === -1) {
           return 'User is not a member of this workspace';
       }
-      
-      workspace.members = workspace.members.filter(
-          member => member.userId.toString() !== userId
-      );
-      
+      workspace.members[memberIndex].role = 'admin';
       await workspace.save();
-      
-      return 'User removed from workspace successfully';
+      return 'User promoted to admin successfully';
   } catch (err) {
-      console.error('Error removing member from workspace:', err);
+      console.error('Error promoting member to admin:', err);
+      return 'An error occurred while promoting the user';
   }
-}
+};
+
 
 exports.isUserWithEmailExists = async (email) => {
   const user = await User.findOne({ email });

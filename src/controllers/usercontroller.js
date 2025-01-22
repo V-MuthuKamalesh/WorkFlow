@@ -157,8 +157,18 @@ exports.removeMemberToWorkspace = async (req, res) => {
   try {
       const { id, userId, token } = req.body ;
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const adminId = decoded._id;
+      const adminId = decoded.userId;
       const response = await userService.removeMember(id, userId, adminId);
+      res.status(200).json({message:response});
+  } catch (err) {
+      console.log('Failed to remove member to workspace: ' + err.message);
+  }
+}
+
+exports.promote = async (req, res) => {
+  try {
+      const { id, userId } = req.body ;
+      const response = await userService.promote(id, userId, adminId);
       res.status(200).json({message:response});
   } catch (err) {
       console.log('Failed to remove member to workspace: ' + err.message);
