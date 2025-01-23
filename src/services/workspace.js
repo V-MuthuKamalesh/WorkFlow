@@ -18,7 +18,7 @@ async function query(filterBy) {
         
         const transformedWorkspaces = module.workspaces
         .filter(workspace => {
-            return workspace.createdBy.toString() === userId || workspace.members.some(member => member.userId.toString() === userId);
+            return workspace.members.some(member => member.userId.toString() === userId);
           })
         .map(workspace => {
             const { _id, workspaceName } = workspace.toObject();
