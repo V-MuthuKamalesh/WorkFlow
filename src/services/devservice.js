@@ -1,4 +1,4 @@
-const { User, Module, Board, Group, Task, Sprint, Bug } = require('../models/schema'); 
+const { User, Module, Workspace, Board, Group, Task, Sprint, Bug } = require('../models/schema'); 
 const { sendNotification } = require('../utils/notification');
 
 async function getBugBoard(boardId) {
@@ -520,11 +520,22 @@ async function removeTaskFromGroup(taskId) {
     }
 }
 
-async function updateTaskInGroup(taskData) {
+async function updateTaskInGroup(taskData, boardId, userId) {
     try {
         const task = await Task.findById(taskData._id);
         if (!task) {
             console.log('task not found');
+        }
+        const isAssigned = task.person.some(person => person.toString() === userId);
+        
+        const workspace = await Workspace.findOne({ boards: boardId });
+        const isAdmin = workspace.members.some(member => 
+            member.userId.toString() === userId.toString() && member.role === 'admin'
+          );
+
+        if (!isAssigned  && !isAdmin) {
+            console.log('Permission denied: User cannot update this bug');
+            return null;
         }
         taskData = {
             ...taskData,
@@ -906,12 +917,23 @@ async function removeBugFromGroup(bugId) {
     }
 }
 
-async function updateBugInGroup(bugData) {
+async function updateBugInGroup(bugData, boardId, userId) {
     try {
-
         const bug = await Bug.findById(bugData._id);
         if (!bug) {
             console.log('Bug not found');
+        }
+        const isReporter = bug.reporter.some(reporterId => reporterId.toString() === userId);
+        const isDeveloper = bug.developer.some(developerId => developerId.toString() === userId);
+        
+        const workspace = await Workspace.findOne({ boards: boardId });
+        const isAdmin = workspace.members.some(member => 
+            member.userId.toString() === userId.toString() && member.role === 'admin'
+          );
+
+        if (!isReporter && !isDeveloper && !isAdmin) {
+            console.log('Permission denied: User cannot update this bug');
+            return null;
         }
         bugData = {
             ...bugData,

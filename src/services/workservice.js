@@ -1,4 +1,4 @@
-const {  Module, Board, Group, Item, User } = require('../models/schema'); 
+const {  Module, Workspace, Board, Group, Item, User } = require('../models/schema'); 
 const { sendNotification } = require('../utils/notification');
 
 async function getBoard(boardId) {
@@ -243,11 +243,22 @@ async function removeItemFromGroup(itemId) {
     }
 }
 
-async function updateItemInGroup(itemData) {
+async function updateItemInGroup(itemData, boardId, userId) {
     try {
         const item = await Item.findById(itemData._id);
         if (!item) {
             console.log('Item not found');
+        }
+        const isAssigned = item.assignedToId.some(assignedTo => assignedTo.toString() === userId);
+        
+        const workspace = await Workspace.findOne({ boards: boardId });
+        const isAdmin = workspace.members.some(member => 
+            member.userId.toString() === userId.toString() && member.role === 'admin'
+          );
+
+        if (!isAssigned  && !isAdmin) {
+            console.log('Permission denied: User cannot update this bug');
+            return null;
         }
         itemData = {
             ...itemData,

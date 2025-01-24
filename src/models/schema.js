@@ -8,6 +8,12 @@ const userSchema = new Schema({
   imgUrl: { type: String },
   phonenumber: { type: String },
   country: { type: String},
+  notifications: [
+    {
+      message: { type: String, required: true },
+      status: { type: String, enum: ['Read', 'Unread'], default: 'Unread' },
+    },
+  ],
   createdAt: { type: Date, default: Date.now }
 });
 

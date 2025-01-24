@@ -1,6 +1,7 @@
 const userService = require('../services/userservice');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 exports.signup = async (req, res) => {
   try {
@@ -53,7 +54,7 @@ exports.OAuth = async (req, res) => {
     const { email,name, picture} = req.body;
     let user = await userService.findUserByEmail(email);
     if (!user) {
-      const password = "bxhjvcjbkjhbgfncdxgcvhbjkn,mb vcdgfsxvcb jskdaghhvhnbcdvvbcbgcbfgcgfcfgqwertyuio8765432wsxcfgyujhgfdx ";
+      const password = crypto.randomBytes(32).toString('hex');
       const hashedPassword = await bcrypt.hash(password, 10);
       user = await userService.createUser({
         email,
@@ -173,6 +174,16 @@ exports.promote = async (req, res) => {
   try {
       const { workspaceId, userId } = req.body ;
       const response = await userService.promote(workspaceId, userId);
+      res.status(200).json({message:response});
+  } catch (err) {
+      console.log('Failed to promote member to workspace: ' + err.message);
+  }
+}
+
+exports.dePromote = async (req, res) => {
+  try {
+      const { workspaceId, userId } = req.body ;
+      const response = await userService.dePromote(workspaceId, userId);
       res.status(200).json({message:response});
   } catch (err) {
       console.log('Failed to promote member to workspace: ' + err.message);

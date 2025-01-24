@@ -1,5 +1,6 @@
 const { sendSlackNotification } = require('../utils/slack');
 const { sendEmail } = require('../utils/email');
+const { User } = require('../models/schema');
 
 async function sendNotification(user, message) {
     try {
@@ -14,6 +15,28 @@ async function sendNotification(user, message) {
             </div>
         `;
         await sendEmail(user.email, emailSubject, emailBody);
+    } finally {
+        try {
+            await User.updateOne(
+                { _id: user._id },
+                {
+                    $push: {
+                        notifications: {
+                            $each: [
+                                {
+                                    message: message,
+                                    status: 'Unread',
+                                },
+                            ],
+                            $position: 0,
+                        },
+                    },
+                }
+            );
+            console.log("Notification pushed to user");
+        } catch (dbError) {
+            console.error('Error updating user notifications:', dbError);
+        }
     }
 }
 

@@ -210,6 +210,28 @@ exports.promote = async (workspaceId, userId) => {
   }
 };
 
+exports.dePromote = async (workspaceId, userId) => {
+  try {
+      const workspace = await Workspace.findById(workspaceId);
+      if (!workspace) {
+          console.log('Workspace not found');
+          return 'Workspace not found';
+      }
+      const memberIndex = workspace.members.findIndex(
+          (member) => member.userId.toString() === userId
+      );
+      if (memberIndex === -1) {
+          return 'User is not a member of this workspace';
+      }
+      workspace.members[memberIndex].role = 'member';
+      await workspace.save();
+      return 'User dePromoted to User successfully';
+  } catch (err) {
+      console.error('Error promoting member to admin:', err);
+      return 'An error occurred while promoting the user';
+  }
+};
+
 
 exports.isUserWithEmailExists = async (email) => {
   const user = await User.findOne({ email });

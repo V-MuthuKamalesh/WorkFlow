@@ -265,22 +265,22 @@ async function removeItemFromGroup(itemId, type) {
     }
 }
 
-async function updateItemInGroup(itemId, itemData, type, boardId) {
+async function updateItemInGroup(itemId, itemData, type, boardId, userId) {
     try {
         itemData._id=itemId;
         let item;
         if(type=="Bug"){
-            item = await devService.updateBugInGroup(itemData);
+            item = await devService.updateBugInGroup(itemData, boardId, userId);
         }else if(type=="Task"){
-            item = await devService.updateTaskInGroup(itemData);
+            item = await devService.updateTaskInGroup(itemData, boardId, userId);
         }else if(type=="Sprint"){
-            item = await devService.updateSprintInGroup(itemData, boardId);
+            item = await devService.updateSprintInGroup(itemData);
         }else if(type=="Lead"){
             item = await crmService.updateLeadInGroup(itemData);
         }else if(type=="Ticket"){
-            item = await service.updateTicketInGroup(itemData);
+            item = await service.updateTicketInGroup(itemData, boardId, userId);
         }else{
-            item = await workService.updateItemInGroup(itemData);
+            item = await workService.updateItemInGroup(itemData, boardId, userId);
         }
         return item;
     } catch (err) {

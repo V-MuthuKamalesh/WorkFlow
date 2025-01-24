@@ -1,4 +1,4 @@
-const { User, Module, Board, Group, Ticket } = require('../models/schema'); 
+const { User, Module, Workspace, Board, Group, Ticket } = require('../models/schema'); 
 const { sendNotification } = require('../utils/notification');
 
 async function getTicketBoard(boardId) {
@@ -262,11 +262,23 @@ async function removeTicketFromGroup(ticketId) {
     }
 }
 
-async function updateTicketInGroup(ticketData) {
+async function updateTicketInGroup(ticketData, boardId, userId) {
     try {
         const ticket = await Ticket.findById(ticketData._id);
         if (!ticket) {
             console.log('ticket not found');
+        }
+        const isEmployee = ticket.employee.some(employeeId => employeeId.toString() === userId);
+        const isAgent = ticket.agent.some(agentId => agentId.toString() === userId);
+        
+        const workspace = await Workspace.findOne({ boards: boardId });
+        const isAdmin = workspace.members.some(member => 
+            member.userId.toString() === userId.toString() && member.role === 'admin'
+          );
+
+        if (!isEmployee && !isAgent && !isAdmin) {
+            console.log('Permission denied: User cannot update this bug');
+            return null;
         }
         ticketData = {
             ...ticketData,

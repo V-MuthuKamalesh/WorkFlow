@@ -121,7 +121,7 @@ module.exports = (io) => {
 
         socket.on('updateItemInGroup', async (data, callback) => {
             const { itemId, updateData, type, boardId } = data;
-            const updatedItem = await workspaceController.updateItemInGroup(itemId, updateData, type, boardId);
+            const updatedItem = await workspaceController.updateItemInGroup(itemId, updateData, type, boardId, userId);
             callback(updatedItem);
         });
 

@@ -18,6 +18,7 @@ router.post('/sendinvite',userController.isUserWithEmailExists);
 router.post('/addMember',userController.addMemberToWorkspace);
 router.post('/removeMember',userController.removeMemberToWorkspace);
 router.post('/promoteToAdmin',userController.promote);
+router.post('/dePromoteToUser',userController.dePromote);
 router.post('/sendMessage',userController.sendMessage);
 router.get('/allusers',userController.getAllUsers);
 router.put('/updateUser',userController.updateUser);
