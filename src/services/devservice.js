@@ -1018,7 +1018,7 @@ async function removeMembersFromReporter(itemId, userId) {
     }
 }
 
-async function getWorkspacesWithTaskCounts(moduleId, userId) {
+async function getWorkspacesWithTaskCounts(moduleId, userId, workspaceId) {
     try {
         const module = await Module.findById(moduleId).populate({
             path: 'workspaces',

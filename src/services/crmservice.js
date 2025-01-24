@@ -210,7 +210,7 @@ async function updateLeadInGroup(leadData) {
     }
 }
 
-async function getWorkspacesWithLeadCounts(moduleId, userId) {
+async function getWorkspacesWithLeadCounts(moduleId, userId, workspaceId) {
     try {
         const module = await Module.findById(moduleId).populate({
             path: 'workspaces',

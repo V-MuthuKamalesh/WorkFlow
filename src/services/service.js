@@ -456,7 +456,7 @@ async function removeMembersFromEmployee(itemId, userId) {
     }
 }
 
-async function getWorkspacesWithTicketCounts(moduleId, userId) {
+async function getWorkspacesWithTicketCounts(moduleId, userId, workspaceId) {
     try {
         const module = await Module.findById(moduleId).populate({
             path: 'workspaces',

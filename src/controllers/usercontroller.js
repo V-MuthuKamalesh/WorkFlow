@@ -25,21 +25,6 @@ exports.signup = async (req, res) => {
   }
 };
 
-exports.email = async (req, res) => {
-  try {
-    const { email} = req.body;
-    const user = await userService.findUserByEmail(email);
-    if (user) {
-      return res.status(409).json({ message: 'User already found!' });
-    }
-    res.status(200).json({ message: 'User can be created successfully' });
-    
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Something went wrong!' });
-  }
-};
-
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -66,10 +51,9 @@ exports.login = async (req, res) => {
 exports.OAuth = async (req, res) => {
   try {
     const { email,name, picture} = req.body;
-    const password = "bxhjvcjbkjhbgfncdxgcvhbjkn,mb vcdgfsxvcb";
-    // console.log(email,name,password);
     let user = await userService.findUserByEmail(email);
     if (!user) {
+      const password = "bxhjvcjbkjhbgfncdxgcvhbjkn,mb vcdgfsxvcb jskdaghhvhnbcdvvbcbgcbfgcgfcfgqwertyuio8765432wsxcfgyujhgfdx ";
       const hashedPassword = await bcrypt.hash(password, 10);
       user = await userService.createUser({
         email,
@@ -88,7 +72,23 @@ exports.OAuth = async (req, res) => {
   }
 };
 
+exports.email = async (req, res) => {
+  try {
+    const { email} = req.body;
+    const user = await userService.findUserByEmail(email);
+    if (user) {
+      return res.status(409).json({ message: 'User already found!' });
+    }
+    res.status(200).json({ message: 'User can be created successfully' });
+    
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Something went wrong!' });
+  }
+};
+
 exports.verifyToken = (req, res, next) => {
+  console.log("Token Verification");
   const {token} = req.body;
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });
@@ -108,6 +108,7 @@ exports.verifyToken = (req, res, next) => {
 
 exports.sendPasswordResetEmail = async (req, res) => {
   try {
+    console.log("Password Reset");
     const { email } = req.body;
     await userService.sendPasswordResetEmail(email);
     res.status(200).json({ message: 'Password reset email sent' });
@@ -131,6 +132,7 @@ exports.isUserWithEmailExists = async (req, res) => {
 
 exports.sendMessage = async (req, res) => {
   try {
+    console.log("Send message");
     const { userId, message } = req.body;
     await userService.sendMessage(userId, message);
     res.status(200).json({ message: 'Message Sent' });
@@ -142,6 +144,7 @@ exports.sendMessage = async (req, res) => {
 
 exports.addMemberToWorkspace = async (req, res) => {
   try {
+    console.log("Add member to workspace");
     const { token } = req.body;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const {workspaceId, userId, adminId, role} = decoded;
@@ -155,6 +158,7 @@ exports.addMemberToWorkspace = async (req, res) => {
 
 exports.removeMemberToWorkspace = async (req, res) => {
   try {
+    console.log("Remove member from workspace");
       const { workspaceId, userId, token } = req.body ;
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const adminId = decoded.userId;
@@ -177,6 +181,7 @@ exports.promote = async (req, res) => {
 
 exports.resetPassword = async (req, res) => {
   try {
+    console.log("Reset Password");
     const { token, newPassword } = req.body;
     await userService.resetPassword(token, newPassword);
     res.status(200).json({ message: 'Password updated successfully' });

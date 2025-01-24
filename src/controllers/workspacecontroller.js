@@ -25,10 +25,8 @@ async function getWorkspacesWithItemCounts(userId, moduleId, workspaceId) {
     }
 }
 
-async function getWorkspaces(token, moduleId) {
+async function getWorkspaces(userId, moduleId) {
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const userId = decoded.userId;
         const filterBy = { moduleId, userId };
         const workspaces = await workspaceService.query(filterBy);
         return workspaces;

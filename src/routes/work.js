@@ -1,21 +1,24 @@
 const express = require('express');
 const workspaceController = require('../controllers/workspacecontroller');
+const { socketAuthMiddleware } = require('../middlewares/auth');
 const router = express.Router();
 
 module.exports = (io) => {
 
+    io.use(socketAuthMiddleware);
+    
     io.on('connection', (socket) => {
         console.log('A user connected');
-
+        const userId = socket.userId;
         // Work-related events
         socket.on('getWorkspaces', async (data, callback) => {
-            const {moduleId, token} = data;
-            const workspaces = await workspaceController.getWorkspaces(token, moduleId);
+            const {moduleId} = data;
+            const workspaces = await workspaceController.getWorkspaces(userId, moduleId);
             callback(workspaces);
         });
 
         socket.on('getDashboardDetails', async (data, callback) => {
-            const {moduleId, userId, workspaceId} = data;
+            const {moduleId, workspaceId} = data;
             const workspaces = await workspaceController.getWorkspacesWithItemCounts(userId, moduleId, workspaceId);
             callback(workspaces);
         });
