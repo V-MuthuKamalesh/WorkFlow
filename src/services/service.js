@@ -290,9 +290,10 @@ async function updateTicketInGroup(ticketData, boardId, userId) {
             { $set: ticketData },
             { new: true }
         );
+        const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: [...ticketData.employee, ...ticketData.agent] } });
         const notificationPromises = users.map(async (user) => {
-            const message = `The ticket "${ticket.ticketName}" has been updated. Please review the updates.`;
+            const message = `The ticket "${ticket.ticketName}" has been updated by ${person.fullname}. Please review the updates.`;
             await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
@@ -302,7 +303,7 @@ async function updateTicketInGroup(ticketData, boardId, userId) {
     }
 }
 
-async function addMembersToAgent(itemId, userId) {
+async function addMembersToAgent(itemId, userId, adminId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
@@ -320,7 +321,8 @@ async function addMembersToAgent(itemId, userId) {
             if (!user) {
                 console.log('User not found');
             }
-            const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
+            const person = await User.findById(adminId);
+            const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName} by ${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
             await sendNotification(user, message);
         }
         await ticket.populate({
@@ -340,7 +342,7 @@ async function addMembersToAgent(itemId, userId) {
     }
 }
 
-async function removeMembersFromAgent(itemId, userId) {
+async function removeMembersFromAgent(itemId, userId, adminId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
@@ -364,8 +366,8 @@ async function removeMembersFromAgent(itemId, userId) {
         ticket.agent.splice(userIndex, 1);
 
         await ticket.save();
-
-        const message = `Hello ${user.fullname},\n\nYou have been removed from the ticket "${ticket.ticketName}".\n\nThank you!`;
+        const person = await User.findById(adminId);
+        const message = `Hello ${user.fullname},\n\nYou have been removed from the ticket "${ticket.ticketName} by ${person.fullname}".\n\nThank you!`;
         await sendNotification(user, message);
 
         await ticket.populate({
@@ -385,7 +387,7 @@ async function removeMembersFromAgent(itemId, userId) {
     }
 }
 
-async function addMembersToEmployee(itemId, userId) {
+async function addMembersToEmployee(itemId, userId, adminId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
@@ -403,7 +405,8 @@ async function addMembersToEmployee(itemId, userId) {
             if (!user) {
                 console.log('User not found');
             }
-            const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName}". Please check the details and take necessary actions.\n\nThank you!`;
+            const person = await User.findById(adminId);
+            const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName} by ${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
             await sendNotification(user, message);
         }
         await ticket.populate({
@@ -423,7 +426,7 @@ async function addMembersToEmployee(itemId, userId) {
     }
 }
 
-async function removeMembersFromEmployee(itemId, userId) {
+async function removeMembersFromEmployee(itemId, userId, adminId) {
     try {
         const ticket = await Ticket.findById(itemId);
         if (!ticket) {
@@ -447,8 +450,8 @@ async function removeMembersFromEmployee(itemId, userId) {
         ticket.employee.splice(userIndex, 1);
 
         await ticket.save();
-
-        const message = `Hello ${user.fullname},\n\nYou have been removed from the ticket "${ticket.ticketName}".\n\nThank you!`;
+        const person = await User.findById(adminId);
+        const message = `Hello ${user.fullname},\n\nYou have been removed from the ticket "${ticket.ticketName} by ${person.fullname}".\n\nThank you!`;
         await sendNotification(user, message);
 
         await ticket.populate({

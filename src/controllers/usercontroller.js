@@ -215,7 +215,8 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserDetails = async (req, res) => {
   try {
     const {userId}=req.query;
-    const users = await userService.getUserDetails(userId); 
+    const users = await userService.getUserDetails(userId);
+    users.picture = users.imgUrl?users.imgUrl:""; 
     res.status(200).json(users); 
   } catch (error) {
     console.error(error);

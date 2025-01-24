@@ -269,9 +269,10 @@ async function updateItemInGroup(itemData, boardId, userId) {
             { $set: itemData },
             { new: true }
         );
+        const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: item.assignedToId } });
         const notificationPromises = users.map(async (user) => {
-            const message = `\n\nThe item "${item.itemName}" has been updated.\nPlease check the details and take necessary actions.\n\nThank you!`;
+            const message = `\n\nThe item "${item.itemName}" has been updated by ${person.fullname}.\nPlease check the details and take necessary actions.\n\nThank you!`;
             await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
@@ -281,7 +282,7 @@ async function updateItemInGroup(itemData, boardId, userId) {
     }
 }
 
-async function addMembersToItem(itemId, userId) {
+async function addMembersToItem(itemId, userId, adminId) {
     try {
         const item = await Item.findById(itemId);
         if (!item) {
@@ -299,7 +300,8 @@ async function addMembersToItem(itemId, userId) {
             if (!user) {
                 console.log('User not found');
             }
-            const message = `\n\nYou have been assigned to the item "${item.itemName}". Please check the details and take necessary actions.\n\nThank you!`;
+            const person = await User.findById(adminId);
+            const message = `\n\nYou have been assigned to the item "${item.itemName} by ${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
             await sendNotification(user, message);
         }
         await item.populate({
@@ -319,7 +321,7 @@ async function addMembersToItem(itemId, userId) {
     }
 }
 
-async function removeMembersFromItem(itemId, userId) {
+async function removeMembersFromItem(itemId, userId, adminId) {
     try {
         const item = await Item.findById(itemId);
         if (!item) {
@@ -343,8 +345,8 @@ async function removeMembersFromItem(itemId, userId) {
         item.assignedToId.splice(userIndex, 1);
 
         await item.save();
-
-        const message = `\n\nYou have been removed from the item "${item.itemName}".\n\nThank you!`;
+        const person = await User.findById(adminId);
+        const message = `\n\nYou have been removed from the item "${item.itemName} by ${person.fullname}".\n\nThank you!`;
         await sendNotification(user, message);
 
         await item.populate({

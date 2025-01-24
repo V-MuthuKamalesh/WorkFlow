@@ -126,15 +126,17 @@ module.exports = (io) => {
         });
 
         socket.on('addMembersToItem', async (data, callback) => {
+            const adminId = userId;
             const { itemId, userId, type } = data;
-            const updatedItem = await workspaceController.addMembersToItem(itemId, userId, type);
+            const updatedItem = await workspaceController.addMembersToItem(itemId, userId, type, adminId);
             callback(updatedItem);
         });
 
         socket.on('removeMembersFromItem', async (data, callback) => {
+            const adminId = userId;
             const { itemId, userId, type } = data;
             try {
-                const updatedItem = await workspaceController.removeMembersFromItem(itemId, userId, type);
+                const updatedItem = await workspaceController.removeMembersFromItem(itemId, userId, type, adminId);
                 callback(updatedItem);
             } catch (err) {
                 callback({ error: err.message });

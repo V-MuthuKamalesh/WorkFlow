@@ -288,21 +288,21 @@ async function updateItemInGroup(itemId, itemData, type, boardId, userId) {
     }
 }
 
-async function addMembersToItem(itemId, userId, type) {
+async function addMembersToItem(itemId, userId, type, adminId) {
     try {
         let item;
         if(type=="reporter"){
-            item = await devService.addMembersToReporter(itemId, userId);
+            item = await devService.addMembersToReporter(itemId, userId, adminId);
         }else if(type=="person"){
-            item = await devService.addMembersToTask(itemId, userId);
+            item = await devService.addMembersToTask(itemId, userId, adminId);
         }else if(type=="developer"){
-            item = await devService.addMembersToDeveloper(itemId, userId);
+            item = await devService.addMembersToDeveloper(itemId, userId, adminId);
         }else if(type=="agent"){
-            item = await service.addMembersToAgent(itemId, userId);
+            item = await service.addMembersToAgent(itemId, userId, adminId);
         }else if(type=="employee"){
-            item = await service.addMembersToEmployee(itemId, userId);
+            item = await service.addMembersToEmployee(itemId, userId, adminId);
         }else{
-            item = await workService.addMembersToItem(itemId, userId);
+            item = await workService.addMembersToItem(itemId, userId, adminId);
         }
         return item;
     } catch (err) {
@@ -310,21 +310,21 @@ async function addMembersToItem(itemId, userId, type) {
     }
 }
 
-async function removeMembersFromItem(itemId, userId, type) {
+async function removeMembersFromItem(itemId, userId, type, adminId) {
     try {
         let item;
         if(type=="reporter"){
-            item = await devService.removeMembersFromReporter(itemId, userId);
+            item = await devService.removeMembersFromReporter(itemId, userId, adminId);
         }else if(type=="person"){
-            item = await devService.removeMembersFromTask(itemId, userId);
+            item = await devService.removeMembersFromTask(itemId, userId, adminId);
         }else if(type=="developer"){
-            item = await devService.removeMembersFromDeveloper(itemId, userId);
+            item = await devService.removeMembersFromDeveloper(itemId, userId, adminId);
         }else if(type=="agent"){
-            item = await service.removeMembersFromAgent(itemId, userId);
+            item = await service.removeMembersFromAgent(itemId, userId, adminId);
         }else if(type=="employee"){
-            item = await service.removeMembersFromEmployee(itemId, userId);
+            item = await service.removeMembersFromEmployee(itemId, userId, adminId);
         }else{
-            item = await workService.removeMembersFromItem(itemId, userId);
+            item = await workService.removeMembersFromItem(itemId, userId, adminId);
         }
         return item;
     } catch (err) {
