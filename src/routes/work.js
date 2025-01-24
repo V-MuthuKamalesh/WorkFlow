@@ -9,17 +9,17 @@ module.exports = (io) => {
     
     io.on('connection', (socket) => {
         console.log('A user connected');
-        const userId = socket.userId;
+        const adminId = socket.userId;
         // Work-related events
         socket.on('getWorkspaces', async (data, callback) => {
             const {moduleId} = data;
-            const workspaces = await workspaceController.getWorkspaces(userId, moduleId);
+            const workspaces = await workspaceController.getWorkspaces(adminId, moduleId);
             callback(workspaces);
         });
 
         socket.on('getDashboardDetails', async (data, callback) => {
             const {moduleId, workspaceId} = data;
-            const workspaces = await workspaceController.getWorkspacesWithItemCounts(userId, moduleId, workspaceId);
+            const workspaces = await workspaceController.getWorkspacesWithItemCounts(adminId, moduleId, workspaceId);
             callback(workspaces);
         });
 
@@ -121,19 +121,17 @@ module.exports = (io) => {
 
         socket.on('updateItemInGroup', async (data, callback) => {
             const { itemId, updateData, type, boardId } = data;
-            const updatedItem = await workspaceController.updateItemInGroup(itemId, updateData, type, boardId, userId);
+            const updatedItem = await workspaceController.updateItemInGroup(itemId, updateData, type, boardId, adminId);
             callback(updatedItem);
         });
 
         socket.on('addMembersToItem', async (data, callback) => {
-            const adminId = userId;
             const { itemId, userId, type } = data;
             const updatedItem = await workspaceController.addMembersToItem(itemId, userId, type, adminId);
             callback(updatedItem);
         });
 
         socket.on('removeMembersFromItem', async (data, callback) => {
-            const adminId = userId;
             const { itemId, userId, type } = data;
             try {
                 const updatedItem = await workspaceController.removeMembersFromItem(itemId, userId, type, adminId);
