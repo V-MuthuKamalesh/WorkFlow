@@ -210,6 +210,26 @@ module.exports = (io) => {
                 callback({ error: err.message });
             }
         });
+
+        socket.on('getNotifications', async (data, callback) => {
+            try {
+                const notifications = await workspaceController.getNotifications(adminId);
+                callback(notifications);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });
+        
+        socket.on('updateNotifications', async (data, callback) => {
+            const { notifications } = data;
+            try {
+                const updatedUser = await workspaceController.updateNotifications(notifications);
+                callback(updatedUser);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });
+        
         socket.on('disconnect', () => {
             console.log('A user disconnected');
         });

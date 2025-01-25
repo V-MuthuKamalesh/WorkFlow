@@ -293,7 +293,7 @@ async function updateTicketInGroup(ticketData, boardId, userId) {
         const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: [...ticketData.employee, ...ticketData.agent] } });
         const notificationPromises = users.map(async (user) => {
-            const message = `The ticket "${ticket.ticketName}" has been updated by ${person.fullname}. Please review the updates.`;
+            const message = `${person.fullname} has updated the ticket "${ticket.ticketName}". Please review the updates.`;
             await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);

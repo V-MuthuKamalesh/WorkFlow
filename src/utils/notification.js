@@ -33,7 +33,7 @@ async function sendNotification(user, message) {
                     },
                 }
             );
-            console.log("Notification pushed to user");
+            // console.log("Notification pushed to user");
         } catch (dbError) {
             console.error('Error updating user notifications:', dbError);
         }

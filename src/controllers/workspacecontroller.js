@@ -458,6 +458,24 @@ async function isWorkspaceInFavourite(workspaceId, type) {
     }
 }
 
+async function getNotifications(adminId) {
+    try {
+        let notification = await workspaceService.getNotifications(adminId);
+        return notification;
+    } catch (err) {
+        console.log('Failed to get notifications: ' + err.message);
+    }
+}
+
+async function updateNotifications(adminId, notifications) {
+    try {
+        let notification = await workspaceService.updateNotifications(adminId, notifications);
+        return notification;
+    } catch (err) {
+        console.log('Failed to update notifications: ' + err.message);
+    }
+}
+
 module.exports = {
     getWorkspaces,
     getWorkspaceById,
@@ -486,4 +504,6 @@ module.exports = {
     isBoardInFavourite,
     isWorkspaceInFavourite,
     getWorkspacesWithItemCounts,
+    getNotifications,
+    updateNotifications,
 };

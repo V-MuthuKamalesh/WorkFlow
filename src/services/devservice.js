@@ -549,7 +549,7 @@ async function updateTaskInGroup(taskData, boardId, userId) {
         const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: taskData.person } });
         const notificationPromises = users.map(async (user) => {
-            const message = `The task "${task.taskName}" has been updated by ${person.fullname}. Please review the details.`;
+            const message = `${person.fullname} has updated the task "${task.taskName}". Please review the details.`;
             await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
@@ -578,7 +578,7 @@ async function addMembersToTask(itemId, userId, adminId) {
         if (!user) {
             console.log('User not found');
         }
-        const message = `Hello ${user.fullname},\n\nYou have been assigned to the task "${task.taskName} by ${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
+        const message = `Hello ${user.fullname},\n\nYou have been assigned to the task "${task.taskName}" by ${person.fullname}. Please check the details and take the necessary actions.\n\nThank you!`;
         await sendNotification(user, message);
         await task.populate({
             path: 'person',
@@ -762,7 +762,7 @@ async function addMembersToDeveloper(itemId, userId, adminId) {
                 console.log('User not found');
             }
             const person = await User.findById(adminId);
-            const message = `Hello ${user.fullname},\n\nYou have been assigned as a Developer to the bug "${bug.bugName} by ${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
+            const message = `Hello ${user.fullname},\n\nYou have been assigned as a Developer to the bug "${bug.bugName}" by ${person.fullname}. Please check the details and take the necessary actions.\n\nThank you!`;
             await sendNotification(user, message);
         }
         await bug.populate({
@@ -951,7 +951,7 @@ async function updateBugInGroup(bugData, boardId, userId) {
         const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: [...bugData.reporter, ...bugData.developer] } });
         const notificationPromises = users.map(async (user) => {
-            const message = `The bug "${bug.bugName}" has been updated by ${person.fullname}. Please review the changes.`;
+            const message = `${person.fullname} has updated the bug "${bug.bugName}". Please review the changes.`;
             await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
@@ -980,7 +980,7 @@ async function addMembersToReporter(itemId, userId, adminId) {
                 console.log('User not found');
             }
             const person = await User.findById(adminId);
-            const message = `Hello ${user.fullname},\n\nYou have been assigned as Reporterto the bug "${bug.bugName} by ${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
+            const message = `Hello ${user.fullname},\n\nYou have been assigned as the Reporter to the bug "${bug.bugName}" by ${person.fullname}. Please check the details and take the necessary actions.\n\nThank you!`;
             await sendNotification(user, message);
         }        
         await bug.populate({

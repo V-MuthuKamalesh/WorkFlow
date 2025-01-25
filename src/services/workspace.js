@@ -1,4 +1,4 @@
-const { Favourite, Module, Workspace, Board, Group } = require('../models/schema'); 
+const { Favourite, Module, User, Workspace, Board, Group } = require('../models/schema'); 
 const workService = require('../services/workservice');
 const devService = require('../services/devservice');
 const service = require('../services/service');
@@ -410,6 +410,39 @@ async function isBoardInFavourite(boardId, favouriteId) {
       console.error(`Error checking if workspace is in Favourite: ${error.message}`);
     }
   }
+
+  async function getNotifications(adminId) {
+    try {
+        const user = await User.findById(adminId).select('notifications');
+        if (!user) {
+            throw new Error('User not found');
+        }
+        return { notifications: user.notifications };
+    } catch (error) {
+        console.error(`Error retrieving notifications: ${error.message}`);
+        throw error;
+    }
+}
+
+async function updateNotifications(adminId, notifications) {
+    try {
+        const updatedUser = await User.findByIdAndUpdate(
+            adminId,
+            { notifications }, 
+            { new: true, fields: 'notifications' } 
+        );
+
+        if (!updatedUser) {
+            throw new Error('User not found');
+        }
+
+        return { notifications: updatedUser.notifications };
+    } catch (error) {
+        console.error(`Error updating notifications: ${error.message}`);
+        throw error;
+    }
+}
+
   
 
 module.exports = {
@@ -430,4 +463,6 @@ module.exports = {
     getFavourite,
     isBoardInFavourite,
     isWorkspaceInFavourite,
+    getNotifications,
+    updateNotifications,
 };

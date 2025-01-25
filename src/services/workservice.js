@@ -272,7 +272,7 @@ async function updateItemInGroup(itemData, boardId, userId) {
         const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: item.assignedToId } });
         const notificationPromises = users.map(async (user) => {
-            const message = `\n\nThe item "${item.itemName}" has been updated by ${person.fullname}.\nPlease check the details and take necessary actions.\n\nThank you!`;
+            const message = `${person.fullname} has updated the work "${work.workName}". Please review the updates.`;
             await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
