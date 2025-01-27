@@ -223,7 +223,7 @@ module.exports = (io) => {
         socket.on('updateNotifications', async (data, callback) => {
             const { notifications } = data;
             try {
-                const updatedUser = await workspaceController.updateNotifications(notifications);
+                const updatedUser = await workspaceController.updateNotifications(adminId, notifications);
                 callback(updatedUser);
             } catch (err) {
                 callback({ error: err.message });
