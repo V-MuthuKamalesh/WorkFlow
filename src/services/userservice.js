@@ -269,7 +269,7 @@ exports.getAllUsers = async () => {
 exports.getUserDetails = async (userId) => {
   try {
     const user = await User.findById(userId); 
-    return {fullname: user.fullname, email: user.email, picture: user.imgUrl};
+    return {fullname: user.fullname, email: user.email, picture: user.imgUrl || "", notifications:user.notifications};
   } catch (error) {
     console.log('Error fetching users');
     throw error;
