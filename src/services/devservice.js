@@ -980,7 +980,7 @@ async function addMembersToReporter(itemId, userId, adminId) {
                 console.log('User not found');
             }
             const person = await User.findById(adminId);
-            const message = `Hello ${user.fullname},\n\nYou have been assigned as the Reporter to the bug "${bug.bugName}" by ${person.fullname}. Please check the details and take the necessary actions.\n\nThank you!`;
+            const message = `Hello ${user.fullname},\n\nYou have been assigned as the Reporter to the bug "${bug.bugName}" by "${person.fullname}". Please check the details and take the necessary actions.\n\nThank you!`;
             await sendNotification(user, message);
         }        
         await bug.populate({

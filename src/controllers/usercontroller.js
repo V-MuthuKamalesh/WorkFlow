@@ -89,7 +89,6 @@ exports.email = async (req, res) => {
 };
 
 exports.verifyToken = (req, res, next) => {
-  console.log("Token Verification");
   const {token} = req.body;
   if (!token) {
     return res.status(401).json({ message: 'No token provided' });
@@ -109,7 +108,6 @@ exports.verifyToken = (req, res, next) => {
 
 exports.sendPasswordResetEmail = async (req, res) => {
   try {
-    console.log("Password Reset");
     const { email } = req.body;
     await userService.sendPasswordResetEmail(email);
     res.status(200).json({ message: 'Password reset email sent' });
@@ -133,7 +131,6 @@ exports.isUserWithEmailExists = async (req, res) => {
 
 exports.sendMessage = async (req, res) => {
   try {
-    console.log("Send message");
     const { userId, message } = req.body;
     await userService.sendMessage(userId, message);
     res.status(200).json({ message: 'Message Sent' });
@@ -145,7 +142,6 @@ exports.sendMessage = async (req, res) => {
 
 exports.addMemberToWorkspace = async (req, res) => {
   try {
-    console.log("Add member to workspace");
     const { token } = req.body;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const {workspaceId, userId, adminId, role} = decoded;
@@ -159,7 +155,6 @@ exports.addMemberToWorkspace = async (req, res) => {
 
 exports.removeMemberToWorkspace = async (req, res) => {
   try {
-    console.log("Remove member from workspace");
       const { workspaceId, userId, token } = req.body ;
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const adminId = decoded.userId;
@@ -192,7 +187,6 @@ exports.dePromote = async (req, res) => {
 
 exports.resetPassword = async (req, res) => {
   try {
-    console.log("Reset Password");
     const { token, newPassword } = req.body;
     await userService.resetPassword(token, newPassword);
     res.status(200).json({ message: 'Password updated successfully' });

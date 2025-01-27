@@ -272,7 +272,7 @@ async function updateItemInGroup(itemData, boardId, userId) {
         const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: item.assignedToId } });
         const notificationPromises = users.map(async (user) => {
-            const message = `${person.fullname} has updated the work "${work.workName}". Please review the updates.`;
+            const message = `${person.fullname} has updated the work "${item.itemName}". Please review the updates.`;
             await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
@@ -301,7 +301,7 @@ async function addMembersToItem(itemId, userId, adminId) {
                 console.log('User not found');
             }
             const person = await User.findById(adminId);
-            const message = `\n\nYou have been assigned to the item "${item.itemName} by ${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
+            const message = `\n\nYou have been assigned to the work "${item.itemName}" by "${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
             await sendNotification(user, message);
         }
         await item.populate({
@@ -346,7 +346,7 @@ async function removeMembersFromItem(itemId, userId, adminId) {
 
         await item.save();
         const person = await User.findById(adminId);
-        const message = `\n\nYou have been removed from the item "${item.itemName} by ${person.fullname}".\n\nThank you!`;
+        const message = `\n\nYou have been removed from the work "${item.itemName} by ${person.fullname}".\n\nThank you!`;
         await sendNotification(user, message);
 
         await item.populate({
