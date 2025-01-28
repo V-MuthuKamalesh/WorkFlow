@@ -511,7 +511,7 @@ async function promoteToAdmin(workspaceId, userId) {
       }
       workspace.members.push({ userId, role });
       await workspace.save();
-      const user = User.findById(userId);
+      const user = await User.findById(userId);
       return {member:{userId:user._id, fullname:user.fullname, email:user.email, role}};
     } catch (error) {
       console.error('Error adding member to workspace:', err);
