@@ -4,9 +4,8 @@ const devService = require('../services/devservice');
 const service = require('../services/service');
 const crmService = require('../services/crmservice');
 
-async function query(filterBy) {
+async function query(moduleId, userId) {
     try {
-        const { moduleId, userId } = filterBy;
         const module = await Module.findById(moduleId).populate({
             path: 'workspaces',
             select: 'workspaceName createdBy members',
@@ -15,7 +14,7 @@ async function query(filterBy) {
             console.log('Module not found');
         }
         // console.log(module);
-        
+
         const transformedWorkspaces = module.workspaces
         .filter(workspace => {
             return workspace.members.some(member => member.userId.toString() === userId);
@@ -86,29 +85,30 @@ async function getWorkspaceDetailsById(workspaceId) {
 }
 
 
-async function add(workspaceData) {
+async function add(workspaceData, moduleId, userId) {
     try {
         workspaceData.members = [{ userId :workspaceData.createdBy , role:"admin"}];
         const workspace = new Workspace(workspaceData);
         await workspace.save();
-        return {workspaceName:workspace.workspaceName, workspaceId: workspace._id};
+        await Module.findByIdAndUpdate(moduleId, { $push: { workspaces: workspace._id } });
+        return query(moduleId, userId);
     } catch (err) {
     }
 }
 
-async function update(id, workspaceData) {
+async function update(id, workspaceData, moduleId, userId) {
     try {
         const updatedWorkspace = await Workspace.findByIdAndUpdate(
             id,
             { $set: workspaceData },
             { new: true }
         );
-        return updatedWorkspace;
+        return {workspace:updatedWorkspace, all:await query(moduleId, userId)};
     } catch (err) {
     }
 }
 
-async function remove(workspaceId, moduleId) {
+async function remove(workspaceId, moduleId, userId) {
     try {
         const moduleUpdate = await Module.findOneAndUpdate(
             { _id: moduleId }, 
@@ -132,7 +132,7 @@ async function remove(workspaceId, moduleId) {
             { $pull: { workspaces: workspaceId } }
         );
         console.log(`Workspace with ID ${workspaceId} successfully removed from Module and deleted.`);
-        return workspaceId;
+        return query(moduleId, userId);
     } catch (err) {
         console.error('Error removing workspace:', err);
     }
@@ -281,7 +281,7 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
       if (!updatedFavourite) {
         console.log('Favourite not found');
       }
-      return updatedFavourite;
+      return getWorkspaceDetailsById(workspaceId);
     } catch (error) {
       console.error(`Error adding workspace to Favourite: ${error.message}`);
     }
@@ -297,7 +297,7 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
       if (!updatedFavourite) {
         console.log('Favourite not found');
       }
-      return updatedFavourite;
+      return {workspaceId};
     } catch (error) {
       console.error(`Error removing workspace from Favourite: ${error.message}`);
     }
@@ -313,7 +313,8 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
       if (!updatedFavourite) {
         console.log('Favourite not found');
       }
-      return updatedFavourite;
+      const board = await Board.findById(boardId);
+      return {board:{workspaceId:board.workspaceId, workspaceName:board.workspaceName, boardId:board._id, boardName:board.boardName, type:board.type}};
     } catch (error) {
       console.error(`Error adding board to Favourite: ${error.message}`);
     }
@@ -329,7 +330,7 @@ async function addFavouriteWorkspace(workspaceId, favouriteId) {
       if (!updatedFavourite) {
         console.log('Favourite not found');
       }
-      return updatedFavourite;
+      return {boardId};
     } catch (error) {
       console.error(`Error removing board from Favourite: ${error.message}`);
     }
@@ -443,6 +444,116 @@ async function updateNotifications(adminId, notifications) {
     }
 }
 
+async function promoteToAdmin(workspaceId, userId) {
+    try {
+        const workspace = await Workspace.findById(workspaceId);
+        if (!workspace) {
+            console.log('Workspace not found');
+            return 'Workspace not found';
+        }
+        const memberIndex = workspace.members.findIndex(
+            (member) => member.userId.toString() === userId
+        );
+        if (memberIndex === -1) {
+            return 'User is not a member of this workspace';
+        }
+        workspace.members[memberIndex].role = 'admin';
+        await workspace.save();
+        return {userId};
+    } catch (err) {
+        console.error('Error promoting member to admin:', err);
+        return 'An error occurred while promoting the user';
+    }
+  };
+
+  async function dePromoteToMember (workspaceId, userId)  {
+    try {
+        const workspace = await Workspace.findById(workspaceId);
+        if (!workspace) {
+            console.log('Workspace not found');
+            return 'Workspace not found';
+        }
+        const memberIndex = workspace.members.findIndex(
+            (member) => member.userId.toString() === userId
+        );
+        if (memberIndex === -1) {
+            return 'User is not a member of this workspace';
+        }
+        workspace.members[memberIndex].role = 'member';
+        await workspace.save();
+        return {userId};
+    } catch (err) {
+        console.error('Error promoting member to admin:', err);
+        return 'An error occurred while promoting the user';
+    }
+  };
+
+  async function addMemberToWorkspace (workspaceId, userId, adminId, role)  {
+    try {
+      const workspace = await Workspace.findById(workspaceId);
+      if (!workspace) {
+          console.log('Workspace not found');
+      }
+      const isAuthorized =
+        workspace.createdBy.toString() === adminId ||
+        workspace.members.some(
+          (member) => member.userId.toString() === adminId && member.role === 'admin'
+        );
+  
+      if (!isAuthorized) {
+        return 'You do not have permission to add a user to this workspace';
+      }
+      const isAlreadyMember = workspace.members.some(
+          member => member.userId.toString() === userId
+      );
+      if (isAlreadyMember) {
+          return 'User is already a member of this workspace';
+      }
+      workspace.members.push({ userId, role });
+      await workspace.save();
+      const user = User.findById(userId);
+      return {member:{userId:user._id, fullname:user.fullname, email:user.email, role}};
+    } catch (error) {
+      console.error('Error adding member to workspace:', err);
+    }  
+  };
+
+async function removeMemberFromWorkspace (workspaceId, userId, adminId) {
+    try {
+        const workspace = await Workspace.findById(workspaceId);
+        if (!workspace) {
+            console.log('Workspace not found');
+        }
+        const isAuthorized =
+        workspace.createdBy.toString() === adminId ||
+        workspace.members.some(
+          (member) => member.userId.toString() === adminId && member.role === 'admin'
+        );
+  
+        if (!isAuthorized) {
+          return 'You do not have permission to remove a user to this workspace';
+        }
+        
+        const isMember = workspace.members.some(
+            member => member.userId.toString() === userId
+        );
+        
+        if (!isMember) {
+            return 'User is not a member of this workspace';
+        }
+        
+        workspace.members = workspace.members.filter(
+            member => member.userId.toString() !== userId
+        );
+        
+        await workspace.save();
+        
+        return {userId};
+    } catch (err) {
+        console.error('Error removing member from workspace:', err);
+    }
+  }
+
   
 
 module.exports = {
@@ -465,4 +576,8 @@ module.exports = {
     isWorkspaceInFavourite,
     getNotifications,
     updateNotifications,
+    addMemberToWorkspace,
+    removeMemberFromWorkspace,
+    promoteToAdmin,
+    dePromoteToMember,
 };

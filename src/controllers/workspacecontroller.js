@@ -27,8 +27,7 @@ async function getWorkspacesWithItemCounts(userId, moduleId, workspaceId) {
 
 async function getWorkspaces(userId, moduleId) {
     try {
-        const filterBy = { moduleId, userId };
-        const workspaces = await workspaceService.query(filterBy);
+        const workspaces = await workspaceService.query(moduleId, userId);
         return workspaces;
     } catch (err) {
         console.log('Failed to get workspaces: ' + err.message);
@@ -59,28 +58,27 @@ async function getWorkspaceDetailsById(id) {
     }
 }
 
-async function createWorkspace(data) {
+async function createWorkspace(workspaceData, moduleId, adminId) {
     try {
-        const newWorkspace = await workspaceService.add(data);
-        await Module.findByIdAndUpdate(data.moduleId, { $push: { workspaces: newWorkspace.workspaceId } });
+        const newWorkspace = await workspaceService.add(workspaceData, moduleId, adminId);
         return newWorkspace;
     } catch (err) {
         console.log('Failed to create workspace: ' + err.message);
     }
 }
 
-async function updateWorkspace(id, updateData) {
+async function updateWorkspace(id, updateData, moduleId, adminId) {
     try {
-        const updatedWorkspace = await workspaceService.update(id, updateData);
+        const updatedWorkspace = await workspaceService.update(id, updateData, moduleId, adminId);
         return updatedWorkspace;
     } catch (err) {
         console.log('Failed to update workspace: ' + err.message);
     }
 }
 
-async function deleteWorkspace(id, moduleId) {
+async function deleteWorkspace(id, moduleId, adminId) {
     try {
-        const workspaceId = await workspaceService.remove(id, moduleId);
+        const workspaceId = await workspaceService.remove(id, moduleId, adminId);
         return workspaceId;
     } catch (err) {
         console.log('Failed to delete workspace: ' + err.message);
@@ -476,6 +474,44 @@ async function updateNotifications(adminId, notifications) {
     }
 }
 
+async function addMemberToWorkspace(token) {
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const {workspaceId, userId, adminId, role} = decoded;
+        let member = await workspaceService.addMemberToWorkspace(workspaceId, userId, adminId, role);
+        return member;
+    } catch (err) {
+        console.log('Failed to update notifications: ' + err.message);
+    }
+}
+
+async function removeMemberFromWorkspace(workspaceId, userId, adminId) {
+    try {
+        let member = await workspaceService.removeMemberFromWorkspace(workspaceId, userId, adminId);
+        return member;
+    } catch (err) {
+        console.log('Failed to update notifications: ' + err.message);
+    }
+}
+
+async function promoteToAdmin(workspaceId, userId) {
+    try {
+        let member = await workspaceService.promoteToAdmin(workspaceId, userId);
+        return member;
+    } catch (err) {
+        console.log('Failed to update notifications: ' + err.message);
+    }
+}
+
+async function dePromoteToMember(workspaceId, userId) {
+    try {
+        let member = await workspaceService.dePromoteToMember(workspaceId, userId);
+        return member;
+    } catch (err) {
+        console.log('Failed to update notifications: ' + err.message);
+    }
+}
+
 module.exports = {
     getWorkspaces,
     getWorkspaceById,
@@ -506,4 +542,8 @@ module.exports = {
     getWorkspacesWithItemCounts,
     getNotifications,
     updateNotifications,
+    addMemberToWorkspace,
+    removeMemberFromWorkspace,
+    promoteToAdmin,
+    dePromoteToMember,
 };

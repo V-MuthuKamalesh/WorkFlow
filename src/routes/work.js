@@ -44,33 +44,35 @@ module.exports = (io) => {
         socket.on('createWorkspace', async (data, callback) => {
             const { moduleId, workspaceData } = data;
             workspaceData.moduleId = moduleId;
-            const workspace = await workspaceController.createWorkspace(workspaceData);
-            emitResponse('createWorkspace', workspace, callback);
+            const workspace = await workspaceController.createWorkspace(workspaceData, moduleId, adminId);
+            emitResponse('workspacesUpdated', workspace, callback);
         });
 
         socket.on('updateWorkspaceById', async (data, callback) => {
-            const { id, updateData } = data;
-            const updatedWorkspace = await workspaceController.updateWorkspace(id, updateData);
-            emitResponse('updateWorkspaceById', updatedWorkspace, callback);
+            const { id, updateData, moduleId } = data;
+            const updatedWorkspace = await workspaceController.updateWorkspace(id, updateData, moduleId, adminId);
+            emitResponse('workspacesUpdated', updatedWorkspace.all, callback);
+            emitResponse('workspaceNameUpdated', updatedWorkspace.workspace, callback);
         });
 
         socket.on('deleteWorkspaceById', async (data, callback) => {
             const { id, moduleId } = data;
-            const result = await workspaceController.deleteWorkspace(id, moduleId);
-            emitResponse('deleteWorkspaceById', result, callback);
+            const result = await workspaceController.deleteWorkspace(id, moduleId, adminId);
+            emitResponse('workspacesUpdated', result, callback);
+            emitResponse('workspaceDeleted',id,callback);
         });
 
         // Board events
         socket.on('addBoardToWorkspace', async (data, callback) => {
             const { id, board } = data;
             const updatedWorkspace = await workspaceController.addBoardToWorkspace(id, board);
-            emitResponse('addBoardToWorkspace', updatedWorkspace, callback);
+            emitResponse('boardAdded', updatedWorkspace, callback);
         });
 
         socket.on('removeBoardFromWorkspace', async (data, callback) => {
             const { boardId } = data;
             const updatedWorkspace = await workspaceController.removeBoardFromWorkspace(boardId);
-            emitResponse('removeBoardFromWorkspace', updatedWorkspace, callback);
+            emitResponse('boardRemoved', updatedWorkspace, callback);
         });
 
         socket.on('updateBoardInWorkspace', async (data, callback) => {
@@ -229,6 +231,46 @@ module.exports = (io) => {
             try {
                 const updatedUser = await workspaceController.updateNotifications(adminId, notifications);
                 emitResponse('updateNotifications', updatedUser, callback);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });
+
+        socket.on('addMember', async (data, callback) => {
+            const { token } = data;
+            try {
+                const addedMember = await workspaceController.addMemberToWorkspace(token);
+                emitResponse('memberAdded', addedMember, callback);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });
+
+        socket.on('removeMember', async (data, callback) => {
+            const {workspaceId, userId } = data;
+            try {
+                const removedMember = await workspaceController.removeMemberFromWorkspace(workspaceId, userId, adminId);
+                emitResponse('memberRemoved', removedMember, callback);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });
+
+        socket.on('promoteToAdmin', async (data, callback) => {
+            const { workspaceId, userId } = data;
+            try {
+                const promotedMember = await workspaceController.promoteToAdmin(workspaceId, userId);
+                emitResponse('memberPromotedToAdmin', promotedMember, callback);
+            } catch (err) {
+                callback({ error: err.message });
+            }
+        });
+
+        socket.on('dePromoteToMember', async (data, callback) => {
+            const { workspaceId, userId } = data;
+            try {
+                const dePromotedMember = await workspaceController.dePromoteToMember(workspaceId, userId);
+                emitResponse('adminDePromotedToMember', dePromotedMember, callback);
             } catch (err) {
                 callback({ error: err.message });
             }
