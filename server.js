@@ -1,6 +1,5 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const cookieParser = require('cookie-parser');
 const cors= require('cors');
 require('dotenv').config();
 const http = require('http');
@@ -20,7 +19,6 @@ mongoose.connect(process.env.DATABASE_URL)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.log('Error connecting to MongoDB', err));
 
-app.use(cookieParser());
 app.use('/api/users', userRoutes); 
 app.use('/api', workRoutes(io)); 
 
