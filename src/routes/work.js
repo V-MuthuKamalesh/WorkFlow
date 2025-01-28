@@ -236,46 +236,6 @@ module.exports = (io) => {
             }
         });
 
-        socket.on('addMember', async (data, callback) => {
-            const { token } = data;
-            try {
-                const addedMember = await workspaceController.addMemberToWorkspace(token);
-                emitResponse('memberAdded', addedMember, callback);
-            } catch (err) {
-                callback({ error: err.message });
-            }
-        });
-
-        socket.on('removeMember', async (data, callback) => {
-            const {workspaceId, userId } = data;
-            try {
-                const removedMember = await workspaceController.removeMemberFromWorkspace(workspaceId, userId, adminId);
-                emitResponse('memberRemoved', removedMember, callback);
-            } catch (err) {
-                callback({ error: err.message });
-            }
-        });
-
-        socket.on('promoteToAdmin', async (data, callback) => {
-            const { workspaceId, userId } = data;
-            try {
-                const promotedMember = await workspaceController.promoteToAdmin(workspaceId, userId);
-                emitResponse('memberPromotedToAdmin', promotedMember, callback);
-            } catch (err) {
-                callback({ error: err.message });
-            }
-        });
-
-        socket.on('dePromoteToMember', async (data, callback) => {
-            const { workspaceId, userId } = data;
-            try {
-                const dePromotedMember = await workspaceController.dePromoteToMember(workspaceId, userId);
-                emitResponse('adminDePromotedToMember', dePromotedMember, callback);
-            } catch (err) {
-                callback({ error: err.message });
-            }
-        });
-
         socket.on('disconnect', () => {
             console.log('A user disconnected');
         });

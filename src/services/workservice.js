@@ -390,9 +390,6 @@ async function getWorkspacesWithItemCounts(moduleId, userId, workspaceId) {
                 },
             ],
         });
-        if (!module) {
-            console.log('Module not found');
-        }
         const filteredWorkspaces = module.workspaces.filter((workspace) =>
             workspace.members.some(member => member.userId.toString() === userId)
         );

@@ -5,10 +5,31 @@ const devService = require('../services/devservice');
 const service = require('../services/service');
 const crmService = require('../services/crmservice');
 
-const { Module } = require('../models/schema');
+async function isWorkspacePresent(workspaceId){
+    return workspaceService.isWorkspacePresent(workspaceId);
+}
+
+async function isModulePresent(moduleId){
+    return workspaceService.isModulePresent(moduleId);
+}
+
+async function isUserPresent(userId){
+    return workspaceService.isUserPresent(userId);
+}
+
+async function isBoardPresent(boardId){
+    return workspaceService.isBoardPresent(boardId);
+}
+
+async function isGroupPresent(groupId){
+    return workspaceService.isGroupPresent(groupId);
+}
 
 async function getWorkspacesWithItemCounts(userId, moduleId, workspaceId) {
     try {
+        if(!isUserPresent(userId) || !isModulePresent(moduleId) || !isWorkspacePresent(workspaceId)){
+            return null;
+        }
         let workspaces;
         if(moduleId==process.env.WORK){
             workspaces = await workService.getWorkspacesWithItemCounts(moduleId, userId, workspaceId);
@@ -27,6 +48,9 @@ async function getWorkspacesWithItemCounts(userId, moduleId, workspaceId) {
 
 async function getWorkspaces(userId, moduleId) {
     try {
+        if(!isUserPresent(userId) || !isModulePresent(moduleId)){
+            return null;
+        }
         const workspaces = await workspaceService.query(moduleId, userId);
         return workspaces;
     } catch (err) {
@@ -36,9 +60,10 @@ async function getWorkspaces(userId, moduleId) {
 
 async function getWorkspaceById(id) {
     try {
-        const workspace = await workspaceService.getById(id);
-        // console.log(workspace);
-        
+        if(!isWorkspacePresent(id)){
+            return null;
+        }
+        const workspace = await workspaceService.getById(id);        
         if (!workspace) console.log('Workspace not found');
         return workspace;
     } catch (err) {
@@ -48,9 +73,10 @@ async function getWorkspaceById(id) {
 
 async function getWorkspaceDetailsById(id) {
     try {
+        if(!isWorkspacePresent(id)){
+            return null;
+        }
         const workspace = await workspaceService.getWorkspaceDetailsById(id);
-        // console.log(workspace);
-        
         if (!workspace) console.log('Workspace not found');
         return workspace;
     } catch (err) {
@@ -60,6 +86,9 @@ async function getWorkspaceDetailsById(id) {
 
 async function createWorkspace(workspaceData, moduleId, adminId) {
     try {
+        if(!isModulePresent(moduleId) || !isUserPresent(adminId)){
+            return null;
+        }
         const newWorkspace = await workspaceService.add(workspaceData, moduleId, adminId);
         return newWorkspace;
     } catch (err) {
@@ -69,6 +98,9 @@ async function createWorkspace(workspaceData, moduleId, adminId) {
 
 async function updateWorkspace(id, updateData, moduleId, adminId) {
     try {
+        if(!isWorkspacePresent(id) || !isModulePresent(moduleId) || !isUserPresent(adminId)){
+            return null;
+        }
         const updatedWorkspace = await workspaceService.update(id, updateData, moduleId, adminId);
         return updatedWorkspace;
     } catch (err) {
@@ -78,6 +110,9 @@ async function updateWorkspace(id, updateData, moduleId, adminId) {
 
 async function deleteWorkspace(id, moduleId, adminId) {
     try {
+        if(!isWorkspacePresent(id) || !isModulePresent(moduleId) || !isUserPresent(adminId)){
+            return null;
+        }
         const workspaceId = await workspaceService.remove(id, moduleId, adminId);
         return workspaceId;
     } catch (err) {
@@ -87,6 +122,9 @@ async function deleteWorkspace(id, moduleId, adminId) {
 
 async function addBoardToWorkspace(id, boardData) {
     try {
+        if(!isWorkspacePresent(id)){
+            return null;
+        }
         const updatedWorkspace = await workspaceService.addBoard(id, boardData);
         return updatedWorkspace;
     } catch (err) {
@@ -96,6 +134,9 @@ async function addBoardToWorkspace(id, boardData) {
 
 async function removeBoardFromWorkspace(boardId) {
     try {
+        if(!isBoardPresent(boardId)){
+            return null;
+        }
         const updatedWorkspace = await workspaceService.removeBoard(boardId);
         return updatedWorkspace;
     } catch (err) {
@@ -105,6 +146,9 @@ async function removeBoardFromWorkspace(boardId) {
 
 async function updateBoardInWorkspace(boardId, boardData) {
     try {
+        if(!isBoardPresent(boardId)){
+            return null;
+        }
         const updatedWorkspace = await workspaceService.updateBoard(boardId, boardData);
         return updatedWorkspace;
     } catch (err) {
@@ -114,6 +158,9 @@ async function updateBoardInWorkspace(boardId, boardData) {
 
 async function getBoardById(boardId) {
     try {
+        if(!isBoardPresent(boardId)){
+            return null;
+        }
         const type = await workService.getType(boardId);
         let boardData;
         if(type=="Bug"){
@@ -141,6 +188,9 @@ async function getBoardById(boardId) {
 
 async function addGroupToBoard(boardId, groupData, itemId) {
     try {
+        if(!isBoardPresent(boardId)){
+            return null;
+        }
         const type = await workService.getType(boardId);
         let boardData;
         if(type=="Bug"){
@@ -165,7 +215,9 @@ async function addGroupToBoard(boardId, groupData, itemId) {
 
 async function removeGroupFromBoard(groupId,type) {
     try {
-        console.log(groupId, type);
+        if(!isGroupPresent(groupId)){
+            return null;
+        }
         let boardData;
         if(type=="Bug"){
             boardData = await devService.removeBugGroup(groupId);
@@ -189,6 +241,9 @@ async function removeGroupFromBoard(groupId,type) {
 
 async function updateGroupInBoard(groupId, groupData) {
     try {
+        if(!isGroupPresent(groupId)){
+            return null;
+        }
         let updatedGroup = await workspaceService.updateGroup(groupId,groupData);        
         return updatedGroup;
     } catch (err) {
@@ -198,6 +253,9 @@ async function updateGroupInBoard(groupId, groupData) {
 
 async function addItemToGroup(groupId, itemData, type, boardId) {
     try {
+        if(!isGroupPresent(groupId) || !isBoardPresent(boardId)){
+            return null;
+        }
         let updatedGroup;
         if(type=="Bug"){
             updatedGroup = await devService.addBugToGroup(groupId,itemData);
@@ -220,6 +278,9 @@ async function addItemToGroup(groupId, itemData, type, boardId) {
 
 async function addItem(itemData, type, boardId) {
     try {
+        if(!isBoardPresent(boardId)){
+            return null;
+        }
         let item;
         if(type=="Bug"){
             item = await devService.addBug(itemData);
@@ -265,6 +326,9 @@ async function removeItemFromGroup(itemId, type) {
 
 async function updateItemInGroup(itemId, itemData, type, boardId, userId) {
     try {
+        if(!isBoardPresent(boardId) || !isUserPresent(userId)){
+            return null;
+        }
         itemData._id=itemId;
         let item;
         if(type=="Bug"){
@@ -288,6 +352,9 @@ async function updateItemInGroup(itemId, itemData, type, boardId, userId) {
 
 async function addMembersToItem(itemId, userId, type, adminId) {
     try {
+        if(!isUserPresent(userId) || !isUserPresent(adminId)){
+            return null;
+        }
         let item;
         if(type=="reporter"){
             item = await devService.addMembersToReporter(itemId, userId, adminId);
@@ -310,6 +377,9 @@ async function addMembersToItem(itemId, userId, type, adminId) {
 
 async function removeMembersFromItem(itemId, userId, type, adminId) {
     try {
+        if(!isUserPresent(userId) || !isUserPresent(adminId)){
+            return null;
+        }
         let item;
         if(type=="reporter"){
             item = await devService.removeMembersFromReporter(itemId, userId, adminId);
@@ -332,6 +402,9 @@ async function removeMembersFromItem(itemId, userId, type, adminId) {
 
 async function addFavouriteWorkspace(workspaceId, type) {
     try {
+        if(!isWorkspacePresent(workspaceId)){
+            return null;
+        }
         let favouriteWorkspace;
         if(type=="work-management"){
             favouriteWorkspace = await workspaceService.addFavouriteWorkspace(workspaceId, process.env.FAV_WORK);
@@ -350,6 +423,9 @@ async function addFavouriteWorkspace(workspaceId, type) {
 
 async function removeFavouriteWorkspace(workspaceId, type) {
     try {
+        if(!isWorkspacePresent(workspaceId)){
+            return null;
+        }
         let favouriteWorkspace;
         if(type=="work-management"){
             favouriteWorkspace = await workspaceService.removeFavouriteWorkspace(workspaceId, process.env.FAV_WORK);
@@ -368,6 +444,9 @@ async function removeFavouriteWorkspace(workspaceId, type) {
 
 async function addBoardToFavourite(boardId, type) {
     try {
+        if(!isBoardPresent(boardId)){
+            return null;
+        }
         let favouriteWorkspace;
         if(type=="work-management"){
             favouriteWorkspace = await workspaceService.addBoardToFavourite(boardId, process.env.FAV_WORK);
@@ -386,6 +465,9 @@ async function addBoardToFavourite(boardId, type) {
 
 async function removeBoardFromFavourite(boardId, type) {
     try {
+        if(!isBoardPresent(boardId)){
+            return null;
+        }
         let favouriteWorkspace;
         if(type=="work-management"){
             favouriteWorkspace = await workspaceService.removeBoardFromFavourite(boardId, process.env.FAV_WORK);
@@ -404,6 +486,9 @@ async function removeBoardFromFavourite(boardId, type) {
 
 async function getFavourite(userId, type) {
     try {
+        if(!isUserPresent(userId)){
+            return null;
+        }
         let favouriteWorkspace;
         if(type=="work-management"){
             favouriteWorkspace = await workspaceService.getFavourite(userId, process.env.FAV_WORK);
@@ -422,6 +507,9 @@ async function getFavourite(userId, type) {
 
 async function isBoardInFavourite(boardId, type) {
     try {
+        if(!isBoardPresent(boardId)){
+            return null;
+        }
         let favouriteBoard;
         if(type=="work-management"){
             favouriteBoard = await workspaceService.isBoardInFavourite(boardId, process.env.FAV_WORK);
@@ -440,6 +528,9 @@ async function isBoardInFavourite(boardId, type) {
 
 async function isWorkspaceInFavourite(workspaceId, type) {
     try {
+        if(!isWorkspacePresent(workspaceId)){
+            return null;
+        }
         let favouriteWorkspace;
         if(type=="work-management"){
             favouriteWorkspace = await workspaceService.isWorkspaceInFavourite(workspaceId, process.env.FAV_WORK);
@@ -458,6 +549,9 @@ async function isWorkspaceInFavourite(workspaceId, type) {
 
 async function getNotifications(adminId) {
     try {
+        if(!isUserPresent(adminId)){
+            return null;
+        }
         let notification = await workspaceService.getNotifications(adminId);
         return notification;
     } catch (err) {
@@ -467,46 +561,11 @@ async function getNotifications(adminId) {
 
 async function updateNotifications(adminId, notifications) {
     try {
+        if(!isUserPresent(adminId)){
+            return null;
+        }
         let notification = await workspaceService.updateNotifications(adminId, notifications);
         return notification;
-    } catch (err) {
-        console.log('Failed to update notifications: ' + err.message);
-    }
-}
-
-async function addMemberToWorkspace(token) {
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const {workspaceId, userId, adminId, role} = decoded;
-        let member = await workspaceService.addMemberToWorkspace(workspaceId, userId, adminId, role);
-        return member;
-    } catch (err) {
-        console.log('Failed to update notifications: ' + err.message);
-    }
-}
-
-async function removeMemberFromWorkspace(workspaceId, userId, adminId) {
-    try {
-        let member = await workspaceService.removeMemberFromWorkspace(workspaceId, userId, adminId);
-        return member;
-    } catch (err) {
-        console.log('Failed to update notifications: ' + err.message);
-    }
-}
-
-async function promoteToAdmin(workspaceId, userId) {
-    try {
-        let member = await workspaceService.promoteToAdmin(workspaceId, userId);
-        return member;
-    } catch (err) {
-        console.log('Failed to update notifications: ' + err.message);
-    }
-}
-
-async function dePromoteToMember(workspaceId, userId) {
-    try {
-        let member = await workspaceService.dePromoteToMember(workspaceId, userId);
-        return member;
     } catch (err) {
         console.log('Failed to update notifications: ' + err.message);
     }
@@ -542,8 +601,4 @@ module.exports = {
     getWorkspacesWithItemCounts,
     getNotifications,
     updateNotifications,
-    addMemberToWorkspace,
-    removeMemberFromWorkspace,
-    promoteToAdmin,
-    dePromoteToMember,
 };

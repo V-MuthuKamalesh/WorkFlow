@@ -10,8 +10,11 @@ router.post('/signup', validationMiddleware(validateUser), userController.signup
 router.post('/resetemail',userController.sendPasswordResetEmail);
 router.post('/resetpassword',userController.resetPassword);
 router.post('/email',userController.email);
-// router.post('/addMember',userController.addMemberToWorkspace);
 router.use(authMiddleware);
+router.post('/addMember',userController.addMemberToWorkspace);
+router.post('/removeMember',userController.removeMemberToWorkspace);
+router.post('/promoteToAdmin',userController.promote);
+router.post('/dePromoteToMember',userController.dePromote);
 router.get('/getuserdetails',userController.getUserDetails);
 router.post('/checkRole',userController.checkRole);
 router.post('/tokenexpired',userController.verifyToken);

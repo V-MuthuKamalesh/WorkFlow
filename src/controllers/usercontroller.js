@@ -140,19 +140,6 @@ exports.sendMessage = async (req, res) => {
   }
 };
 
-exports.addMemberToWorkspace = async (req, res) => {
-  try {
-    const { token } = req.body;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const {workspaceId, userId, adminId, role} = decoded;
-    await userService.addMemberToWorkspace(workspaceId, userId, adminId, role);
-    res.status(200).json({ message: 'Invite email sent' });
-  } catch (error) {
-    console.error(error);
-    res.status(error.status || 500).json({ message:'User with given Email is not a user of Work Flow' });
-  }
-};
-
 exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
@@ -204,5 +191,50 @@ exports.checkRole = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error occured!' });
+  }
+}
+
+exports.addMemberToWorkspace = async (req, res) => {
+  try {
+    const { token } = req.body;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const {workspaceId, userId, adminId, role} = decoded;
+    await userService.addMemberToWorkspace(workspaceId, userId, adminId, role);
+    res.status(200).json({ message: 'Invite email sent' });
+  } catch (error) {
+    console.error(error);
+    res.status(error.status || 500).json({ message:'User with given Email is not a user of Work Flow' });
+  }
+};
+
+exports.removeMemberToWorkspace = async (req, res) => {
+  try {
+      const { workspaceId, userId, token } = req.body ;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const adminId = decoded.userId;
+      const response = await userService.removeMember(workspaceId, userId, adminId);
+      res.status(200).json({message:response});
+  } catch (err) {
+      console.log('Failed to remove member to workspace: ' + err.message);
+  }
+}
+
+exports.promote = async (req, res) => {
+  try {
+      const { workspaceId, userId } = req.body ;
+      const response = await userService.promote(workspaceId, userId);
+      res.status(200).json({message:response});
+  } catch (err) {
+      console.log('Failed to promote member to workspace: ' + err.message);
+  }
+}
+
+exports.dePromote = async (req, res) => {
+  try {
+      const { workspaceId, userId } = req.body ;
+      const response = await userService.dePromote(workspaceId, userId);
+      res.status(200).json({message:response});
+  } catch (err) {
+      console.log('Failed to promote member to workspace: ' + err.message);
   }
 }

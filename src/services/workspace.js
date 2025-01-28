@@ -4,6 +4,36 @@ const devService = require('../services/devservice');
 const service = require('../services/service');
 const crmService = require('../services/crmservice');
 
+async function isModulePresent(moduleId){
+    const mod = await Module.findById(moduleId);
+    if(mod) return true;
+    return false;
+}
+
+async function isUserPresent(userId){
+    const user = await User.findById(userId);
+    if(user) return true;
+    return false;
+}
+
+async function isWorkspacePresent(workspaceId){
+    const workspace = await Workspace.findById(workspaceId);
+    if(workspace) return true;
+    return false;
+}
+
+async function isBoardPresent(boardId){
+    const board = await Board.findById(boardId);
+    if(board) return true;
+    return false;
+}
+
+async function isGroupPresent(groupId){
+    const group = await Group.findById(groupId);
+    if(group) return true;
+    return false;
+}
+
 async function query(moduleId, userId) {
     try {
         const module = await Module.findById(moduleId).populate({
@@ -444,119 +474,12 @@ async function updateNotifications(adminId, notifications) {
     }
 }
 
-async function promoteToAdmin(workspaceId, userId) {
-    try {
-        const workspace = await Workspace.findById(workspaceId);
-        if (!workspace) {
-            console.log('Workspace not found');
-            return 'Workspace not found';
-        }
-        const memberIndex = workspace.members.findIndex(
-            (member) => member.userId.toString() === userId
-        );
-        if (memberIndex === -1) {
-            return 'User is not a member of this workspace';
-        }
-        workspace.members[memberIndex].role = 'admin';
-        await workspace.save();
-        return {userId};
-    } catch (err) {
-        console.error('Error promoting member to admin:', err);
-        return 'An error occurred while promoting the user';
-    }
-  };
-
-  async function dePromoteToMember (workspaceId, userId)  {
-    try {
-        const workspace = await Workspace.findById(workspaceId);
-        if (!workspace) {
-            console.log('Workspace not found');
-            return 'Workspace not found';
-        }
-        const memberIndex = workspace.members.findIndex(
-            (member) => member.userId.toString() === userId
-        );
-        if (memberIndex === -1) {
-            return 'User is not a member of this workspace';
-        }
-        workspace.members[memberIndex].role = 'member';
-        await workspace.save();
-        return {userId};
-    } catch (err) {
-        console.error('Error promoting member to admin:', err);
-        return 'An error occurred while promoting the user';
-    }
-  };
-
-  async function addMemberToWorkspace (workspaceId, userId, adminId, role)  {
-    try {
-      const workspace = await Workspace.findById(workspaceId);
-      if (!workspace) {
-          console.log('Workspace not found');
-      }
-      const isAuthorized =
-        workspace.createdBy.toString() === adminId ||
-        workspace.members.some(
-          (member) => member.userId.toString() === adminId && member.role === 'admin'
-        );
-  
-      if (!isAuthorized) {
-        return 'You do not have permission to add a user to this workspace';
-      }
-      const isAlreadyMember = workspace.members.some(
-          member => member.userId.toString() === userId
-      );
-      if (isAlreadyMember) {
-          return 'User is already a member of this workspace';
-      }
-      workspace.members.push({ userId, role });
-      await workspace.save();
-      const user = await User.findById(userId);
-      return {member:{userId:user._id, fullname:user.fullname, email:user.email, role}};
-    } catch (error) {
-      console.error('Error adding member to workspace:', err);
-    }  
-  };
-
-async function removeMemberFromWorkspace (workspaceId, userId, adminId) {
-    try {
-        const workspace = await Workspace.findById(workspaceId);
-        if (!workspace) {
-            console.log('Workspace not found');
-        }
-        const isAuthorized =
-        workspace.createdBy.toString() === adminId ||
-        workspace.members.some(
-          (member) => member.userId.toString() === adminId && member.role === 'admin'
-        );
-  
-        if (!isAuthorized) {
-          return 'You do not have permission to remove a user to this workspace';
-        }
-        
-        const isMember = workspace.members.some(
-            member => member.userId.toString() === userId
-        );
-        
-        if (!isMember) {
-            return 'User is not a member of this workspace';
-        }
-        
-        workspace.members = workspace.members.filter(
-            member => member.userId.toString() !== userId
-        );
-        
-        await workspace.save();
-        
-        return {userId};
-    } catch (err) {
-        console.error('Error removing member from workspace:', err);
-    }
-  }
-
-  
-
 module.exports = {
+    isModulePresent,
+    isUserPresent,
+    isWorkspacePresent,
+    isBoardPresent,
+    isGroupPresent,
     query,
     getById,
     getWorkspaceDetailsById,
@@ -576,8 +499,4 @@ module.exports = {
     isWorkspaceInFavourite,
     getNotifications,
     updateNotifications,
-    addMemberToWorkspace,
-    removeMemberFromWorkspace,
-    promoteToAdmin,
-    dePromoteToMember,
 };
