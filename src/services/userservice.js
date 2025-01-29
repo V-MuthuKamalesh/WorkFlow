@@ -66,7 +66,7 @@ exports.sendPasswordResetEmail = async (email) => {
   }
 
   const resetToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
-  const resetLink = `${process.env.FRONTEND_URL}/reset-password?token=${resetToken}`;
+  const resetLink = `${process.env.RESET_FRONTEND_URL}/reset-password?token=${resetToken}`;
   
   const transporter = nodemailer.createTransport({
     service: 'Gmail',
