@@ -204,7 +204,7 @@ async function updateLeadInGroup(leadData) {
             { $set: leadData },
             { new: true }
         );
-        return updatedLead;
+        return {item:updatedLead,messgae:null};
     } catch (err) {
         console.error('Error updating lead in group:', err);
     }

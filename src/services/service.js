@@ -292,12 +292,13 @@ async function updateTicketInGroup(ticketData, boardId, userId) {
         );
         const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: [...ticketData.employee, ...ticketData.agent] } });
+        let notification;
         const notificationPromises = users.map(async (user) => {
             const message = `${person.fullname} has updated the ticket "${ticket.ticketName}". Please review the updates.`;
             await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
-        return updatedTicket;
+        return {item:updatedTicket, message:notification};
     } catch (err) {
         console.error('Error updating ticket in group:', err);
     }
@@ -312,6 +313,7 @@ async function addMembersToAgent(itemId, userId, adminId) {
         const userAlreadyAssigned = ticket.agent.some(
             (id) => id.toString() === userId
         );
+        let notification;
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this ticket');
         }else{
@@ -323,7 +325,7 @@ async function addMembersToAgent(itemId, userId, adminId) {
             }
             const person = await User.findById(adminId);
             const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName} by ${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
-            await sendNotification(user, message);
+            notification = await sendNotification(user, message);
         }
         await ticket.populate({
             path: 'agent',
@@ -336,7 +338,7 @@ async function addMembersToAgent(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error adding members to ticket:', err);
     }
@@ -368,7 +370,7 @@ async function removeMembersFromAgent(itemId, userId, adminId) {
         await ticket.save();
         const person = await User.findById(adminId);
         const message = `Hello ${user.fullname},\n\nYou have been removed from the ticket "${ticket.ticketName} by ${person.fullname}".\n\nThank you!`;
-        await sendNotification(user, message);
+        let notification = await sendNotification(user, message);
 
         await ticket.populate({
             path: 'agent',
@@ -381,7 +383,7 @@ async function removeMembersFromAgent(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error removing members from ticket:', err);
     }
@@ -396,6 +398,7 @@ async function addMembersToEmployee(itemId, userId, adminId) {
         const userAlreadyAssigned = ticket.employee.some(
             (id) => id.toString() === userId
         );
+        let notification;
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this ticket');
         }else{
@@ -407,7 +410,7 @@ async function addMembersToEmployee(itemId, userId, adminId) {
             }
             const person = await User.findById(adminId);
             const message = `Hello ${user.fullname},\n\nYou have been assigned to the ticket "${ticket.ticketName} by ${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
-            await sendNotification(user, message);
+            notification = await sendNotification(user, message);
         }
         await ticket.populate({
             path: 'employee',
@@ -420,7 +423,7 @@ async function addMembersToEmployee(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error adding members to ticket:', err);
     }
@@ -452,7 +455,7 @@ async function removeMembersFromEmployee(itemId, userId, adminId) {
         await ticket.save();
         const person = await User.findById(adminId);
         const message = `Hello ${user.fullname},\n\nYou have been removed from the ticket "${ticket.ticketName} by ${person.fullname}".\n\nThank you!`;
-        await sendNotification(user, message);
+        let notification = await sendNotification(user, message);
 
         await ticket.populate({
             path: 'employee',
@@ -465,7 +468,7 @@ async function removeMembersFromEmployee(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error removing members from ticket:', err);
     }

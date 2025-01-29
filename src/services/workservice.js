@@ -271,12 +271,13 @@ async function updateItemInGroup(itemData, boardId, userId) {
         );
         const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: item.assignedToId } });
+        let notification;
         const notificationPromises = users.map(async (user) => {
             const message = `${person.fullname} has updated the work "${item.itemName}". Please review the updates.`;
-            await sendNotification(user, message);
+            notification = await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
-        return updatedItem;
+        return {item:updatedItem, message:notification};
     } catch (err) {
         console.error('Error updating item in group:', err);
     }
@@ -291,6 +292,7 @@ async function addMembersToItem(itemId, userId, adminId) {
         const userAlreadyAssigned = item.assignedToId.some(
             (id) => id.toString() === userId
         );
+        let notification;
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this item');
         }else{
@@ -302,7 +304,7 @@ async function addMembersToItem(itemId, userId, adminId) {
             }
             const person = await User.findById(adminId);
             const message = `\n\nYou have been assigned to the work "${item.itemName}" by "${person.fullname}". Please check the details and take necessary actions.\n\nThank you!`;
-            await sendNotification(user, message);
+            notification = await sendNotification(user, message);
         }
         await item.populate({
             path: 'assignedToId',
@@ -315,7 +317,7 @@ async function addMembersToItem(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error adding members to item:', err);
     }
@@ -347,7 +349,7 @@ async function removeMembersFromItem(itemId, userId, adminId) {
         await item.save();
         const person = await User.findById(adminId);
         const message = `\n\nYou have been removed from the work "${item.itemName} by ${person.fullname}".\n\nThank you!`;
-        await sendNotification(user, message);
+        let notification = await sendNotification(user, message);
 
         await item.populate({
             path: 'assignedToId',
@@ -360,7 +362,7 @@ async function removeMembersFromItem(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error removing members from item:', err);
     }

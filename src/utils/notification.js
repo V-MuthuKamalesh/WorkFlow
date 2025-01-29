@@ -17,7 +17,7 @@ async function sendNotification(user, message) {
         await sendEmail(user.email, emailSubject, emailBody);
     } finally {
         try {
-            await User.updateOne(
+            const updatedUser = await User.findOneAndUpdate(
                 { _id: user._id },
                 {
                     $push: {
@@ -31,8 +31,10 @@ async function sendNotification(user, message) {
                             $position: 0,
                         },
                     },
-                }
+                },
+                { new: true, projection: { notifications: 1 } }
             );
+            return updatedUser.notifications[0];
             // console.log("Notification pushed to user");
         } catch (dbError) {
             console.error('Error updating user notifications:', dbError);

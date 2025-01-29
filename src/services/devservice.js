@@ -548,12 +548,13 @@ async function updateTaskInGroup(taskData, boardId, userId) {
         );
         const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: taskData.person } });
+        let notification;
         const notificationPromises = users.map(async (user) => {
             const message = `${person.fullname} has updated the task "${task.taskName}". Please review the details.`;
-            await sendNotification(user, message);
+            notification = await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
-        return updatedTask;
+        return {item:updatedTask, message:notification};
     } catch (err) {
         console.error('Error updating task in group:', err);
     }
@@ -579,7 +580,7 @@ async function addMembersToTask(itemId, userId, adminId) {
             console.log('User not found');
         }
         const message = `Hello ${user.fullname},\n\nYou have been assigned to the task "${task.taskName}" by ${person.fullname}. Please check the details and take the necessary actions.\n\nThank you!`;
-        await sendNotification(user, message);
+        let notification = await sendNotification(user, message);
         await task.populate({
             path: 'person',
             select: '_id email fullname',
@@ -591,7 +592,7 @@ async function addMembersToTask(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error adding members to task:', err);
     }
@@ -623,7 +624,7 @@ async function removeMembersFromTask(itemId, userId, adminId) {
         await task.save();
         const person = await User.findById(adminId);
         const message = `Hello ${user.fullname},\n\nYou have been removed from the task "${task.taskName} by ${person.fullname}".\n\nThank you!`;
-        await sendNotification(user, message);
+        let notification = await sendNotification(user, message);
 
         await task.populate({
             path: 'person',
@@ -636,7 +637,7 @@ async function removeMembersFromTask(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error removing members from task:', err);
     }
@@ -737,7 +738,7 @@ async function updateSprintInGroup(sprintData) {
                 console.warn('Task group matching old sprintName not found');
             }
         }
-        return updatedSprint;
+        return {item:updatedSprint, message:null};
     } catch (err) {
         console.error('Error updating sprint in group:', err);
     }
@@ -752,6 +753,7 @@ async function addMembersToDeveloper(itemId, userId, adminId) {
         const userAlreadyAssigned = bug.developer.some(
             (id) => id.toString() === userId
         );
+        let notification;
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this bug');
         }else{
@@ -763,7 +765,7 @@ async function addMembersToDeveloper(itemId, userId, adminId) {
             }
             const person = await User.findById(adminId);
             const message = `Hello ${user.fullname},\n\nYou have been assigned as a Developer to the bug "${bug.bugName}" by ${person.fullname}. Please check the details and take the necessary actions.\n\nThank you!`;
-            await sendNotification(user, message);
+            notification = await sendNotification(user, message);
         }
         await bug.populate({
             path: 'developer',
@@ -776,7 +778,7 @@ async function addMembersToDeveloper(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error adding members to bug:', err);
     }
@@ -808,7 +810,7 @@ async function removeMembersFromDeveloper(itemId, userId, adminId) {
         await bug.save();
         const person = await User.findById(adminId);
         const message = `Hello ${user.fullname},\n\nYou have been removed as a Developer from the bug "${bug.bugName} by ${person.fullname}".\n\nThank you!`;
-        await sendNotification(user, message);
+        let notification = await sendNotification(user, message);
 
         await bug.populate({
             path: 'developer',
@@ -821,7 +823,7 @@ async function removeMembersFromDeveloper(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error removing members from bug:', err);
     }
@@ -879,6 +881,7 @@ async function removeBugFromGroup(bugId) {
         if (!group) {
             console.log('Group containing the bug not found');
         }
+        const users = await User.find({ _id: { $in: [...bug.reporter, ...bug.developer] } });
         group.bugs = group.bugs.filter((id) => id.toString() !== bugId);
         await group.save();
         await Bug.findByIdAndDelete(bugId);
@@ -895,7 +898,13 @@ async function removeBugFromGroup(bugId) {
                 },
             ],
         });
-        return {
+        const notificationPromises = users.map(async (user) => {
+            const message = `Bug "${bug.bugName}" has been removed from the group.`;
+            return sendNotification(user, message);
+        });
+
+        const notifications = await Promise.all(notificationPromises);
+        const item = {
             groupId: group._id,
             groupName: group.groupName,
             items: group.bugs.map((bug) => ({
@@ -915,6 +924,7 @@ async function removeBugFromGroup(bugId) {
                 status: bug.status || "",
             })),
         };
+        return {item, users, notifications};
     } catch (err) {
         console.error('Error removing bug from group:', err);
     }
@@ -950,12 +960,13 @@ async function updateBugInGroup(bugData, boardId, userId) {
         );
         const person = await User.findById(userId);
         const users = await User.find({ _id: { $in: [...bugData.reporter, ...bugData.developer] } });
+        let notification;
         const notificationPromises = users.map(async (user) => {
             const message = `${person.fullname} has updated the bug "${bug.bugName}". Please review the changes.`;
-            await sendNotification(user, message);
+            notification = await sendNotification(user, message);
         });
         await Promise.all(notificationPromises);
-        return updatedBug;
+        return {item:updatedBug,message:notification};
     } catch (err) {
         console.error('Error updating bug in group:', err);
     }
@@ -970,6 +981,7 @@ async function addMembersToReporter(itemId, userId, adminId) {
         const userAlreadyAssigned = bug.reporter.some(
             (id) => id.toString() === userId
         );
+        let notification;
         if (userAlreadyAssigned) {
             console.log('User is already assigned to this bug');
         }else{
@@ -981,7 +993,7 @@ async function addMembersToReporter(itemId, userId, adminId) {
             }
             const person = await User.findById(adminId);
             const message = `Hello ${user.fullname},\n\nYou have been assigned as the Reporter to the bug "${bug.bugName}" by "${person.fullname}". Please check the details and take the necessary actions.\n\nThank you!`;
-            await sendNotification(user, message);
+            notification = await sendNotification(user, message);
         }        
         await bug.populate({
             path: 'reporter',
@@ -994,7 +1006,7 @@ async function addMembersToReporter(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return {item:{ assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error adding members to bug:', err);
     }
@@ -1026,7 +1038,7 @@ async function removeMembersFromReporter(itemId, userId, adminId) {
         await bug.save();
         const person = await User.findById(adminId);
         const message = `Hello ${user.fullname},\n\nYou have been removed as Reporter from the bug "${bug.bugName} by ${person.fullname}".\n\nThank you!`;
-        await sendNotification(user, message);
+        let notification = await sendNotification(user, message);
 
         await bug.populate({
             path: 'reporter',
@@ -1039,7 +1051,7 @@ async function removeMembersFromReporter(itemId, userId, adminId) {
             fullname: assignedUser.fullname,
         }));
 
-        return { assignedToId: transformedAssignedTo };
+        return { item:{assignedToId: transformedAssignedTo}, message:notification };
     } catch (err) {
         console.error('Error removing members from bug:', err);
     }

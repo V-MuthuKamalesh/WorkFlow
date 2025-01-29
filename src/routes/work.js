@@ -4,13 +4,13 @@ const { socketAuthMiddleware } = require('../middlewares/auth');
 const router = express.Router();
 
 module.exports = (io) => {
-
+    const userSockets = {}; 
     io.use(socketAuthMiddleware);
 
     io.on('connection', (socket) => {
         console.log('A user connected');
         const adminId = socket.userId;
-        
+        userSockets[socket.userId] = socket.id;
         const emitResponse = (eventName, data, callback) => {
             io.emit(eventName, data); 
             callback(data); 
@@ -122,26 +122,40 @@ module.exports = (io) => {
         socket.on('removeItemFromGroup', async (data, callback) => {
             const { itemId, type } = data;
             const updatedGroup = await workspaceController.removeItemFromGroup(itemId, type);
-            emitResponse('removeItemFromGroup', updatedGroup, callback);
+            emitResponse('removeItemFromGroup', updatedGroup.item, callback);
+            if (updatedGroup.users && updatedGroup.notifications) {
+                updatedGroup.users.forEach((user, index) => {
+                    if (userSockets[user]) {
+                        io.to(userSockets[user]).emit("newNotification", updatedGroup.notifications[index]);
+                    }
+                });
+            }
         });
 
         socket.on('updateItemInGroup', async (data, callback) => {
             const { itemId, updateData, type, boardId } = data;
             const updatedItem = await workspaceController.updateItemInGroup(itemId, updateData, type, boardId, adminId);
-            emitResponse('updateItemInGroup', updatedItem, callback);
+            emitResponse('updateItemInGroup', updatedItem.item, callback);
+            if(updatedItem.message) emitResponse('newNotification', updatedItem.message, callback);
         });
 
         socket.on('addMembersToItem', async (data, callback) => {
             const { itemId, userId, type } = data;
             const updatedItem = await workspaceController.addMembersToItem(itemId, userId, type, adminId);
-            emitResponse('addMembersToItem', updatedItem, callback);
+            emitResponse('addMembersToItem', updatedItem.item, callback);
+            if (userSockets[userId]) {
+                io.to(userSockets[userId]).emit("newNotification", updatedItem.message);
+            }
         });
 
         socket.on('removeMembersFromItem', async (data, callback) => {
             const { itemId, userId, type } = data;
             try {
                 const updatedItem = await workspaceController.removeMembersFromItem(itemId, userId, type, adminId);
-                emitResponse('removeMembersFromItem', updatedItem, callback);
+                emitResponse('removeMembersFromItem', updatedItem.item, callback);
+                if (userSockets[userId]) {
+                    io.to(userSockets[userId]).emit("newNotification", updatedItem.message);
+                }
             } catch (err) {
                 callback({ error: err.message });
             }
@@ -238,6 +252,7 @@ module.exports = (io) => {
 
         socket.on('disconnect', () => {
             console.log('A user disconnected');
+            delete userSockets[socket.userId]; 
         });
     });
 
