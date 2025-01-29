@@ -97,6 +97,14 @@ exports.sendInviteMemberRequestEmail = async (email, role, workspaceId, adminId)
     error.status = 404;
   }
   const workspace = await Workspace.findById(workspaceId);
+  console.log(user._id.toString(), workspace.members);
+  const isAlreadyMember = workspace.members.some(
+    member => member.userId.toString() === user._id.toString()
+  );
+  if (isAlreadyMember) {
+    console.log(`User ${email} is already a member of workspace ${workspace.workspaceName}.`);
+    return true;
+  }
   const adminUser = await User.findById(adminId);
   const resetToken = jwt.sign({ userId: user._id, email: user.email, role,adminId, workspaceId }, JWT_SECRET, { expiresIn: '1h' });
   const resetLink = `${process.env.FRONTEND_URL}/invite-user?token=${resetToken}&name=${adminUser.fullname}&workspaceName=${workspace.workspaceName}`;
@@ -121,6 +129,7 @@ exports.sendInviteMemberRequestEmail = async (email, role, workspaceId, adminId)
       </div>
     `,
   });
+  return false;
 };
 
 exports.isUserWithEmailExists = async (email) => {
@@ -219,7 +228,8 @@ exports.addMemberToWorkspace = async (workspaceId, userId, adminId, role) => {
         member => member.userId.toString() === userId
     );
     if (isAlreadyMember) {
-        return 'User is already a member of this workspace';
+      console.log("User already present");
+      return null;
     }
     workspace.members.push({ userId, role });
     const updatedWorkspace = await workspace.save();

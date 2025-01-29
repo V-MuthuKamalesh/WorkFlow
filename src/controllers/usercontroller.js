@@ -121,8 +121,9 @@ exports.isUserWithEmailExists = async (req, res) => {
   try {
     const { email, role, workspaceId, adminId } = req.body;
     await userService.isUserWithEmailExists(email);
-    await userService.sendInviteMemberRequestEmail(email, role, workspaceId, adminId);
-    res.status(200).json({ message: 'Invite email sent' });
+    const response = await userService.sendInviteMemberRequestEmail(email, role, workspaceId, adminId);
+    if(response){ return res.status(409).json({message:"User Already Member"});}
+    else {return res.status(200).json({ message: 'Invite email sent' });}
   } catch (error) {
     console.error(error);
     res.status(error.status || 500).json({ message:'User with given Email is not a user of Work Flow' });
