@@ -195,12 +195,13 @@ exports.checkRole = async (req, res) => {
   }
 }
 
-exports.addMemberToWorkspace = async (req, res) => {
+exports.addMemberToWorkspace = async (req, res, io) => {
   try {
     const { token } = req.body;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const {workspaceId, userId, adminId, role} = decoded;
-    await userService.addMemberToWorkspace(workspaceId, userId, adminId, role);
+    const data = await userService.addMemberToWorkspace(workspaceId, userId, adminId, role);
+    io.emit("memberAdded",data);
     res.status(200).json({ message: 'Invite email sent' });
   } catch (error) {
     console.error(error);

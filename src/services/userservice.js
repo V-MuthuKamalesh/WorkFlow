@@ -232,10 +232,20 @@ exports.addMemberToWorkspace = async (workspaceId, userId, adminId, role) => {
       return null;
     }
     workspace.members.push({ userId, role });
-    const updatedWorkspace = await workspace.save();
-    return 'User added to Workspace successfully';
+    await workspace.save();
+    const membersDetails = await Promise.all(workspace.members.map(async (member) => {
+      const user = await User.findById(member.userId);
+      return {
+        userId: member.userId,
+        fullname: user.fullname,
+        email: user.email,
+        role: member.role
+      };
+    }));
+
+    return membersDetails;
   } catch (error) {
-    console.error('Error adding member to workspace:', err);
+    console.error('Error adding member to workspace:', error);
   }  
 };
 

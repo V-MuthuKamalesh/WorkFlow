@@ -12,6 +12,7 @@ const workRoutes = require('./src/routes/work');
 const app = express();
 const server = http.createServer(app);  
 const io = new Server(server); 
+app.set('io', io);
 app.use(express.json({limit:'50mb'}));
 app.use(cors());
 
@@ -19,7 +20,7 @@ mongoose.connect(process.env.DATABASE_URL)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.log('Error connecting to MongoDB', err));
 
-app.use('/api/users', userRoutes); 
+app.use('/api/users', userRoutes(io)); 
 app.use('/api', workRoutes(io)); 
 
 const PORT = process.env.PORT;
