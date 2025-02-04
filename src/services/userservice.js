@@ -256,7 +256,7 @@ exports.removeMember = async (workspaceId, userId, adminId) => {
           console.log('Workspace not found');
       }
       const isAuthorized =
-      workspace.createdBy.toString() === adminId ||
+      workspace.createdBy.toString() === adminId || userId === adminId ||
       workspace.members.some(
         (member) => member.userId.toString() === adminId && member.role === 'admin'
       );

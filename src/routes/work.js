@@ -167,7 +167,7 @@ module.exports = (io) => {
                 const updatedFavourite = await workspaceController.addFavouriteWorkspace(workspaceId, type);
                 emitResponse('addFavouriteWorkspace', updatedFavourite, callback);
             } catch (err) {
-                callback({ error: err.message });
+                console.log({ error: err.message });
             }
         });
 

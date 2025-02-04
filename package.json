@@ -2,9 +2,9 @@
   "name": "workflow",
   "version": "1.0.0",
   "description": "",
-  "main": "service.js",
+  "main": "server.js",
   "scripts": {
-    "start": "NODE_OPTIONS='--no-warnings' nodemon server.js"
+    "start": "nodemon server.js"
   },
   "author": "",
   "license": "ISC",
