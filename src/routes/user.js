@@ -11,6 +11,7 @@ module.exports = (io) => {
     router.post('/resetemail',userController.sendPasswordResetEmail);
     router.post('/resetpassword',userController.resetPassword);
     router.post('/email',userController.email);
+    router.post('/tokenexpired',userController.verifyToken);
     router.use(authMiddleware);
     router.post('/addMember',(req, res) => userController.addMemberToWorkspace(req, res, io));
     router.post('/removeMember',userController.removeMemberToWorkspace);
@@ -18,7 +19,6 @@ module.exports = (io) => {
     router.post('/dePromoteToMember',userController.dePromote);
     router.get('/getuserdetails',userController.getUserDetails);
     router.post('/checkRole',userController.checkRole);
-    router.post('/tokenexpired',userController.verifyToken);
     router.post('/sendinvite',userController.isUserWithEmailExists);
     router.post('/sendMessage',userController.sendMessage);
     router.get('/allusers',userController.getAllUsers);
