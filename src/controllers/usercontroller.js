@@ -88,22 +88,8 @@ exports.email = async (req, res) => {
   }
 };
 
-exports.verifyToken = (req, res, next) => {
-  const {token} = req.body;
-  if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.userId = decoded.userId;
-    res.status(200).json({message:'Valid Token'});
-  } catch (error) {
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Token expired' });
-    }
-    return res.status(401).json({ message: 'Invalid token' });
-  }
+exports.verifyToken = (req, res) => {
+  res.status(200).json({message:'Valid Token'});
 };
 
 exports.sendPasswordResetEmail = async (req, res) => {
@@ -186,7 +172,7 @@ exports.updateUser = async (req, res) => {
 
 exports.checkRole = async (req, res) => {
   try {
-    const { workspaceId, userId } = req.body;
+    const { workspaceId, userId } = req.query;
     const role = await userService.checkRole(workspaceId, userId);
     res.status(200).json(role);
   } catch (error) {
@@ -211,7 +197,7 @@ exports.addMemberToWorkspace = async (req, res, io) => {
 
 exports.removeMemberToWorkspace = async (req, res) => {
   try {
-      const { workspaceId, userId } = req.body ;
+      const { workspaceId, userId } = req.query ;
       const adminId = req.userId;
       const response = await userService.removeMember(workspaceId, userId, adminId);
       res.status(200).json({message:response});

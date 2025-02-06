@@ -11,17 +11,17 @@ module.exports = (io) => {
     router.post('/resetemail',userController.sendPasswordResetEmail);
     router.post('/resetpassword',userController.resetPassword);
     router.post('/email',userController.email);
-    router.post('/tokenexpired',userController.verifyToken);
     router.use(authMiddleware);
-    router.post('/addMember',(req, res) => userController.addMemberToWorkspace(req, res, io));
-    router.post('/removeMember',userController.removeMemberToWorkspace);
-    router.post('/promoteToAdmin',userController.promote);
-    router.post('/dePromoteToMember',userController.dePromote);
+    router.get('/tokenexpired',userController.verifyToken);
+    router.get('/allusers',userController.getAllUsers);
     router.get('/getuserdetails',userController.getUserDetails);
-    router.post('/checkRole',userController.checkRole);
+    router.get('/checkRole',userController.checkRole);
+    router.patch('/promoteToAdmin',userController.promote);
+    router.patch('/dePromoteToMember',userController.dePromote);
+    router.put('/updateUser',userController.updateUser);
+    router.post('/addMember',(req, res) => userController.addMemberToWorkspace(req, res, io));
     router.post('/sendinvite',userController.isUserWithEmailExists);
     router.post('/sendMessage',userController.sendMessage);
-    router.get('/allusers',userController.getAllUsers);
-    router.put('/updateUser',userController.updateUser);
+    router.delete('/removeMember',userController.removeMemberToWorkspace);
     return router;
 }

@@ -97,7 +97,7 @@ exports.sendInviteMemberRequestEmail = async (email, role, workspaceId, adminId)
     error.status = 404;
   }
   const workspace = await Workspace.findById(workspaceId);
-  console.log(user._id.toString(), workspace.members);
+  // console.log(user._id.toString(), workspace.members);
   const isAlreadyMember = workspace.members.some(
     member => member.userId.toString() === user._id.toString()
   );
