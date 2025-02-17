@@ -1,7 +1,12 @@
 const userService = require('../services/userservice');
+const { OAuth2Client } = require("google-auth-library");
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+
+const oauth2Client = new OAuth2Client({
+  clientId: process.env.GOOGLE_CLIENT_ID,
+});
 
 exports.signup = async (req, res) => {
   try {
@@ -51,16 +56,18 @@ exports.login = async (req, res) => {
 
 exports.OAuth = async (req, res) => {
   try {
-    const { email,name, picture} = req.body;
-    let user = await userService.findUserByEmail(email);
+    const { accessToken } = req.body;
+    const data = await oauth2Client.getTokenInfo(accessToken);
+    console.log(data);
+    let user = await userService.findUserByEmail(data.email);
     if (!user) {
       const password = crypto.randomBytes(32).toString('hex');
       const hashedPassword = await bcrypt.hash(password, 10);
       user = await userService.createUser({
-        email,
+        email: data.email,
         password: hashedPassword,
-        fullname:name,
-        imgUrl: picture ,
+        fullname:data.name,
+        imgUrl: data.picture ,
       });
     }
 
