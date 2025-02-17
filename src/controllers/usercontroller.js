@@ -58,7 +58,7 @@ exports.OAuth = async (req, res) => {
   try {
     const { accessToken } = req.body;
     const data = await oauth2Client.getTokenInfo(accessToken);
-    console.log(data);
+    // console.log(data);
     let user = await userService.findUserByEmail(data.email);
     if (!user) {
       const password = crypto.randomBytes(32).toString('hex');
